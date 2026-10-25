@@ -15,19 +15,29 @@ export default async function CompanySettingsPage() {
         description={
           c.isReadyToInvoice
             ? "Údaje dodávateľa na faktúrach a PDF."
-            : `${c.percentComplete}%: doplň povinné polia pred ďalšou faktúrou.`
+            : `${c.percentComplete}% hotové — doplň povinné polia.`
+        }
+        ledger={
+          <>
+            <span>
+              {c.completedRequired}/{c.totalRequired} povinných
+            </span>
+            <span className={c.isReadyToInvoice ? "text-positive" : "text-warning"}>
+              {c.isReadyToInvoice ? "Pripravené" : "Doplniť"}
+            </span>
+          </>
         }
       />
 
       {!c.isReadyToInvoice ? (
-        <ul className="mb-8 space-y-1 border-b border-border pb-8 text-[14px]">
+        <ul className="mb-6 max-w-[40rem] space-y-1 border border-border bg-surface px-4 py-3 text-[13px]">
           {c.items
             .filter((i) => i.isRequired && !i.isComplete)
             .map((i) => (
               <li key={i.key} className="text-warning">
                 {i.label}
                 {i.hint ? (
-                  <span className="text-muted-foreground">: {i.hint}</span>
+                  <span className="text-muted-foreground"> — {i.hint}</span>
                 ) : null}
               </li>
             ))}

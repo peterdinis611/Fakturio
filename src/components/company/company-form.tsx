@@ -12,14 +12,14 @@ import {
   companySchema,
   type CompanyFormValues,
 } from "@/lib/validations/company";
-
-type CompanyFormInput = z.input<typeof companySchema>;
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+
+type CompanyFormInput = z.input<typeof companySchema>;
 
 type CompanyFormProps = {
   initial: CompanySettings;
@@ -62,28 +62,38 @@ function toFormValues(initial: CompanySettings): CompanyFormInput {
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <p className="text-xs text-destructive">{message}</p>;
+  return <p className="text-[12px] text-negative">{message}</p>;
+}
+
+function Field({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <div className={cn("flex flex-col gap-1.5", className)}>{children}</div>;
 }
 
 function Section({
   title,
-  description,
+  hint,
   children,
 }: {
   title: string;
-  description?: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid gap-4 border-b border-border py-8 first:pt-0 last:border-0 last:pb-0 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:gap-8">
-      <div>
-        <h2 className="text-[16px] font-medium text-ink">{title}</h2>
-        {description ? (
-          <p className="mt-1 text-[14px] text-muted-foreground">{description}</p>
+    <section className="border-b border-rule py-7 last:border-0">
+      <div className="mb-4">
+        <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
+        {hint ? (
+          <p className="mt-0.5 text-[13px] text-muted-foreground">{hint}</p>
         ) : null}
       </div>
-      <div className="panel-soft flex flex-col gap-4">{children}</div>
-    </div>
+      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
+    </section>
   );
 }
 
@@ -135,194 +145,190 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     });
   }
 
-  const fieldClass = "flex flex-col gap-1.5";
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6"
+      className="mx-auto w-full max-w-[40rem]"
       noValidate
     >
-      <Section title="Identita"><div className="grid gap-4 sm:grid-cols-2">
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="name">Názov firmy</Label>
-            <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
-            <FieldError message={errors.name?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="legalForm">Právna forma</Label>
-            <Input id="legalForm" {...register("legalForm")} />
-            <FieldError message={errors.legalForm?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="ico">IČO</Label>
-            <Input id="ico" className="data-num" {...register("ico")} />
-            <FieldError message={errors.ico?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="dic">DIČ</Label>
-            <Input id="dic" className="data-num" {...register("dic")} />
-            <FieldError message={errors.dic?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="icDph">IČ DPH</Label>
-            <Input id="icDph" {...register("icDph")} />
-            <FieldError message={errors.icDph?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="isVatPayer"
-                checked={isVatPayer}
-                onCheckedChange={(checked) =>
-                  setValue("isVatPayer", checked === true)
-                }
-              />
-              <Label htmlFor="isVatPayer" className="font-normal">
-                Platca DPH
-              </Label>
-            </div>
-            <FieldError message={errors.isVatPayer?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="commercialRegister">Obchodný register</Label>
-            <Input id="commercialRegister" {...register("commercialRegister")} />
-            <FieldError message={errors.commercialRegister?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="email">E-mail</Label>
-            <Input id="email" type="email" {...register("email")} />
-            <FieldError message={errors.email?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="invoiceEmail">E-mail na faktúry</Label>
-            <Input id="invoiceEmail" type="email" {...register("invoiceEmail")} />
-            <FieldError message={errors.invoiceEmail?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="phone">Telefón</Label>
-            <Input id="phone" type="tel" {...register("phone")} />
-            <FieldError message={errors.phone?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="website">Web</Label>
-            <Input id="website" type="url" {...register("website")} />
-            <FieldError message={errors.website?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="contactPerson">Kontaktná osoba</Label>
-            <Input id="contactPerson" {...register("contactPerson")} />
-            <FieldError message={errors.contactPerson?.message} />
-          </div>
-        </div></Section>
-
-      <Section title="Adresa"><div className="grid gap-4 sm:grid-cols-2">
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="street">Ulica</Label>
-            <Input id="street" {...register("street")} />
-            <FieldError message={errors.street?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="city">Mesto</Label>
-            <Input id="city" {...register("city")} />
-            <FieldError message={errors.city?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="postalCode">PSČ</Label>
-            <Input id="postalCode" className="data-num" {...register("postalCode")} />
-            <FieldError message={errors.postalCode?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="country">Krajina</Label>
-            <Input id="country" {...register("country")} />
-            <FieldError message={errors.country?.message} />
-          </div>
-        </div></Section>
-
-      <Section title="Banka"><div className="grid gap-4 sm:grid-cols-2">
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="bankIban">IBAN</Label>
-            <Input id="bankIban" className="data-num text-sm" {...register("bankIban")} />
-            <FieldError message={errors.bankIban?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="bankBic">BIC / SWIFT</Label>
-            <Input id="bankBic" className="data-num text-sm" {...register("bankBic")} />
-            <FieldError message={errors.bankBic?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="bankName">Názov banky</Label>
-            <Input id="bankName" {...register("bankName")} />
-            <FieldError message={errors.bankName?.message} />
-          </div>
-        </div></Section>
-
-      <Section title="Predvolené hodnoty"><div className="grid gap-4 sm:grid-cols-2">
-          <div className={fieldClass}>
-            <Label htmlFor="defaultDueDays">Splatnosť (dni)</Label>
-            <Input
-              id="defaultDueDays"
-              type="number"
-              min={0}
-              max={365}
-              className="data-num"
-              {...register("defaultDueDays")}
+      <Section title="Identita" hint="Čo ide do hlavičky faktúry.">
+        <Field className="sm:col-span-2">
+          <Label htmlFor="name">Názov firmy</Label>
+          <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
+          <FieldError message={errors.name?.message} />
+        </Field>
+        <Field>
+          <Label htmlFor="legalForm">Právna forma</Label>
+          <Input id="legalForm" placeholder="s.r.o., SZČO…" {...register("legalForm")} />
+        </Field>
+        <Field>
+          <Label htmlFor="ico">IČO</Label>
+          <Input id="ico" className="data-num" {...register("ico")} />
+          <FieldError message={errors.ico?.message} />
+        </Field>
+        <Field>
+          <Label htmlFor="dic">DIČ</Label>
+          <Input id="dic" className="data-num" {...register("dic")} />
+        </Field>
+        <Field>
+          <Label htmlFor="icDph">IČ DPH</Label>
+          <Input id="icDph" {...register("icDph")} />
+        </Field>
+        <Field className="sm:col-span-2">
+          <div className="flex items-center gap-2.5 rounded-[4px] border border-border bg-surface px-3 py-2.5">
+            <Checkbox
+              id="isVatPayer"
+              checked={isVatPayer}
+              onCheckedChange={(checked) =>
+                setValue("isVatPayer", checked === true)
+              }
             />
-            <FieldError message={errors.defaultDueDays?.message} />
+            <Label htmlFor="isVatPayer" className="font-normal">
+              Platca DPH
+            </Label>
           </div>
-          <div className={fieldClass}>
-            <Label htmlFor="defaultVatRate">DPH (%)</Label>
-            <Input
-              id="defaultVatRate"
-              type="number"
-              min={0}
-              max={100}
-              step="0.01"
-              className="data-num"
-              {...register("defaultVatRate")}
-            />
-            <FieldError message={errors.defaultVatRate?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="defaultCurrency">Mena</Label>
-            <Input id="defaultCurrency" maxLength={3} className="data-num uppercase" {...register("defaultCurrency")} />
-            <FieldError message={errors.defaultCurrency?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="invoicePrefix">Prefix faktúr</Label>
-            <Input id="invoicePrefix" {...register("invoicePrefix")} />
-            <FieldError message={errors.invoicePrefix?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="defaultPaymentMethod">Spôsob platby</Label>
-            <Input id="defaultPaymentMethod" {...register("defaultPaymentMethod")} />
-            <FieldError message={errors.defaultPaymentMethod?.message} />
-          </div>
-          <div className={fieldClass}>
-            <Label htmlFor="defaultConstantSymbol">Konštantný symbol</Label>
-            <Input id="defaultConstantSymbol" className="data-num" {...register("defaultConstantSymbol")} />
-            <FieldError message={errors.defaultConstantSymbol?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="defaultInvoiceNotes">Predvolená poznámka na faktúre</Label>
-            <Textarea id="defaultInvoiceNotes" rows={3} {...register("defaultInvoiceNotes")} />
-            <FieldError message={errors.defaultInvoiceNotes?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="invoiceFooter">Pätička faktúry</Label>
-            <Textarea id="invoiceFooter" rows={3} {...register("invoiceFooter")} />
-            <FieldError message={errors.invoiceFooter?.message} />
-          </div>
-          <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label htmlFor="notes">Interné poznámky</Label>
-            <Textarea id="notes" rows={3} {...register("notes")} />
-            <FieldError message={errors.notes?.message} />
-          </div>
-        </div></Section>
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label htmlFor="commercialRegister">Obchodný register</Label>
+          <Input id="commercialRegister" {...register("commercialRegister")} />
+        </Field>
+        <Field>
+          <Label htmlFor="email">E-mail</Label>
+          <Input id="email" type="email" {...register("email")} />
+        </Field>
+        <Field>
+          <Label htmlFor="invoiceEmail">E-mail na faktúry</Label>
+          <Input id="invoiceEmail" type="email" {...register("invoiceEmail")} />
+        </Field>
+        <Field>
+          <Label htmlFor="phone">Telefón</Label>
+          <Input id="phone" type="tel" {...register("phone")} />
+        </Field>
+        <Field>
+          <Label htmlFor="website">Web</Label>
+          <Input id="website" type="url" {...register("website")} />
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label htmlFor="contactPerson">Kontaktná osoba</Label>
+          <Input id="contactPerson" {...register("contactPerson")} />
+        </Field>
+      </Section>
 
-      <div className="flex justify-end border-t border-border pt-4">
+      <Section title="Adresa">
+        <Field className="sm:col-span-2">
+          <Label htmlFor="street">Ulica</Label>
+          <Input id="street" {...register("street")} />
+        </Field>
+        <Field>
+          <Label htmlFor="city">Mesto</Label>
+          <Input id="city" {...register("city")} />
+        </Field>
+        <Field>
+          <Label htmlFor="postalCode">PSČ</Label>
+          <Input id="postalCode" className="data-num" {...register("postalCode")} />
+        </Field>
+        <Field>
+          <Label htmlFor="country">Krajina</Label>
+          <Input id="country" {...register("country")} />
+        </Field>
+      </Section>
+
+      <Section title="Banka" hint="Predvolený účet na faktúrach.">
+        <Field className="sm:col-span-2">
+          <Label htmlFor="bankIban">IBAN</Label>
+          <Input id="bankIban" className="data-num" {...register("bankIban")} />
+        </Field>
+        <Field>
+          <Label htmlFor="bankBic">BIC / SWIFT</Label>
+          <Input id="bankBic" className="data-num" {...register("bankBic")} />
+        </Field>
+        <Field>
+          <Label htmlFor="bankName">Názov banky</Label>
+          <Input id="bankName" {...register("bankName")} />
+        </Field>
+      </Section>
+
+      <Section title="Predvolené hodnoty" hint="Použijú sa pri novej faktúre.">
+        <Field>
+          <Label htmlFor="defaultDueDays">Splatnosť (dni)</Label>
+          <Input
+            id="defaultDueDays"
+            type="number"
+            min={0}
+            max={365}
+            className="data-num"
+            {...register("defaultDueDays")}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="defaultVatRate">DPH (%)</Label>
+          <Input
+            id="defaultVatRate"
+            type="number"
+            min={0}
+            max={100}
+            step="0.01"
+            className="data-num"
+            {...register("defaultVatRate")}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="defaultCurrency">Mena</Label>
+          <Input
+            id="defaultCurrency"
+            maxLength={3}
+            className="data-num uppercase"
+            {...register("defaultCurrency")}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="invoicePrefix">Prefix faktúr</Label>
+          <Input id="invoicePrefix" {...register("invoicePrefix")} />
+        </Field>
+        <Field>
+          <Label htmlFor="defaultPaymentMethod">Spôsob platby</Label>
+          <Input
+            id="defaultPaymentMethod"
+            placeholder="bank_transfer"
+            {...register("defaultPaymentMethod")}
+          />
+        </Field>
+        <Field>
+          <Label htmlFor="defaultConstantSymbol">Konštantný symbol</Label>
+          <Input
+            id="defaultConstantSymbol"
+            className="data-num"
+            {...register("defaultConstantSymbol")}
+          />
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label htmlFor="defaultInvoiceNotes">Poznámka na faktúre</Label>
+          <Textarea
+            id="defaultInvoiceNotes"
+            rows={3}
+            {...register("defaultInvoiceNotes")}
+          />
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label htmlFor="invoiceFooter">Pätička faktúry</Label>
+          <Textarea id="invoiceFooter" rows={3} {...register("invoiceFooter")} />
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label htmlFor="notes">Interné poznámky</Label>
+          <Textarea id="notes" rows={3} {...register("notes")} />
+        </Field>
+      </Section>
+
+      <div className="sticky bottom-0 -mx-1 flex items-center justify-between gap-3 border-t border-border bg-ground/95 px-1 py-4 backdrop-blur-[1px]">
+        <p className="text-[12px] text-muted-foreground">
+          Zmeny sa prejavia na nových faktúrach.
+        </p>
         <Button type="submit" disabled={pending}>
-          {mode === "onboarding" ? "Dokončiť onboarding" : "Uložiť firmu"}
+          {pending
+            ? "Ukladám…"
+            : mode === "onboarding"
+              ? "Dokončiť"
+              : "Uložiť firmu"}
         </Button>
       </div>
     </form>
