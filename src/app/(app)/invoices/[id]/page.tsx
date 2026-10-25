@@ -1,0 +1,206 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getInvoice } from "@/actions/invoices";
+import { InvoiceActions } from "@/components/invoices/invoice-actions";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { isApiError } from "@/lib/api/errors";
+import { emptyDash, formatDate, formatMoney } from "@/lib/format";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  try {
+    const inv = await getInvoice(id);
+    return { title: inv.number };
+  } catch {
+    return { title: "Faktúra" };
+  }
+}
+
+export default async function InvoiceDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  let invoice;
+  try {
+    invoice = await getInvoice(id);
+  } catch (e) {
+    if (isApiError(e) && e.status === 404) notFound();
+    throw e;
+  }
+
+  return (
+    <div>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <StatusBadge status={invoice.status} />
+            {invoice.isOverdue ? (
+              <span className="text-[12px] font-medium text-negative">
+                Po splatnosti
+              </span>
+            ) : null}
+          </div>
+          <h1 className="data-num text-[24px] font-semibold tracking-tight text-ink">
+            {invoice.number}
+          </h1>
+          <p className="mt-1 text-[14px] text-muted-foreground">
+            {invoice.customer.name} · splatnosť{" "}
+            <span className={invoice.isOverdue ? "text-negative" : undefined}>
+              {formatDate(invoice.dueDate)}
+            </span>
+          </p>
+          {/* Signature: platobný pás */}
+          <div className="ledger-strip mt-3 mb-0">
+            <span>VS {emptyDash(invoice.variableSymbol)}</span>
+            <span>IBAN {emptyDash(invoice.bankIban)}</span>
+            <span className="money text-ink">
+              {formatMoney(invoice.total, invoice.currency)}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {invoice.status === "Draft" ? (
+            <Button asChild variant="outline">
+              <Link href={`/invoices/${id}/edit`}>Upraviť</Link>
+            </Button>
+          ) : null}
+          <InvoiceActions invoice={invoice} />
+        </div>
+      </div>
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-2">
+        <div className="panel space-y-1 px-5 py-4 text-[14px]">
+          <h2 className="mb-2 text-[14px] font-medium text-ink">Odberateľ</h2>
+          <p className="font-medium">{invoice.customer.name}</p>
+          <p className="data-num text-[12px] text-muted-foreground">
+            IČO {emptyDash(invoice.customer.ico)}
+          </p>
+          <p className="text-muted-foreground">
+            {emptyDash(invoice.customer.street)}
+          </p>
+          <p className="text-muted-foreground">
+            {emptyDash(invoice.customer.postalCode)}{" "}
+            {emptyDash(invoice.customer.city)}
+          </p>
+        </div>
+        <div className="panel space-y-1 px-5 py-4 text-[14px]">
+          <h2 className="mb-2 text-[14px] font-medium text-ink">Platba</h2>
+          <p>Metóda: {emptyDash(invoice.paymentMethod)}</p>
+          <p className="data-num text-[12px]">
+            IBAN {emptyDash(invoice.bankIban)}
+          </p>
+          <p className="data-num text-[12px]">
+            BIC {emptyDash(invoice.bankBic)}
+          </p>
+          <p className="text-muted-foreground">
+            Vystavené {formatDate(invoice.issueDate)}
+          </p>
+          {invoice.paidAt ? (
+            <p className="text-positive">Zaplatené {formatDate(invoice.paidAt)}</p>
+          ) : null}
+          {invoice.cancelReason ? (
+            <p className="text-negative">Zrušené: {invoice.cancelReason}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="panel mb-6 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="text-[12px] text-muted-foreground">
+                Popis
+              </TableHead>
+              <TableHead className="text-right text-[12px] text-muted-foreground">
+                Množ.
+              </TableHead>
+              <TableHead className="text-[12px] text-muted-foreground">
+                MJ
+              </TableHead>
+              <TableHead className="text-right text-[12px] text-muted-foreground">
+                Cena
+              </TableHead>
+              <TableHead className="text-right text-[12px] text-muted-foreground">
+                DPH %
+              </TableHead>
+              <TableHead className="text-right text-[12px] text-muted-foreground">
+                Spolu
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoice.items.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.description}</TableCell>
+                <TableCell className="data-num text-right">
+                  {item.quantity}
+                </TableCell>
+                <TableCell>{item.unit}</TableCell>
+                <TableCell className="money text-right">
+                  {formatMoney(item.unitPrice, invoice.currency)}
+                </TableCell>
+                <TableCell className="data-num text-right">
+                  {item.vatRate}
+                </TableCell>
+                <TableCell className="money text-right">
+                  {formatMoney(item.total, invoice.currency)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="ml-auto max-w-xs space-y-1 text-[14px]">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Základ</span>
+          <span className="money">
+            {formatMoney(invoice.subtotal, invoice.currency)}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">DPH</span>
+          <span className="money">
+            {formatMoney(invoice.vatTotal, invoice.currency)}
+          </span>
+        </div>
+        <div className="flex justify-between border-t border-border pt-2 text-[16px]">
+          <span className="font-medium">Celkom</span>
+          <span className="money font-bold">
+            {formatMoney(invoice.total, invoice.currency)}
+          </span>
+        </div>
+      </div>
+
+      {invoice.notes ? (
+        <p className="panel mt-6 px-5 py-3 text-[14px] text-muted-foreground">
+          {invoice.notes}
+        </p>
+      ) : null}
+
+      <div className="mt-8">
+        <h2 className="mb-2 text-[16px] font-medium text-ink">PDF</h2>
+        <iframe
+          title={`PDF ${invoice.number}`}
+          src={`/api/pdf/${invoice.id}?disposition=inline`}
+          className="panel h-[70vh] w-full"
+        />
+      </div>
+    </div>
+  );
+}

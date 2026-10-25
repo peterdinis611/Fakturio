@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Fakturio palette — cool slate ledger + teal data hue (not purple / not cream-terracotta).
+  Light: paper slate ground, white sheets, deep ink.
+  Dark: charcoal elevation, cyan-teal chart signal.
+*/
+
+@theme inline {
+  --color-background: var(--ground);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist);
+  --color-sidebar-ring: var(--border);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-accent-foreground: var(--text);
+  --color-sidebar-accent: var(--raised);
+  --color-sidebar-primary-foreground: var(--primary-ink);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-foreground: var(--text);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-2);
+  --color-chart-4: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-3);
+  --color-ring: var(--ring);
+  --color-input: var(--control);
+  --color-border: var(--border);
+  --color-rule: var(--rule);
+  --color-control: var(--control);
+  --color-destructive: var(--negative);
+  --color-accent-foreground: var(--text);
+  --color-accent: var(--raised);
+  --color-muted-foreground: var(--muted);
+  --color-muted: var(--raised);
+  --color-secondary-foreground: var(--text);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-ink);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--text);
+  --color-popover: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-ink: var(--text);
+  --color-panel: var(--surface);
+  --color-signal: var(--negative);
+  --color-signal-foreground: #ffffff;
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --color-chart: var(--chart-3);
+  --color-ground: var(--ground);
+  --color-raised: var(--raised);
+  --color-active: var(--active);
+  --color-faint: var(--faint);
+  --color-soft: var(--soft);
+  --color-pill-positive-bg: var(--pill-positive-bg);
+  --color-pill-positive-ink: var(--pill-positive-ink);
+  --color-pill-negative-bg: var(--pill-negative-bg);
+  --color-pill-negative-ink: var(--pill-negative-ink);
+  --color-pill-warning-bg: var(--pill-warning-bg);
+  --color-pill-warning-ink: var(--pill-warning-ink);
+  --color-pill-neutral-bg: var(--pill-neutral-bg);
+  --color-pill-neutral-ink: var(--pill-neutral-ink);
+  --radius-sm: calc(var(--radius-control) - 2px);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-card);
+  --radius-xl: calc(var(--radius-card) + 4px);
+}
+
+:root {
+  --ground: #e8eef6;
+  --surface: #ffffff;
+  --soft: #f3f6fb;
+  --raised: #dde5f0;
+  --active: #d0dced;
+  --border: #c8d3e3;
+  --rule: #e6ecf5;
+  --control: #b8c5d8;
+  --text: #0c1524;
+  --muted: #5b6b82;
+  --faint: #7a8ba3;
+  --accent: #0c1524;
+  --primary: #0c1524;
+  --primary-ink: #f7fafc;
+  --secondary: #d7e0ec;
+  --ring: #0e7490;
+  --positive: #047857;
+  --negative: #c81e1e;
+  --warning: #b45309;
+  --chart-1: #0c1524;
+  --chart-2: #7a8ba3;
+  --chart-3: #0e7490;
+  --pill-positive-bg: #d1fae5;
+  --pill-positive-ink: #064e3b;
+  --pill-negative-bg: #fee2e2;
+  --pill-negative-ink: #7f1d1d;
+  --pill-warning-bg: #fef3c7;
+  --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #e2e8f0;
+  --pill-neutral-ink: #334155;
+  --radius-card: 10px;
+  --radius-control: 7px;
+  --radius: 10px;
+  --row-height: 44px;
+  --gap: 12px;
+  --pad: 24px;
+  --control-height: 36px;
+  --fs-title: 24px;
+  --fs-section: 16px;
+  --fs-kpi: 30px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+  --column: 1152px;
+  --sidebar-width: 232px;
+  --sidebar: #e0e8f2;
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-ink);
+  --sidebar-accent: var(--raised);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: #c0cddf;
+  --sidebar-ring: var(--ring);
+}
+
+.dark {
+  --ground: #0a0e14;
+  --surface: #121821;
+  --soft: #171e28;
+  --raised: #1a2330;
+  --active: #243044;
+  --border: #2a3648;
+  --rule: #1e2836;
+  --control: #3d4d63;
+  --text: #eef3f9;
+  --muted: #9aabbf;
+  --faint: #7d8fa5;
+  --accent: #eef3f9;
+  --primary: #e8eef7;
+  --primary-ink: #0a0e14;
+  --secondary: #1f2a3a;
+  --ring: #2dd4bf;
+  --positive: #34d399;
+  --negative: #f87171;
+  --warning: #fbbf24;
+  --chart-1: #eef3f9;
+  --chart-2: #7d8fa5;
+  --chart-3: #2dd4bf;
+  --pill-positive-bg: #064e3b;
+  --pill-positive-ink: #a7f3d0;
+  --pill-negative-bg: #7f1d1d;
+  --pill-negative-ink: #fecaca;
+  --pill-warning-bg: #78350f;
+  --pill-warning-ink: #fde68a;
+  --pill-neutral-bg: #1f2a3a;
+  --pill-neutral-ink: #cbd5e1;
+  --sidebar: #0d1219;
+  --sidebar-border: #1e2836;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-ground text-foreground antialiased;
+    font-size: var(--fs-body);
+    line-height: 20px;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+  html {
+    @apply font-sans;
+  }
+  .num,
+  .data-num,
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer utilities {
+  .app-column {
+    width: min(100%, var(--column));
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) {
+    .app-column {
+      padding-inline: 24px;
+    }
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+  .panel-soft {
+    background: var(--soft);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .ledger-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+  .data-num {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .money {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-track {
+    height: 8px;
+    background: var(--raised);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--chart-3);
+    border-radius: 3px;
+  }
+}
