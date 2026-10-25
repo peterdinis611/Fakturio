@@ -38,7 +38,7 @@ function NavLinks({
   const reduce = useReducedMotion();
 
   return (
-    <nav className="flex flex-1 flex-col gap-0.5 px-2">
+    <nav className="flex flex-1 flex-col gap-px px-2">
       {nav.map((item, i) => {
         const active =
           item.href === "/"
@@ -49,11 +49,11 @@ function NavLinks({
         return (
           <motion.div
             key={item.href}
-            initial={reduce ? false : { opacity: 0, x: -8 }}
+            initial={reduce ? false : { opacity: 0, x: -6 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
-              duration: 0.28,
-              delay: reduce ? 0 : 0.03 * i,
+              duration: 0.25,
+              delay: reduce ? 0 : 0.025 * i,
               ease: [0.22, 1, 0.36, 1],
             }}
           >
@@ -62,13 +62,19 @@ function NavLinks({
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[14px] transition-colors duration-150",
+                "relative flex h-9 items-center gap-2.5 px-2.5 text-[14px] transition-colors duration-150",
                 active
-                  ? "bg-active text-ink"
-                  : "text-muted-foreground hover:bg-raised hover:text-ink",
+                  ? "bg-active font-medium text-ink"
+                  : "text-muted-foreground hover:bg-raised/80 hover:text-ink",
               )}
             >
-              <Icon className="size-4 shrink-0 opacity-80" strokeWidth={1.5} />
+              {active ? (
+                <span
+                  aria-hidden
+                  className="absolute inset-y-1.5 left-0 w-0.5 bg-ink"
+                />
+              ) : null}
+              <Icon className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
               {item.label}
             </Link>
           </motion.div>
@@ -81,17 +87,14 @@ function NavLinks({
 function Brand({ companyName }: { companyName?: string }) {
   return (
     <Link href="/" className="block px-4 py-5">
-      <div className="flex items-center gap-2">
-        <span
-          aria-hidden
-          className="inline-block size-2 shrink-0 bg-ink"
-        />
-        <span className="text-[15px] font-semibold tracking-tight text-ink">
-          Fakturio
+      <div className="flex items-center gap-2.5">
+        <span className="stamp" aria-hidden>
+          F
         </span>
+        <span className="text-[16px] font-semibold text-ink">Fakturio</span>
       </div>
       {companyName ? (
-        <p className="mt-1 truncate pl-4 text-[12px] text-muted-foreground">
+        <p className="mt-1.5 truncate text-[12px] text-muted-foreground">
           {companyName}
         </p>
       ) : null}
@@ -106,14 +109,16 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
 
   return (
     <>
-      {/* Mobile top strip */}
-      <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-border bg-sidebar px-4 md:hidden">
-        <Link href="/" className="text-[15px] font-semibold tracking-tight text-ink">
-          Fakturio
+      <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 md:hidden">
+        <Link href="/" className="flex items-center gap-2 text-ink">
+          <span className="stamp" aria-hidden>
+            F
+          </span>
+          <span className="text-[15px] font-semibold">Fakturio</span>
         </Link>
         <button
           type="button"
-          className="inline-flex size-9 items-center justify-center rounded-[7px] text-muted-foreground hover:bg-raised hover:text-ink"
+          className="inline-flex size-9 items-center justify-center text-muted-foreground hover:bg-raised hover:text-ink"
           aria-expanded={open}
           aria-label={open ? "Zavrieť menu" : "Otvoriť menu"}
           onClick={() => setOpen((v) => !v)}
@@ -133,35 +138,32 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
           >
             <button
               type="button"
-              className="absolute inset-0 bg-ink/20"
+              className="absolute inset-0 bg-ink/25"
               aria-label="Zavrieť"
               onClick={() => setOpen(false)}
             />
             <motion.aside
-              className="absolute inset-y-0 left-0 flex w-[min(100%,16rem)] flex-col border-r border-sidebar-border bg-sidebar"
-              initial={reduce ? false : { x: -24 }}
+              className="absolute inset-y-0 left-0 flex w-[min(100%,14rem)] flex-col border-r border-sidebar-border bg-sidebar"
+              initial={reduce ? false : { x: -20 }}
               animate={{ x: 0 }}
-              exit={{ x: -24 }}
+              exit={{ x: -20 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <Brand companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
                 <ThemeToggle />
-                <p className="px-2.5 py-1 text-[11px] text-faint">SK · EUR</p>
               </div>
             </motion.aside>
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <Brand companyName={companyName} />
         <NavLinks pathname={pathname} />
         <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
           <ThemeToggle />
-          <p className="px-2.5 py-1 text-[11px] text-faint">SK · EUR</p>
         </div>
       </aside>
     </>

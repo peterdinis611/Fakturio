@@ -3,21 +3,33 @@ import { statusLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const styles: Record<InvoiceStatus, string> = {
-  Draft: "bg-pill-neutral-bg text-pill-neutral-ink",
-  Issued: "bg-pill-neutral-bg text-ink",
-  Paid: "bg-pill-positive-bg text-pill-positive-ink",
-  Cancelled: "bg-transparent text-muted-foreground line-through",
-  Overdue: "bg-pill-negative-bg text-pill-negative-ink",
+  Draft: "text-muted-foreground",
+  Issued: "text-ink",
+  Paid: "text-positive",
+  Cancelled: "text-muted-foreground line-through",
+  Overdue: "text-negative",
+};
+
+const dots: Record<InvoiceStatus, string> = {
+  Draft: "bg-faint",
+  Issued: "bg-ink",
+  Paid: "bg-positive",
+  Cancelled: "bg-faint",
+  Overdue: "bg-negative",
 };
 
 export function StatusBadge({ status }: { status: InvoiceStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-[6px] px-1.5 py-0.5 text-[12px] font-medium",
+        "inline-flex items-center gap-1.5 text-[13px] font-medium",
         styles[status],
       )}
     >
+      <span
+        aria-hidden
+        className={cn("size-1.5 shrink-0 rounded-none", dots[status])}
+      />
       {statusLabel[status]}
     </span>
   );

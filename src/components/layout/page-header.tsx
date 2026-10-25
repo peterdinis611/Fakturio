@@ -19,7 +19,7 @@ export function PageHeader({
       <header>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.01em] text-ink">
+            <h1 className="text-[22px] font-semibold leading-tight text-ink">
               {title}
             </h1>
             {description ? (

@@ -75,16 +75,12 @@ export default async function CustomerDetailPage({
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         <div className="panel space-y-2 px-4 py-4 text-sm">
-          <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            Kontakt
-          </h2>
+          <h2 className="text-[14px] font-medium text-ink">Kontakt</h2>
           <p>{emptyDash(customer.email)}</p>
           <p>{emptyDash(customer.phone)}</p>
         </div>
         <div className="panel space-y-2 px-4 py-4 text-sm">
-          <h2 className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            Adresa
-          </h2>
+          <h2 className="text-[14px] font-medium text-ink">Adresa</h2>
           <p>{emptyDash(customer.street)}</p>
           <p>
             {emptyDash(customer.postalCode)} {emptyDash(customer.city)}
@@ -93,9 +89,7 @@ export default async function CustomerDetailPage({
         </div>
       </div>
 
-      <h2 className="mb-3 text-sm font-medium uppercase tracking-[0.12em] text-muted-foreground">
-        Faktúry
-      </h2>
+      <h2 className="mb-3 text-[15px] font-medium text-ink">Faktúry</h2>
       {invoices.items.length === 0 ? (
         <p className="panel px-4 py-6 text-sm text-muted-foreground">
           Zatiaľ žiadne faktúry pre tohto zákazníka.

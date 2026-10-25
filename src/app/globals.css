@@ -5,19 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Fakturio palette — cool slate ledger + teal data hue (not purple / not cream-terracotta).
-  Light: paper slate ground, white sheets, deep ink.
-  Dark: charcoal elevation, cyan-teal chart signal.
+  Anti-slop ledger face
+  - IBM Plex (not Geist/Inter)
+  - Chrome: ink only; teal (#0f766e) only on money series
+  - Surfaces: tone step, not hairline boxes everywhere
+  - Signature: invoice stamp mark + platobný pás
 */
 
 @theme inline {
   --color-background: var(--ground);
   --color-foreground: var(--text);
-  --font-sans: var(--font-geist);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-geist);
+  --font-sans: var(--font-plex);
+  --font-mono: var(--font-plex-mono);
+  --font-heading: var(--font-plex);
   --color-sidebar-ring: var(--border);
-  --color-sidebar-border: var(--border);
+  --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--text);
   --color-sidebar-accent: var(--raised);
   --color-sidebar-primary-foreground: var(--primary-ink);
@@ -68,100 +70,95 @@
   --color-pill-warning-ink: var(--pill-warning-ink);
   --color-pill-neutral-bg: var(--pill-neutral-bg);
   --color-pill-neutral-ink: var(--pill-neutral-ink);
-  --radius-sm: calc(var(--radius-control) - 2px);
-  --radius-md: var(--radius-control);
-  --radius-lg: var(--radius-card);
-  --radius-xl: calc(var(--radius-card) + 4px);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
 }
 
 :root {
-  --ground: #e8eef6;
-  --surface: #ffffff;
-  --soft: #f3f6fb;
-  --raised: #dde5f0;
-  --active: #d0dced;
-  --border: #c8d3e3;
-  --rule: #e6ecf5;
-  --control: #b8c5d8;
-  --text: #0c1524;
-  --muted: #5b6b82;
-  --faint: #7a8ba3;
-  --accent: #0c1524;
-  --primary: #0c1524;
-  --primary-ink: #f7fafc;
-  --secondary: #d7e0ec;
-  --ring: #0e7490;
-  --positive: #047857;
-  --negative: #c81e1e;
-  --warning: #b45309;
-  --chart-1: #0c1524;
-  --chart-2: #7a8ba3;
-  --chart-3: #0e7490;
-  --pill-positive-bg: #d1fae5;
-  --pill-positive-ink: #064e3b;
-  --pill-negative-bg: #fee2e2;
-  --pill-negative-ink: #7f1d1d;
-  --pill-warning-bg: #fef3c7;
+  /* Cool stone paper — no yellow-cream (inspector palette-cream) */
+  --ground: #eef0f3;
+  --surface: #f7f8fa;
+  --soft: #e8eaee;
+  --raised: #e2e5ea;
+  --active: #d8dce3;
+  --border: #cdd2da;
+  --rule: #e6e9ee;
+  --control: #b8bec8;
+  --text: #12151a;
+  --muted: #5a6270;
+  --faint: #7a8494;
+  --accent: #12151a;
+  --primary: #12151a;
+  --primary-ink: #f7f8fa;
+  --secondary: #e2e5ea;
+  --ring: #0f766e;
+  --positive: #166534;
+  --negative: #b91c1c;
+  --warning: #92400e;
+  --chart-1: #141414;
+  --chart-2: #787870;
+  --chart-3: #0f766e;
+  --pill-positive-bg: transparent;
+  --pill-positive-ink: #166534;
+  --pill-negative-bg: transparent;
+  --pill-negative-ink: #b91c1c;
+  --pill-warning-bg: #f5f0e6;
   --pill-warning-ink: #92400e;
-  --pill-neutral-bg: #e2e8f0;
-  --pill-neutral-ink: #334155;
-  --radius-card: 10px;
-  --radius-control: 7px;
-  --radius: 10px;
+  --pill-neutral-bg: transparent;
+  --pill-neutral-ink: #5c5c56;
+  --radius-card: 4px;
+  --radius-control: 4px;
+  --radius: 4px;
   --row-height: 44px;
-  --gap: 12px;
+  --gap: 16px;
   --pad: 24px;
   --control-height: 36px;
-  --fs-title: 24px;
-  --fs-section: 16px;
-  --fs-kpi: 30px;
+  --fs-title: 22px;
+  --fs-section: 15px;
+  --fs-kpi: 28px;
   --fs-body: 14px;
   --fs-small: 12px;
   --column: 1152px;
-  --sidebar-width: 232px;
-  --sidebar: #e0e8f2;
-  --sidebar-foreground: var(--text);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-ink);
-  --sidebar-accent: var(--raised);
-  --sidebar-accent-foreground: var(--text);
-  --sidebar-border: #c0cddf;
-  --sidebar-ring: var(--ring);
+  --sidebar-width: 220px;
+  --sidebar: #e6e9ee;
+  --sidebar-border: #cdd2da;
 }
 
 .dark {
-  --ground: #0a0e14;
-  --surface: #121821;
-  --soft: #171e28;
-  --raised: #1a2330;
-  --active: #243044;
-  --border: #2a3648;
-  --rule: #1e2836;
-  --control: #3d4d63;
-  --text: #eef3f9;
-  --muted: #9aabbf;
-  --faint: #7d8fa5;
-  --accent: #eef3f9;
-  --primary: #e8eef7;
-  --primary-ink: #0a0e14;
-  --secondary: #1f2a3a;
+  --ground: #111110;
+  --surface: #1a1a18;
+  --soft: #161614;
+  --raised: #242422;
+  --active: #2e2e2a;
+  --border: #33332e;
+  --rule: #262622;
+  --control: #4a4a44;
+  --text: #f2f2ee;
+  --muted: #a3a39a;
+  --faint: #8a8a80;
+  --accent: #f2f2ee;
+  --primary: #f2f2ee;
+  --primary-ink: #111110;
+  --secondary: #242422;
   --ring: #2dd4bf;
-  --positive: #34d399;
+  --positive: #4ade80;
   --negative: #f87171;
   --warning: #fbbf24;
-  --chart-1: #eef3f9;
-  --chart-2: #7d8fa5;
+  --chart-1: #f2f2ee;
+  --chart-2: #8a8a80;
   --chart-3: #2dd4bf;
-  --pill-positive-bg: #064e3b;
-  --pill-positive-ink: #a7f3d0;
-  --pill-negative-bg: #7f1d1d;
-  --pill-negative-ink: #fecaca;
-  --pill-warning-bg: #78350f;
-  --pill-warning-ink: #fde68a;
-  --pill-neutral-bg: #1f2a3a;
-  --pill-neutral-ink: #cbd5e1;
-  --sidebar: #0d1219;
-  --sidebar-border: #1e2836;
+  --pill-positive-bg: transparent;
+  --pill-positive-ink: #4ade80;
+  --pill-negative-bg: transparent;
+  --pill-negative-ink: #f87171;
+  --pill-warning-bg: #2a2210;
+  --pill-warning-ink: #fbbf24;
+  --pill-neutral-bg: transparent;
+  --pill-neutral-ink: #a3a39a;
+  --sidebar: #0e0e0d;
+  --sidebar-border: #262622;
 }
 
 @layer base {
@@ -172,7 +169,6 @@
     @apply bg-ground text-foreground antialiased;
     font-size: var(--fs-body);
     line-height: 20px;
-    transition: background-color 0.25s ease, color 0.25s ease;
   }
   html {
     @apply font-sans;
@@ -185,55 +181,57 @@
 }
 
 @layer utilities {
-  .app-column {
-    width: min(100%, var(--column));
-    margin-inline: auto;
-    padding-inline: 16px;
-  }
-  @media (min-width: 768px) {
-    .app-column {
-      padding-inline: 24px;
-    }
-  }
   .panel {
     background: var(--surface);
-    border: 1px solid var(--border);
     border-radius: var(--radius-card);
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    border: 1px solid var(--border);
+  }
+  .panel-flat {
+    background: var(--surface);
+    border-radius: var(--radius-card);
   }
   .panel-soft {
     background: var(--soft);
-    border-radius: 14px;
+    border-radius: 6px;
     padding: 16px;
   }
   .ledger-strip {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem 1.25rem;
+    gap: 0.75rem 1.5rem;
     margin-bottom: 1rem;
-    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--rule);
     font-size: var(--fs-small);
     color: var(--muted);
   }
   .data-num {
-    font-family: var(--font-geist-mono), ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
   }
   .money {
-    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-family: var(--font-plex-mono), ui-monospace, monospace;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
   .bar-track {
-    height: 8px;
+    height: 6px;
     background: var(--raised);
-    border-radius: 3px;
     overflow: hidden;
   }
   .bar-fill {
     height: 100%;
     background: var(--chart-3);
-    border-radius: 3px;
+  }
+  .stamp {
+    display: inline-flex;
+    height: 1.25rem;
+    width: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--text);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
   }
 }
