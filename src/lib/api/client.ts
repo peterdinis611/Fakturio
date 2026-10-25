@@ -83,9 +83,10 @@ export async function apiFetch<T>(
 export async function apiFetchBlob(
   path: string,
   searchParams?: RequestOptions["searchParams"],
-): Promise<{ blob: Blob; filename: string | null }> {
+  accept = "application/pdf, text/csv, */*",
+): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
   const res = await fetch(buildUrl(path, searchParams), {
-    headers: { Accept: "application/pdf" },
+    headers: { Accept: accept },
     cache: "no-store",
   });
 
@@ -95,7 +96,13 @@ export async function apiFetchBlob(
 
   const disposition = res.headers.get("content-disposition");
   const match = disposition?.match(/filename\*?=(?:UTF-8''|")?([^\";]+)/i);
-  const filename = match?.[1] ? decodeURIComponent(match[1].replace(/"/g, "")) : null;
+  const filename = match?.[1]
+    ? decodeURIComponent(match[1].replace(/"/g, ""))
+    : null;
 
-  return { blob: await res.blob(), filename };
+  return {
+    blob: await res.blob(),
+    filename,
+    contentType: res.headers.get("content-type"),
+  };
 }

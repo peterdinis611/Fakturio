@@ -1,35 +1,41 @@
 import { z } from "zod";
-
-const optionalString = z
-  .string()
-  .trim()
-  .optional()
-  .or(z.literal(""))
-  .transform((v) => (v === "" || v === undefined ? null : v));
+import {
+  countryCode,
+  currencyCode,
+  optionalBic,
+  optionalDic,
+  optionalEmail,
+  optionalIban,
+  optionalIcDph,
+  optionalIco,
+  optionalPostalCode,
+  optionalString,
+  vatRateSchema,
+} from "@/lib/validations/common";
 
 export const companySchema = z.object({
-  name: z.string().trim().min(1, "Názov firmy je povinný"),
+  name: z.string().trim().min(1, "Názov firmy je povinný").max(200),
   legalForm: optionalString,
-  ico: optionalString,
-  dic: optionalString,
-  icDph: optionalString,
+  ico: optionalIco,
+  dic: optionalDic,
+  icDph: optionalIcDph,
   isVatPayer: z.boolean(),
   commercialRegister: optionalString,
-  email: optionalString,
-  invoiceEmail: optionalString,
+  email: optionalEmail,
+  invoiceEmail: optionalEmail,
   phone: optionalString,
   website: optionalString,
   contactPerson: optionalString,
   street: optionalString,
   city: optionalString,
-  postalCode: optionalString,
-  country: z.string().trim().min(2, "Krajina je povinná").default("SK"),
-  bankIban: optionalString,
-  bankBic: optionalString,
+  postalCode: optionalPostalCode,
+  country: countryCode.default("SK"),
+  bankIban: optionalIban,
+  bankBic: optionalBic,
   bankName: optionalString,
   defaultDueDays: z.coerce.number().int().min(0).max(365),
-  defaultVatRate: z.coerce.number().min(0).max(100),
-  defaultCurrency: z.string().trim().min(3).max(3).default("EUR"),
+  defaultVatRate: vatRateSchema,
+  defaultCurrency: currencyCode.default("EUR"),
   invoicePrefix: optionalString,
   defaultPaymentMethod: optionalString,
   defaultConstantSymbol: optionalString,
@@ -43,8 +49,8 @@ export type CompanyFormValues = z.infer<typeof companySchema>;
 
 export const companyDefaultsSchema = z.object({
   defaultDueDays: z.coerce.number().int().min(0).max(365),
-  defaultVatRate: z.coerce.number().min(0).max(100),
-  defaultCurrency: z.string().trim().min(3).max(3),
+  defaultVatRate: vatRateSchema,
+  defaultCurrency: currencyCode,
   invoicePrefix: optionalString,
   defaultPaymentMethod: optionalString,
   defaultConstantSymbol: optionalString,

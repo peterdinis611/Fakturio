@@ -2,6 +2,10 @@ import { redirect } from "next/navigation";
 import { getCompanyStatus, getCompanySummary } from "@/actions/company";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { CompanyBanner } from "@/components/layout/company-banner";
+import {
+  ScrollRestoration,
+  ScrollToTopButton,
+} from "@/components/layout/scroll-to-top";
 import { PageMotion } from "@/components/motion/page-motion";
 
 export default async function AppLayout({
@@ -26,6 +30,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">
+      <ScrollRestoration />
       <AppSidebar companyName={summary.name} />
       <div className="flex min-w-0 flex-1 flex-col">
         <CompanyBanner status={status} />
@@ -35,6 +40,7 @@ export default async function AppLayout({
           </div>
         </main>
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getReminders, listInvoices } from "@/actions/invoices";
 import { getReportOverview } from "@/actions/reports";
 import { dueDaysLabel } from "@/components/dashboard/due-days";
+import { DashboardEmptyActions } from "@/components/dashboard/empty-actions";
 import { PageHeader } from "@/components/layout/page-header";
 import { MotionItem } from "@/components/motion/page-motion";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -94,23 +95,7 @@ export default async function DashboardPage() {
             Dostane číslo, variabilný symbol a IBAN do PDF. Potom tu uvidíš
             neuhradené, splatnosti a inkaso.
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-3">
-            <Button asChild>
-              <Link href="/invoices/new">Nová faktúra</Link>
-            </Button>
-            <Link
-              href="/customers/new"
-              className="text-[13px] font-medium text-ink underline-offset-2 hover:underline"
-            >
-              Pridať zákazníka
-            </Link>
-            <Link
-              href="/settings"
-              className="text-[13px] text-muted-foreground underline-offset-2 hover:underline"
-            >
-              Nastavenia
-            </Link>
-          </div>
+          <DashboardEmptyActions />
         </MotionItem>
       </>
     );

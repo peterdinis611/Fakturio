@@ -12,6 +12,7 @@ import {
   markPaidAction,
 } from "@/actions/invoices";
 import type { Invoice } from "@/lib/api/types";
+import { cancelSchema } from "@/lib/validations/invoice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   const [pending, startTransition] = useTransition();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const pdfInline = `/api/pdf/${invoice.id}?disposition=inline`;
   const pdfDownload = `/api/pdf/${invoice.id}?disposition=attachment`;
@@ -84,8 +86,15 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   }
 
   function handleCancel() {
+    const parsed = cancelSchema.safeParse({ reason: cancelReason });
+    if (!parsed.success) {
+      setCancelError(parsed.error.issues[0]?.message ?? "Neplatný dôvod");
+      return;
+    }
+    setCancelError(null);
+
     startTransition(async () => {
-      const result = await cancelInvoiceAction(invoice.id, cancelReason);
+      const result = await cancelInvoiceAction(invoice.id, parsed.data.reason);
       if (!result.ok) {
         toast.error(result.message);
         return;
@@ -147,15 +156,22 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
               <Input
                 id="cancel-reason"
                 value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
+                onChange={(e) => {
+                  setCancelReason(e.target.value);
+                  if (cancelError) setCancelError(null);
+                }}
                 placeholder="Napr. chybné údaje"
+                aria-invalid={!!cancelError}
               />
+              {cancelError ? (
+                <p className="text-xs text-destructive">{cancelError}</p>
+              ) : null}
             </div>
             <DialogFooter>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={pending || cancelReason.trim().length < 3}
+                disabled={pending}
                 onClick={handleCancel}
               >
                 Potvrdiť zrušenie

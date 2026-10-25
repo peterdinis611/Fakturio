@@ -9,6 +9,7 @@ import {
 import { PageHeader } from "@/components/layout/page-header";
 import { FadeIn } from "@/components/motion/page-motion";
 import { AgingChart } from "@/components/reports/aging-chart";
+import { ReportExportLinks } from "@/components/reports/export-links";
 import { MonthlyRevenueChart } from "@/components/reports/monthly-chart";
 import { ReportsFilters } from "@/components/reports/reports-filters";
 import { StatusChart } from "@/components/reports/status-chart";
@@ -23,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { vatExportHref } from "@/lib/exports";
 import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 
 export const metadata = { title: "Reporty" };
@@ -78,6 +80,7 @@ export default async function ReportsPage({
       <PageHeader
         title="Reporty"
         description={`Stav k ${formatDate(overview.asOf)} · ${overview.currency}`}
+        actions={<ReportExportLinks from={from} to={to} />}
         ledger={
           <>
             <span>{periodLabel}</span>
@@ -317,11 +320,20 @@ export default async function ReportsPage({
 
           <div className="space-y-6">
             <div>
-              <header className="mb-3 flex items-baseline justify-between gap-2">
+              <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-[16px] font-medium text-ink">DPH podľa sadzby</h2>
-                <span className="money text-[12px] text-chart">
-                  {formatMoney(vat.vatTotal, vat.currency)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="money text-[12px] text-chart">
+                    {formatMoney(vat.vatTotal, vat.currency)}
+                  </span>
+                  <a
+                    href={vatExportHref({ from, to })}
+                    download
+                    className="text-[12px] font-medium text-ink underline-offset-2 hover:underline"
+                  >
+                    CSV
+                  </a>
+                </div>
               </header>
               <div className="panel px-3 pt-2 pb-3 sm:px-4">
                 <VatChart currency={vat.currency} rows={vat.byRate} />

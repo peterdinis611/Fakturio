@@ -1,8 +1,8 @@
 import { listCustomers } from "@/actions/customers";
 import { getCompany } from "@/actions/company";
 import { InvoiceForm } from "@/components/invoices/invoice-form";
+import { NewInvoiceNeedsCustomer } from "@/components/invoices/new-invoice-gate";
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
 
 export const metadata = { title: "Nová faktúra" };
 
@@ -21,12 +21,7 @@ export default async function NewInvoicePage({
     return (
       <div>
         <PageHeader title="Nová faktúra" />
-        <EmptyState
-          title="Najprv pridaj zákazníka"
-          description="Faktúra potrebuje odberateľa: vytvor ho a vráť sa sem."
-          actionLabel="Pridať zákazníka"
-          actionHref="/customers/new"
-        />
+        <NewInvoiceNeedsCustomer />
       </div>
     );
   }

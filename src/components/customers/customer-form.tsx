@@ -5,26 +5,30 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import type { z } from "zod";
 import {
   createCustomerAction,
   updateCustomerAction,
 } from "@/actions/customers";
 import type { Customer } from "@/lib/api/types";
-import type { z } from "zod";
 import {
   customerSchema,
   type CustomerFormValues,
 } from "@/lib/validations/customer";
-
-type CustomerFormInput = z.input<typeof customerSchema>;
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type CustomerFormInput = z.input<typeof customerSchema>;
+
 type CustomerFormProps = {
   initial?: Customer | null;
   customerId?: string;
+  /** Compact layout for dialogs (no outer panel). */
+  embedded?: boolean;
+  /** When set, skips default navigation after create/update. */
+  onSuccess?: (customer: Customer) => void;
 };
 
 function toFormValues(initial?: Customer | null): CustomerFormInput {
@@ -47,7 +51,12 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-xs text-destructive">{message}</p>;
 }
 
-export function CustomerForm({ initial, customerId }: CustomerFormProps) {
+export function CustomerForm({
+  initial,
+  customerId,
+  embedded = false,
+  onSuccess,
+}: CustomerFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(customerId);
@@ -83,8 +92,17 @@ export function CustomerForm({ initial, customerId }: CustomerFormProps) {
         return;
       }
 
-      toast.success(isEdit ? "Zákazník bol aktualizovaný" : "Zákazník bol vytvorený");
+      toast.success(
+        isEdit ? "Zákazník bol aktualizovaný" : "Zákazník bol vytvorený",
+      );
+
+      if (onSuccess) {
+        onSuccess(result.data);
+        return;
+      }
+
       router.push(`/customers/${result.data.id}`);
+      router.refresh();
     });
   }
 
@@ -93,63 +111,79 @@ export function CustomerForm({ initial, customerId }: CustomerFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="panel flex flex-col gap-4 p-4"
+      className={cn(
+        "flex flex-col gap-4",
+        !embedded && "panel p-4",
+      )}
       noValidate
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={cn(fieldClass, "sm:col-span-2")}>
-          <Label htmlFor="name">Názov / meno</Label>
-          <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
+          <Label htmlFor="customer-name">Názov / meno</Label>
+          <Input
+            id="customer-name"
+            {...register("name")}
+            aria-invalid={!!errors.name}
+          />
           <FieldError message={errors.name?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="ico">IČO</Label>
-          <Input id="ico" className="data-num" {...register("ico")} />
+          <Label htmlFor="customer-ico">IČO</Label>
+          <Input id="customer-ico" className="data-num" {...register("ico")} />
           <FieldError message={errors.ico?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="dic">DIČ</Label>
-          <Input id="dic" className="data-num" {...register("dic")} />
+          <Label htmlFor="customer-dic">DIČ</Label>
+          <Input id="customer-dic" className="data-num" {...register("dic")} />
           <FieldError message={errors.dic?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="icDph">IČ DPH</Label>
-          <Input id="icDph" {...register("icDph")} />
+          <Label htmlFor="customer-icDph">IČ DPH</Label>
+          <Input id="customer-icDph" {...register("icDph")} />
           <FieldError message={errors.icDph?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="email">E-mail</Label>
-          <Input id="email" type="email" {...register("email")} />
+          <Label htmlFor="customer-email">E-mail</Label>
+          <Input id="customer-email" type="email" {...register("email")} />
           <FieldError message={errors.email?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="phone">Telefón</Label>
-          <Input id="phone" type="tel" {...register("phone")} />
+          <Label htmlFor="customer-phone">Telefón</Label>
+          <Input id="customer-phone" type="tel" {...register("phone")} />
           <FieldError message={errors.phone?.message} />
         </div>
         <div className={cn(fieldClass, "sm:col-span-2")}>
-          <Label htmlFor="street">Ulica</Label>
-          <Input id="street" {...register("street")} />
+          <Label htmlFor="customer-street">Ulica</Label>
+          <Input id="customer-street" {...register("street")} />
           <FieldError message={errors.street?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="city">Mesto</Label>
-          <Input id="city" {...register("city")} />
+          <Label htmlFor="customer-city">Mesto</Label>
+          <Input id="customer-city" {...register("city")} />
           <FieldError message={errors.city?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="postalCode">PSČ</Label>
-          <Input id="postalCode" className="data-num" {...register("postalCode")} />
+          <Label htmlFor="customer-postalCode">PSČ</Label>
+          <Input
+            id="customer-postalCode"
+            className="data-num"
+            {...register("postalCode")}
+          />
           <FieldError message={errors.postalCode?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="country">Krajina</Label>
-          <Input id="country" {...register("country")} />
+          <Label htmlFor="customer-country">Krajina</Label>
+          <Input id="customer-country" {...register("country")} />
           <FieldError message={errors.country?.message} />
         </div>
       </div>
 
-      <div className="flex justify-end border-t border-border pt-4">
+      <div
+        className={cn(
+          "flex justify-end",
+          !embedded && "border-t border-border pt-4",
+        )}
+      >
         <Button type="submit" disabled={pending}>
           {isEdit ? "Uložiť zákazníka" : "Vytvoriť zákazníka"}
         </Button>

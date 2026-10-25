@@ -1,23 +1,25 @@
 import { z } from "zod";
-
-const optionalString = z
-  .string()
-  .trim()
-  .optional()
-  .or(z.literal(""))
-  .transform((v) => (v === "" || v === undefined ? null : v));
+import {
+  countryCode,
+  optionalDic,
+  optionalEmail,
+  optionalIcDph,
+  optionalIco,
+  optionalPostalCode,
+  optionalString,
+} from "@/lib/validations/common";
 
 export const customerSchema = z.object({
-  name: z.string().trim().min(1, "Názov je povinný"),
-  ico: optionalString,
-  dic: optionalString,
-  icDph: optionalString,
-  email: optionalString,
+  name: z.string().trim().min(1, "Názov je povinný").max(200),
+  ico: optionalIco,
+  dic: optionalDic,
+  icDph: optionalIcDph,
+  email: optionalEmail,
   phone: optionalString,
   street: optionalString,
   city: optionalString,
-  postalCode: optionalString,
-  country: z.string().trim().min(2).default("SK"),
+  postalCode: optionalPostalCode,
+  country: countryCode.default("SK"),
 });
 
 export type CustomerFormValues = z.infer<typeof customerSchema>;

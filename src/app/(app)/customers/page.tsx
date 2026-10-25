@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listCustomers } from "@/actions/customers";
+import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
@@ -30,11 +31,7 @@ export default async function CustomersPage({
       <PageHeader
         title="Zákazníci"
         description={`${data.totalCount} odberateľov: IČO a adresa idú do faktúry.`}
-        actions={
-          <Button asChild>
-            <Link href="/customers/new">Pridať zákazníka</Link>
-          </Button>
-        }
+        actions={<CreateCustomerDialog />}
       />
 
       <form className="mb-4 flex max-w-sm gap-2" action="/customers">
@@ -50,12 +47,17 @@ export default async function CustomersPage({
       </form>
 
       {data.items.length === 0 ? (
-        <EmptyState
-          title="Žiadni zákazníci"
-          description="Pridaj odberateľa pred vystavením faktúry."
-          actionLabel="Pridať zákazníka"
-          actionHref="/customers/new"
-        />
+        <div className="space-y-4">
+          <EmptyState
+            title="Žiadni zákazníci"
+            description="Pridaj odberateľa pred vystavením faktúry."
+          />
+          <CreateCustomerDialog
+            trigger={
+              <Button type="button">Pridať zákazníka</Button>
+            }
+          />
+        </div>
       ) : (
         <div className="panel overflow-hidden">
           <Table>

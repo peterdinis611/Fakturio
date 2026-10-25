@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 import { listInvoices } from "@/actions/invoices";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -13,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { InvoiceStatus } from "@/lib/api/types";
+import { invoicesExportHref } from "@/lib/exports";
 import { formatDate, formatMoney, statusLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -62,9 +64,20 @@ export default async function InvoicesPage({
             : "Koncept → vystavená → zaplatená. Číslo a VS sú v detaile."
         }
         actions={
-          <Button asChild>
-            <Link href="/invoices/new">Nová faktúra</Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <a
+                href={invoicesExportHref({ status })}
+                download
+              >
+                <Download className="size-3.5" aria-hidden />
+                CSV
+              </a>
+            </Button>
+            <Button asChild>
+              <Link href="/invoices/new">Nová faktúra</Link>
+            </Button>
+          </div>
         }
       />
 

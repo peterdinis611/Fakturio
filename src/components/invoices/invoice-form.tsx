@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,14 +10,13 @@ import {
   createInvoiceAction,
   updateInvoiceAction,
 } from "@/actions/invoices";
+import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
 import type { Invoice } from "@/lib/api/types";
 import type { z } from "zod";
 import {
   invoiceSchema,
   type InvoiceFormValues,
 } from "@/lib/validations/invoice";
-
-type InvoiceFormInput = z.input<typeof invoiceSchema>;
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+type InvoiceFormInput = z.input<typeof invoiceSchema>;
 
 type CompanyDefaults = {
   defaultVatRate: number;
@@ -135,6 +136,7 @@ export function InvoiceForm({
 }: InvoiceFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [customerOptions, setCustomerOptions] = useState(customers);
   const isEdit = Boolean(initial?.id);
   const readOnly = isEdit && initial!.status !== "Draft";
 
@@ -149,6 +151,7 @@ export function InvoiceForm({
     control,
     watch,
     setError,
+    setValue,
     formState: { errors },
   } = form;
 
@@ -220,7 +223,31 @@ export function InvoiceForm({
         <h2 className="font-heading text-sm font-medium">Základné údaje</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className={cn(fieldClass, "sm:col-span-2")}>
-            <Label>Zákazník</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label>Zákazník</Label>
+              {!readOnly ? (
+                <CreateCustomerDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="xs">
+                      <PlusIcon className="size-3.5" aria-hidden />
+                      Nový
+                    </Button>
+                  }
+                  onCreated={(customer) => {
+                    setCustomerOptions((prev) => {
+                      if (prev.some((c) => c.id === customer.id)) return prev;
+                      return [...prev, { id: customer.id, name: customer.name }].sort(
+                        (a, b) => a.name.localeCompare(b.name, "sk"),
+                      );
+                    });
+                    setValue("customerId", customer.id, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }}
+                />
+              ) : null}
+            </div>
             <Controller
               control={control}
               name="customerId"
@@ -234,7 +261,7 @@ export function InvoiceForm({
                     <SelectValue placeholder="Vyber zákazníka" />
                   </SelectTrigger>
                   <SelectContent>
-                    {customers.map((c) => (
+                    {customerOptions.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.name}
                       </SelectItem>
