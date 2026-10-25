@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { returnValidationErrors } from "next-safe-action";
+import { z } from "zod";
 import { apiFetch } from "@/lib/api/client";
+import { isApiError } from "@/lib/api/errors";
 import type { Customer, CreateCustomerInput, PagedResponse } from "@/lib/api/types";
-import { customerSchema, type CustomerFormValues } from "@/lib/validations/customer";
-import { fail, fromUnknown, ok, type ActionResult } from "./result";
+import { ActionError, actionClient } from "@/lib/safe-action";
+import { customerSchema } from "@/lib/validations/customer";
 
 export async function listCustomers(params?: {
   page?: number;
@@ -27,66 +30,80 @@ export async function getCustomer(id: string): Promise<Customer> {
   });
 }
 
-export async function createCustomerAction(
-  values: CustomerFormValues,
-): Promise<ActionResult<Customer>> {
-  const parsed = customerSchema.safeParse(values);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      fieldErrors[issue.path.join(".") || "form"] ??= issue.message;
+function mapApiFieldErrors(
+  schema: typeof customerSchema,
+  error: unknown,
+): never | void {
+  if (!isApiError(error)) return;
+  const fields = error.fieldErrors();
+  if (Object.keys(fields).length === 0) throw error;
+
+  returnValidationErrors(
+    schema,
+    Object.fromEntries(
+      Object.entries(fields).map(([key, message]) => [
+        key,
+        { _errors: [message] },
+      ]),
+    ) as never,
+  );
+}
+
+export const createCustomerAction = actionClient
+  .inputSchema(customerSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const data = await apiFetch<Customer>("/api/customers", {
+        method: "POST",
+        body: parsedInput as CreateCustomerInput,
+      });
+      revalidateTag("customers", "max");
+      revalidatePath("/customers");
+      return data;
+    } catch (error) {
+      mapApiFieldErrors(customerSchema, error);
+      throw error instanceof Error
+        ? error
+        : new ActionError("Zákazníka sa nepodarilo vytvoriť");
     }
-    return fail("Skontroluj formulár", fieldErrors);
-  }
+  });
 
-  try {
-    const data = await apiFetch<Customer>("/api/customers", {
-      method: "POST",
-      body: parsed.data as CreateCustomerInput,
-    });
-    revalidateTag("customers", "max");
-    revalidatePath("/customers");
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+const updateCustomerSchema = customerSchema.and(
+  z.object({ id: z.string().uuid("Neplatné ID zákazníka") }),
+);
 
-export async function updateCustomerAction(
-  id: string,
-  values: CustomerFormValues,
-): Promise<ActionResult<Customer>> {
-  const parsed = customerSchema.safeParse(values);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      fieldErrors[issue.path.join(".") || "form"] ??= issue.message;
+export const updateCustomerAction = actionClient
+  .inputSchema(updateCustomerSchema)
+  .action(async ({ parsedInput }) => {
+    const { id, ...values } = parsedInput;
+    try {
+      const data = await apiFetch<Customer>(`/api/customers/${id}`, {
+        method: "PUT",
+        body: values,
+      });
+      revalidateTag("customers", "max");
+      revalidateTag(`customer-${id}`, "max");
+      revalidatePath("/customers");
+      revalidatePath(`/customers/${id}`);
+      return data;
+    } catch (error) {
+      mapApiFieldErrors(customerSchema, error);
+      throw error instanceof Error
+        ? error
+        : new ActionError("Zákazníka sa nepodarilo uložiť");
     }
-    return fail("Skontroluj formulár", fieldErrors);
-  }
+  });
 
-  try {
-    const data = await apiFetch<Customer>(`/api/customers/${id}`, {
-      method: "PUT",
-      body: parsed.data,
-    });
-    revalidateTag("customers", "max");
-    revalidateTag(`customer-${id}`, "max");
-    revalidatePath("/customers");
-    revalidatePath(`/customers/${id}`);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
-
-export async function deleteCustomerAction(id: string): Promise<ActionResult> {
-  try {
-    await apiFetch<void>(`/api/customers/${id}`, { method: "DELETE" });
-    revalidateTag("customers", "max");
-    revalidatePath("/customers");
-    return ok(undefined);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const deleteCustomerAction = actionClient
+  .inputSchema(z.object({ id: z.string().uuid() }))
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      await apiFetch<void>(`/api/customers/${id}`, { method: "DELETE" });
+      revalidateTag("customers", "max");
+      revalidatePath("/customers");
+      return { id };
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });

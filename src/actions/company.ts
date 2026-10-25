@@ -1,14 +1,16 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { returnValidationErrors } from "next-safe-action";
 import { apiFetch } from "@/lib/api/client";
+import { isApiError } from "@/lib/api/errors";
 import type {
   CompanyCompleteness,
   CompanySettings,
   CompanySummary,
 } from "@/lib/api/types";
-import { companySchema, type CompanyFormValues } from "@/lib/validations/company";
-import { fail, fromUnknown, ok, type ActionResult } from "./result";
+import { ActionError, actionClient } from "@/lib/safe-action";
+import { companySchema } from "@/lib/validations/company";
 
 export async function getCompany(): Promise<CompanySettings> {
   return apiFetch<CompanySettings>("/api/company", {
@@ -28,30 +30,35 @@ export async function getCompanyStatus(): Promise<CompanyCompleteness> {
   });
 }
 
-export async function updateCompanyAction(
-  values: CompanyFormValues,
-): Promise<ActionResult<CompanySettings>> {
-  const parsed = companySchema.safeParse(values);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      const key = issue.path.join(".") || "form";
-      fieldErrors[key] ??= issue.message;
+export const updateCompanyAction = actionClient
+  .inputSchema(companySchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const data = await apiFetch<CompanySettings>("/api/company", {
+        method: "PUT",
+        body: parsedInput,
+      });
+      revalidateTag("company", "max");
+      revalidatePath("/", "layout");
+      revalidatePath("/settings/company");
+      revalidatePath("/onboarding");
+      return data;
+    } catch (error) {
+      if (isApiError(error)) {
+        const fields = error.fieldErrors();
+        if (Object.keys(fields).length > 0) {
+          returnValidationErrors(
+            companySchema,
+            Object.fromEntries(
+              Object.entries(fields).map(([key, message]) => [
+                key,
+                { _errors: [message] },
+              ]),
+            ) as never,
+          );
+        }
+        throw new ActionError(error.message);
+      }
+      throw error;
     }
-    return fail("Skontroluj formulár", fieldErrors);
-  }
-
-  try {
-    const data = await apiFetch<CompanySettings>("/api/company", {
-      method: "PUT",
-      body: parsed.data,
-    });
-    revalidateTag("company", "max");
-    revalidatePath("/", "layout");
-    revalidatePath("/settings/company");
-    revalidatePath("/onboarding");
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+  });

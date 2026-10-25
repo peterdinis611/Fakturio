@@ -1,7 +1,10 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { returnValidationErrors } from "next-safe-action";
+import { z } from "zod";
 import { apiFetch } from "@/lib/api/client";
+import { isApiError } from "@/lib/api/errors";
 import type {
   CreateInvoiceInput,
   Invoice,
@@ -14,12 +17,12 @@ import type {
   SyncOverdueResponse,
   UpdateInvoiceInput,
 } from "@/lib/api/types";
+import { ActionError, actionClient } from "@/lib/safe-action";
 import {
   cancelSchema,
   invoiceSchema,
-  type InvoiceFormValues,
+  markPaidSchema,
 } from "@/lib/validations/invoice";
-import { fail, fromUnknown, ok, type ActionResult } from "./result";
 
 function revalidateInvoices(id?: string) {
   revalidateTag("invoices", "max");
@@ -80,183 +83,203 @@ export async function getReminders(params?: {
   });
 }
 
-export async function createInvoiceAction(
-  values: InvoiceFormValues,
-  status?: InvoiceStatus,
-): Promise<ActionResult<Invoice>> {
-  const parsed = invoiceSchema.safeParse(values);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      fieldErrors[issue.path.join(".") || "form"] ??= issue.message;
+const createInvoiceSchema = invoiceSchema.and(
+  z.object({
+    status: z.enum(["Draft", "Issued"]).optional().default("Draft"),
+  }),
+);
+
+const updateInvoiceSchema = invoiceSchema.and(
+  z.object({ id: z.string().uuid("Neplatné ID faktúry") }),
+);
+
+const invoiceIdSchema = z.object({ id: z.string().uuid("Neplatné ID faktúry") });
+
+function throwMappedApiError(schema: z.ZodType, error: unknown): never {
+  if (isApiError(error)) {
+    const fields = error.fieldErrors();
+    if (Object.keys(fields).length > 0) {
+      returnValidationErrors(
+        schema,
+        Object.fromEntries(
+          Object.entries(fields).map(([key, message]) => [
+            key,
+            { _errors: [message] },
+          ]),
+        ) as never,
+      );
     }
-    return fail("Skontroluj formulár", fieldErrors);
+    throw new ActionError(error.message);
   }
-
-  const body: CreateInvoiceInput = {
-    ...parsed.data,
-    status: status ?? "Draft",
-  };
-
-  try {
-    const data = await apiFetch<Invoice>("/api/invoices", {
-      method: "POST",
-      body,
-    });
-    revalidateInvoices(data.id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
+  throw error instanceof Error
+    ? error
+    : new ActionError("Operácia zlyhala");
 }
 
-export async function updateInvoiceAction(
-  id: string,
-  values: InvoiceFormValues,
-): Promise<ActionResult<Invoice>> {
-  const parsed = invoiceSchema.safeParse(values);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) {
-      fieldErrors[issue.path.join(".") || "form"] ??= issue.message;
+export const createInvoiceAction = actionClient
+  .inputSchema(createInvoiceSchema)
+  .action(async ({ parsedInput }) => {
+    const { status, ...values } = parsedInput;
+    const body: CreateInvoiceInput = {
+      ...values,
+      status: status ?? "Draft",
+    };
+
+    try {
+      const data = await apiFetch<Invoice>("/api/invoices", {
+        method: "POST",
+        body,
+      });
+      revalidateInvoices(data.id);
+      return data;
+    } catch (error) {
+      throwMappedApiError(invoiceSchema, error);
     }
-    return fail("Skontroluj formulár", fieldErrors);
-  }
+  });
 
-  if (!parsed.data.issueDate || !parsed.data.dueDate) {
-    return fail("Dátum vystavenia a splatnosti sú povinné");
-  }
+export const updateInvoiceAction = actionClient
+  .inputSchema(updateInvoiceSchema)
+  .action(async ({ parsedInput }) => {
+    const { id, ...values } = parsedInput;
 
-  const body: UpdateInvoiceInput = {
-    customerId: parsed.data.customerId,
-    issueDate: parsed.data.issueDate,
-    dueDate: parsed.data.dueDate,
-    deliveryDate: parsed.data.deliveryDate,
-    currency: parsed.data.currency,
-    variableSymbol: parsed.data.variableSymbol,
-    constantSymbol: parsed.data.constantSymbol,
-    specificSymbol: parsed.data.specificSymbol,
-    paymentMethod: parsed.data.paymentMethod,
-    bankIban: parsed.data.bankIban,
-    bankBic: parsed.data.bankBic,
-    notes: parsed.data.notes,
-    items: parsed.data.items,
-  };
+    if (!values.issueDate || !values.dueDate) {
+      throw new ActionError("Dátum vystavenia a splatnosti sú povinné");
+    }
 
-  try {
-    const data = await apiFetch<Invoice>(`/api/invoices/${id}`, {
-      method: "PUT",
-      body,
-    });
-    revalidateInvoices(id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+    const body: UpdateInvoiceInput = {
+      customerId: values.customerId,
+      issueDate: values.issueDate,
+      dueDate: values.dueDate,
+      deliveryDate: values.deliveryDate,
+      currency: values.currency,
+      variableSymbol: values.variableSymbol,
+      constantSymbol: values.constantSymbol,
+      specificSymbol: values.specificSymbol,
+      paymentMethod: values.paymentMethod,
+      bankIban: values.bankIban,
+      bankBic: values.bankBic,
+      notes: values.notes,
+      items: values.items,
+    };
 
-export async function issueInvoiceAction(
-  id: string,
-): Promise<ActionResult<InvoiceStatusResponse>> {
-  try {
-    const data = await apiFetch<InvoiceStatusResponse>(
-      `/api/invoices/${id}/status`,
-      { method: "PATCH", body: { status: "Issued" } },
-    );
-    revalidateInvoices(id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+    try {
+      const data = await apiFetch<Invoice>(`/api/invoices/${id}`, {
+        method: "PUT",
+        body,
+      });
+      revalidateInvoices(id);
+      return data;
+    } catch (error) {
+      throwMappedApiError(invoiceSchema, error);
+    }
+  });
 
-export async function markPaidAction(
-  id: string,
-  paidAt?: string | null,
-): Promise<ActionResult<InvoiceStatusResponse>> {
-  try {
-    const data = await apiFetch<InvoiceStatusResponse>(
-      `/api/invoices/${id}/pay`,
-      { method: "POST", body: { paidAt: paidAt || null } },
-    );
-    revalidateInvoices(id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const issueInvoiceAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      const data = await apiFetch<InvoiceStatusResponse>(
+        `/api/invoices/${id}/status`,
+        { method: "PATCH", body: { status: "Issued" } },
+      );
+      revalidateInvoices(id);
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-export async function cancelInvoiceAction(
-  id: string,
-  reason: string,
-): Promise<ActionResult<InvoiceStatusResponse>> {
-  const parsed = cancelSchema.safeParse({ reason });
-  if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "Neplatný dôvod");
-  }
+export const markPaidAction = actionClient
+  .inputSchema(
+    invoiceIdSchema.and(markPaidSchema),
+  )
+  .action(async ({ parsedInput: { id, paidAt } }) => {
+    try {
+      const data = await apiFetch<InvoiceStatusResponse>(
+        `/api/invoices/${id}/pay`,
+        { method: "POST", body: { paidAt: paidAt || null } },
+      );
+      revalidateInvoices(id);
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-  try {
-    const data = await apiFetch<InvoiceStatusResponse>(
-      `/api/invoices/${id}/cancel`,
-      { method: "POST", body: parsed.data },
-    );
-    revalidateInvoices(id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const cancelInvoiceAction = actionClient
+  .inputSchema(
+    invoiceIdSchema.and(cancelSchema),
+  )
+  .action(async ({ parsedInput: { id, reason } }) => {
+    try {
+      const data = await apiFetch<InvoiceStatusResponse>(
+        `/api/invoices/${id}/cancel`,
+        { method: "POST", body: { reason } },
+      );
+      revalidateInvoices(id);
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-export async function deleteInvoiceAction(id: string): Promise<ActionResult> {
-  try {
-    await apiFetch<void>(`/api/invoices/${id}`, { method: "DELETE" });
-    revalidateInvoices(id);
-    return ok(undefined);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const deleteInvoiceAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      await apiFetch<void>(`/api/invoices/${id}`, { method: "DELETE" });
+      revalidateInvoices(id);
+      return { id };
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-export async function duplicateInvoiceAction(
-  id: string,
-): Promise<ActionResult<Invoice>> {
-  try {
-    const data = await apiFetch<Invoice>(`/api/invoices/${id}/duplicate`, {
-      method: "POST",
-    });
-    revalidateInvoices(data.id);
-    return ok(data);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const duplicateInvoiceAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      const data = await apiFetch<Invoice>(`/api/invoices/${id}/duplicate`, {
+        method: "POST",
+      });
+      revalidateInvoices(data.id);
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-export async function markReminderSentAction(
-  id: string,
-): Promise<ActionResult> {
-  try {
-    await apiFetch(`/api/invoices/${id}/reminders/mark-sent`, {
-      method: "POST",
-    });
-    revalidateTag("reminders", "max");
-    revalidateInvoices(id);
-    return ok(undefined);
-  } catch (error) {
-    return fromUnknown(error);
-  }
-}
+export const markReminderSentAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      await apiFetch(`/api/invoices/${id}/reminders/mark-sent`, {
+        method: "POST",
+      });
+      revalidateTag("reminders", "max");
+      revalidateInvoices(id);
+      return { id };
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
 
-export async function syncOverdueAction(): Promise<
-  ActionResult<SyncOverdueResponse>
-> {
+export const syncOverdueAction = actionClient.action(async () => {
   try {
     const data = await apiFetch<SyncOverdueResponse>(
       "/api/invoices/sync-overdue",
       { method: "POST" },
     );
     revalidateInvoices();
-    return ok(data);
+    return data;
   } catch (error) {
-    return fromUnknown(error);
+    if (isApiError(error)) throw new ActionError(error.message);
+    throw error;
   }
-}
+});

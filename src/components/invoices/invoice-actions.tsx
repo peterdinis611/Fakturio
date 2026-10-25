@@ -12,6 +12,7 @@ import {
   markPaidAction,
 } from "@/actions/invoices";
 import type { Invoice } from "@/lib/api/types";
+import { actionErrorMessage } from "@/lib/action-utils";
 import { cancelSchema } from "@/lib/validations/invoice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,11 +41,14 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   const pdfInline = `/api/pdf/${invoice.id}?disposition=inline`;
   const pdfDownload = `/api/pdf/${invoice.id}?disposition=attachment`;
 
-  function run(action: () => Promise<{ ok: boolean; message?: string }>, success: string) {
+  function run(
+    action: () => Promise<{ data?: unknown; serverError?: string; validationErrors?: unknown }>,
+    success: string,
+  ) {
     startTransition(async () => {
       const result = await action();
-      if (!result.ok) {
-        toast.error(result.message ?? "Operácia zlyhala");
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Operácia zlyhala");
         return;
       }
       toast.success(success);
@@ -53,18 +57,21 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   }
 
   function handleIssue() {
-    run(() => issueInvoiceAction(invoice.id), "Faktúra bola vystavená");
+    run(() => issueInvoiceAction({ id: invoice.id }), "Faktúra bola vystavená");
   }
 
   function handleMarkPaid() {
-    run(() => markPaidAction(invoice.id), "Faktúra bola označená ako zaplatená");
+    run(
+      () => markPaidAction({ id: invoice.id }),
+      "Faktúra bola označená ako zaplatená",
+    );
   }
 
   function handleDuplicate() {
     startTransition(async () => {
-      const result = await duplicateInvoiceAction(invoice.id);
-      if (!result.ok) {
-        toast.error(result.message);
+      const result = await duplicateInvoiceAction({ id: invoice.id });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Duplikácia zlyhala");
         return;
       }
       toast.success("Faktúra bola duplikovaná");
@@ -75,9 +82,9 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   function handleDelete() {
     if (!window.confirm("Naozaj zmazať tento koncept?")) return;
     startTransition(async () => {
-      const result = await deleteInvoiceAction(invoice.id);
-      if (!result.ok) {
-        toast.error(result.message);
+      const result = await deleteInvoiceAction({ id: invoice.id });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Zmazanie zlyhalo");
         return;
       }
       toast.success("Koncept bol zmazaný");
@@ -94,9 +101,12 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
     setCancelError(null);
 
     startTransition(async () => {
-      const result = await cancelInvoiceAction(invoice.id, parsed.data.reason);
-      if (!result.ok) {
-        toast.error(result.message);
+      const result = await cancelInvoiceAction({
+        id: invoice.id,
+        reason: parsed.data.reason,
+      });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Zrušenie zlyhalo");
         return;
       }
       toast.success("Faktúra bola zrušená");

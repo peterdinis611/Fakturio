@@ -11,6 +11,7 @@ import {
   updateCustomerAction,
 } from "@/actions/customers";
 import type { Customer } from "@/lib/api/types";
+import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import {
   customerSchema,
   type CustomerFormValues,
@@ -83,12 +84,12 @@ export function CustomerForm({
   function onSubmit(values: CustomerFormValues) {
     startTransition(async () => {
       const result = isEdit
-        ? await updateCustomerAction(customerId!, values)
+        ? await updateCustomerAction({ ...values, id: customerId! })
         : await createCustomerAction(values);
 
-      if (!result.ok) {
-        toast.error(result.message);
-        applyFieldErrors(result.fieldErrors);
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Operácia zlyhala");
+        applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
 

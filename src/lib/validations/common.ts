@@ -13,13 +13,14 @@ import {
   isValidVariableSymbol,
 } from "@/lib/validations/sk";
 
-/** Empty string / undefined → null for optional API fields. */
+/** Empty string / null / undefined → null for optional API fields. */
 export const optionalString = z
-  .string()
-  .trim()
-  .optional()
-  .or(z.literal(""))
-  .transform((v) => (v === "" || v === undefined ? null : v));
+  .union([z.string(), z.null(), z.undefined()])
+  .transform((v) => {
+    if (v == null) return null;
+    const trimmed = v.trim();
+    return trimmed === "" ? null : trimmed;
+  });
 
 export const optionalIco = optionalString.refine(
   (v) => v === null || isValidIco(v),

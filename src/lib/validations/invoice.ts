@@ -45,7 +45,7 @@ export const cancelSchema = z.object({
 export type CancelFormValues = z.infer<typeof cancelSchema>;
 
 export const markPaidSchema = z.object({
-  paidAt: optionalString,
+  paidAt: optionalString.optional(),
 });
 
 export type MarkPaidFormValues = z.infer<typeof markPaidSchema>;

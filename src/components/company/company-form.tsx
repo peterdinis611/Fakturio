@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { updateCompanyAction } from "@/actions/company";
+import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import type { CompanySettings } from "@/lib/api/types";
 import type { z } from "zod";
 import {
@@ -127,9 +128,9 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   function onSubmit(values: CompanyFormValues) {
     startTransition(async () => {
       const result = await updateCompanyAction(values);
-      if (!result.ok) {
-        toast.error(result.message);
-        applyFieldErrors(result.fieldErrors);
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
       toast.success(

@@ -13,6 +13,7 @@ import {
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
 import type { Invoice } from "@/lib/api/types";
 import type { z } from "zod";
+import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import {
   invoiceSchema,
   type InvoiceFormValues,
@@ -186,12 +187,12 @@ export function InvoiceForm({
   function submit(values: InvoiceFormValues, status?: "Draft" | "Issued") {
     startTransition(async () => {
       const result = isEdit
-        ? await updateInvoiceAction(initial!.id, values)
-        : await createInvoiceAction(values, status ?? "Draft");
+        ? await updateInvoiceAction({ ...values, id: initial!.id })
+        : await createInvoiceAction({ ...values, status: status ?? "Draft" });
 
-      if (!result.ok) {
-        toast.error(result.message);
-        applyFieldErrors(result.fieldErrors);
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
 

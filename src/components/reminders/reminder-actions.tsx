@@ -8,6 +8,7 @@ import {
   markReminderSentAction,
   syncOverdueAction,
 } from "@/actions/invoices";
+import { actionErrorMessage } from "@/lib/action-utils";
 import { Button } from "@/components/ui/button";
 
 export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
@@ -22,9 +23,9 @@ export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
       disabled={pending}
       onClick={() => {
         startTransition(async () => {
-          const result = await markReminderSentAction(invoiceId);
-          if (!result.ok) {
-            toast.error(result.message);
+          const result = await markReminderSentAction({ id: invoiceId });
+          if (!result?.data) {
+            toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
             return;
           }
           toast.success("Upomienka označená ako odoslaná");
@@ -49,8 +50,10 @@ export function SyncOverdueButton() {
       onClick={() => {
         startTransition(async () => {
           const result = await syncOverdueAction();
-          if (!result.ok) {
-            toast.error(result.message);
+          if (!result?.data) {
+            toast.error(
+              actionErrorMessage(result ?? {}) ?? "Synchronizácia zlyhala",
+            );
             return;
           }
           toast.success(
