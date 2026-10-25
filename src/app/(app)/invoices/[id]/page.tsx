@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getInvoice } from "@/actions/invoices";
 import { InvoiceActions } from "@/components/invoices/invoice-actions";
+import { XmlPreview } from "@/components/preview/xml-preview";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { isApiError } from "@/lib/api/errors";
 import { emptyDash, formatDate, formatMoney } from "@/lib/format";
+import { buildInvoiceXml } from "@/lib/preview/invoice-xml";
 
 export async function generateMetadata({
   params,
@@ -193,14 +195,25 @@ export default async function InvoiceDetailPage({
         </p>
       ) : null}
 
-      <div className="mt-8">
-        <h2 className="mb-2 text-[16px] font-medium text-ink">PDF</h2>
-        <iframe
-          title={`PDF ${invoice.number}`}
-          src={`/api/pdf/${invoice.id}?disposition=inline`}
-          className="panel h-[70vh] w-full"
-        />
-      </div>
+      {invoice.status !== "Draft" ? (
+        <div className="mt-8 space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[16px] font-medium text-ink">Dokumenty</h2>
+            <XmlPreview
+              title={`XML · ${invoice.number}`}
+              description="Štruktúrovaný náhľad faktúry pred stiahnutím."
+              xml={buildInvoiceXml(invoice)}
+              fileName={`${invoice.number}.xml`}
+              triggerVariant="outline"
+            />
+          </div>
+          <iframe
+            title={`PDF ${invoice.number}`}
+            src={`/api/pdf/${invoice.id}?disposition=inline`}
+            className="panel h-[70vh] w-full"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 import type { Invoice } from "@/lib/api/types";
 import { actionErrorMessage } from "@/lib/action-utils";
 import { cancelSchema } from "@/lib/validations/invoice";
+import { XmlPreview } from "@/components/preview/xml-preview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { buildInvoiceXml } from "@/lib/preview/invoice-xml";
 
 type InvoiceActionsProps = {
   invoice: Invoice;
@@ -40,6 +43,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
 
   const pdfInline = `/api/pdf/${invoice.id}?disposition=inline`;
   const pdfDownload = `/api/pdf/${invoice.id}?disposition=attachment`;
+  const xml = buildInvoiceXml(invoice);
 
   function run(
     action: () => Promise<{ data?: unknown; serverError?: string; validationErrors?: unknown }>,
@@ -225,7 +229,19 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
               Stiahnuť PDF
             </a>
           </Button>
+          <XmlPreview
+            title={`XML · ${invoice.number}`}
+            description="Štruktúrovaný náhľad faktúry (Fakturio XML). Nie je oficiálny e-fakturačný formát."
+            xml={xml}
+            fileName={`${invoice.number}.xml`}
+          />
         </>
+      ) : null}
+      {pending ? (
+        <span className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground">
+          <Spinner size="sm" label="Prebieha" />
+          Prebieha…
+        </span>
       ) : null}
     </div>
   );

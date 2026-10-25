@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Download } from "lucide-react";
 import { listInvoices } from "@/actions/invoices";
 import { PageHeader } from "@/components/layout/page-header";
+import { CsvPreview } from "@/components/preview/csv-preview";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
@@ -65,13 +66,19 @@ export default async function InvoicesPage({
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a
-                href={invoicesExportHref({ status })}
-                download
-              >
+            <CsvPreview
+              href={invoicesExportHref({ status })}
+              title="Náhľad — faktúry CSV"
+              description={
+                status
+                  ? `Export filtrovaný podľa stavu ${status}.`
+                  : "Všetky faktúry v CSV (oddeľovač ;)."
+              }
+            />
+            <Button asChild variant="ghost" size="sm">
+              <a href={invoicesExportHref({ status })} download>
                 <Download className="size-3.5" aria-hidden />
-                CSV
+                Stiahnuť
               </a>
             </Button>
             <Button asChild>

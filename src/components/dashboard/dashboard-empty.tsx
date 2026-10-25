@@ -40,11 +40,11 @@ const STEPS = [
   },
 ] as const;
 
-const GHOST_KPIS = [
+const GHOST_KPIS: { label: string; value: string; lead?: boolean }[] = [
   { label: "Neuhradené celkom", value: "—", lead: true },
   { label: "Inkaso", value: "—" },
   { label: "Vystavené", value: "—" },
-] as const;
+];
 
 const GHOST_BUCKETS = [
   { label: "Zaplatené", tone: "text-faint" },
