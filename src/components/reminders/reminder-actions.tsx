@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import {
   markReminderSentAction,
@@ -31,7 +32,7 @@ export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
         });
       }}
     >
-      Odoslané
+      {pending ? "Ukladám…" : "Označiť odoslané"}
     </Button>
   );
 }
@@ -61,7 +62,8 @@ export function SyncOverdueButton() {
         });
       }}
     >
-      Sync overdue
+      <RefreshCw className={pending ? "animate-spin" : undefined} />
+      {pending ? "Synchronizujem…" : "Obnoviť omeškané"}
     </Button>
   );
 }
