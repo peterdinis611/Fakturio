@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   BarChart3,
-  Building2,
   FileText,
   LayoutDashboard,
   Menu,
   Bell,
   Search,
+  Settings,
   Users,
   X,
 } from "lucide-react";
@@ -25,7 +25,7 @@ const nav = [
   { href: "/reminders", label: "Upomienky", icon: Bell },
   { href: "/reports", label: "Reporty", icon: BarChart3 },
   { href: "/search", label: "Hľadanie", icon: Search },
-  { href: "/settings/company", label: "Firma", icon: Building2 },
+  { href: "/settings", label: "Nastavenia", icon: Settings },
 ];
 
 function NavLinks({
