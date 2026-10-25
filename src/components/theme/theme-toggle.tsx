@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useTheme } from "@teispace/next-themes";
 import { motion, useReducedMotion } from "motion/react";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";

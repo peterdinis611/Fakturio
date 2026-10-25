@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { DatePickerField } from "@/components/reports/date-picker-field";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 export type ReportsFilterValues = {
@@ -40,6 +50,11 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
   const lastYear = yearBounds(currentYear - 1);
   const last12From = isoDaysAgo(365);
   const today = new Date().toISOString().slice(0, 10);
+
+  const [from, setFrom] = useState(values.from);
+  const [to, setTo] = useState(values.to);
+  const [year, setYear] = useState(String(values.year));
+  const [top, setTop] = useState(String(values.top));
 
   const presets = [
     {
@@ -106,64 +121,72 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
 
       <form
         action="/reports"
+        method="get"
         className="panel flex flex-wrap items-end gap-3 px-4 py-3"
       >
-        <div className="grid gap-1">
-          <Label htmlFor="reports-from">Od</Label>
-          <Input
-            id="reports-from"
-            type="date"
-            name="from"
-            defaultValue={values.from}
-            className="w-[10.5rem]"
-          />
-        </div>
-        <div className="grid gap-1">
-          <Label htmlFor="reports-to">Do</Label>
-          <Input
-            id="reports-to"
-            type="date"
-            name="to"
-            defaultValue={values.to}
-            className="w-[10.5rem]"
-          />
-        </div>
+        <DatePickerField
+          id="reports-from"
+          name="from"
+          label="Od"
+          value={from}
+          onChange={setFrom}
+        />
+        <DatePickerField
+          id="reports-to"
+          name="to"
+          label="Do"
+          value={to}
+          onChange={setTo}
+        />
+
         <div className="grid gap-1">
           <Label htmlFor="reports-year">Rok grafu</Label>
-          <select
-            id="reports-year"
-            name="year"
-            defaultValue={values.year}
-            className="h-9 rounded-[4px] border border-border bg-surface px-2.5 text-[14px] text-ink outline-none focus-visible:border-ink focus-visible:ring-2 focus-visible:ring-ink/10"
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
+          <input type="hidden" name="year" value={year} />
+          <Select value={year} onValueChange={setYear}>
+            <SelectTrigger
+              id="reports-year"
+              size="default"
+              className="h-9 w-[7.5rem] rounded-[4px] border-border bg-surface"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper" align="start">
+              {years.map((y) => (
+                <SelectItem key={y} value={String(y)}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
         <div className="grid gap-1">
           <Label htmlFor="reports-top">Top N</Label>
-          <select
-            id="reports-top"
-            name="top"
-            defaultValue={values.top}
-            className="h-9 rounded-[4px] border border-border bg-surface px-2.5 text-[14px] text-ink outline-none focus-visible:border-ink focus-visible:ring-2 focus-visible:ring-ink/10"
-          >
-            {[5, 8, 10, 15, 20].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+          <input type="hidden" name="top" value={top} />
+          <Select value={top} onValueChange={setTop}>
+            <SelectTrigger
+              id="reports-top"
+              size="default"
+              className="h-9 w-[5.5rem] rounded-[4px] border-border bg-surface"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper" align="start">
+              {[5, 8, 10, 15, 20].map((n) => (
+                <SelectItem key={n} value={String(n)}>
+                  {n}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
         <Button type="submit" className="h-9">
           Použiť filtre
         </Button>
-        {(values.from || values.to) && (
+        {(from || to) && (
           <Button asChild variant="ghost" className="h-9">
-            <Link href={buildHref({ year: values.year, top: values.top })}>
+            <Link href={buildHref({ year: Number(year), top: Number(top) })}>
               Zrušiť dátumy
             </Link>
           </Button>

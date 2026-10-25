@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
 import { searchGlobal } from "@/actions/search";
 import { PageHeader } from "@/components/layout/page-header";
 import { FadeIn } from "@/components/motion/page-motion";
+import { SearchBox } from "@/components/search/search-box";
+import {
+  SearchIdle,
+  SearchNoResults,
+  SearchTooShort,
+} from "@/components/search/search-empty";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { Button } from "@/components/ui/button";
 import type { SearchHit } from "@/lib/api/types";
 import { formatDate, formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -32,7 +36,9 @@ function HitRow({ hit }: { hit: SearchHit }) {
           aria-hidden
           className={cn(
             "stamp mt-0.5 shrink-0",
-            customer ? "border-muted text-muted-foreground" : "border-ink text-ink",
+            customer
+              ? "border-muted text-muted-foreground"
+              : "border-ink text-ink",
           )}
         >
           {customer ? "Z" : "F"}
@@ -133,69 +139,20 @@ export default async function SearchPage({
       />
 
       <FadeIn delay={0.05}>
-        <form
-          action="/search"
-          className="mb-8 flex overflow-hidden rounded-[4px] border border-border bg-surface shadow-[0_1px_0_var(--rule)] focus-within:border-ink focus-within:ring-2 focus-within:ring-ink/10"
-        >
-          <label className="relative flex min-w-0 flex-1 items-center">
-            <Search
-              aria-hidden
-              className="pointer-events-none absolute left-3.5 size-4 text-faint"
-            />
-            <input
-              name="q"
-              defaultValue={query}
-              placeholder="Meno, IČO, číslo faktúry…"
-              autoFocus
-              autoComplete="off"
-              className="h-12 w-full bg-transparent pr-3 pl-10 text-[15px] text-ink outline-none placeholder:text-faint"
-            />
-          </label>
-          <Button
-            type="submit"
-            className="h-12 shrink-0 rounded-none px-5 text-[14px]"
-          >
-            Hľadať
-          </Button>
-        </form>
+        <SearchBox initialQuery={query} />
       </FadeIn>
 
       {!query ? (
         <FadeIn delay={0.1}>
-          <div className="border-t border-rule pt-6">
-            <p className="text-[14px] text-muted-foreground">
-              Začni písať — prehľadá meno, IČO, email aj číslo faktúry.
-            </p>
-            <ul className="mt-4 grid gap-2 text-[13px] text-faint sm:grid-cols-3">
-              <li className="border border-dashed border-border px-3 py-2.5">
-                <span className="text-muted-foreground">Príklad</span>
-                <p className="mt-0.5 text-ink">Acme</p>
-              </li>
-              <li className="border border-dashed border-border px-3 py-2.5">
-                <span className="text-muted-foreground">Príklad</span>
-                <p className="mt-0.5 font-mono text-ink">12345678</p>
-              </li>
-              <li className="border border-dashed border-border px-3 py-2.5">
-                <span className="text-muted-foreground">Príklad</span>
-                <p className="mt-0.5 font-mono text-ink">2026-001</p>
-              </li>
-            </ul>
-          </div>
+          <SearchIdle />
         </FadeIn>
       ) : query.length < 2 ? (
         <FadeIn delay={0.08}>
-          <p className="border-t border-rule pt-6 text-[14px] text-warning">
-            Zadaj aspoň 2 znaky.
-          </p>
+          <SearchTooShort />
         </FadeIn>
       ) : result && result.hits.length === 0 ? (
         <FadeIn delay={0.08}>
-          <div className="border-t border-rule pt-6">
-            <p className="text-[16px] font-medium text-ink">Nič sa nenašlo</p>
-            <p className="mt-1 text-[14px] text-muted-foreground">
-              Pre „{query}“ nie sú zhody medzi zákazníkmi ani faktúrami.
-            </p>
-          </div>
+          <SearchNoResults query={query} />
         </FadeIn>
       ) : (
         <FadeIn delay={0.08} className="space-y-8">

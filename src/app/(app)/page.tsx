@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getReminders, listInvoices } from "@/actions/invoices";
 import { getReportOverview } from "@/actions/reports";
+import { DashboardEmpty } from "@/components/dashboard/dashboard-empty";
 import { dueDaysLabel } from "@/components/dashboard/due-days";
-import { DashboardEmptyActions } from "@/components/dashboard/empty-actions";
 import { PageHeader } from "@/components/layout/page-header";
 import { MotionItem } from "@/components/motion/page-motion";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -79,23 +79,9 @@ export default async function DashboardPage() {
   if (isEmpty) {
     return (
       <>
-        <PageHeader
-          title="Prehľad"
-          description={finding}
-        />
-
-        <MotionItem className="panel mt-2 max-w-xl px-5 py-6 sm:px-6 sm:py-7">
-          <span className="stamp" aria-hidden>
-            F
-          </span>
-          <h2 className="mt-4 text-[18px] font-semibold tracking-tight text-ink">
-            Vystav prvú faktúru
-          </h2>
-          <p className="mt-2 max-w-md text-[14px] leading-relaxed text-muted-foreground">
-            Dostane číslo, variabilný symbol a IBAN do PDF. Potom tu uvidíš
-            neuhradené, splatnosti a inkaso.
-          </p>
-          <DashboardEmptyActions />
+        <PageHeader title="Prehľad" description={finding} />
+        <MotionItem>
+          <DashboardEmpty />
         </MotionItem>
       </>
     );
