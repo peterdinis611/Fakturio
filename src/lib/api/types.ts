@@ -397,3 +397,30 @@ export type ApiProblem = {
   type?: string;
   instance?: string;
 };
+
+export type OverdueJobSettings = {
+  enabled: boolean;
+  runAtHourUtc: number;
+  runAtMinuteUtc: number;
+  runOnStartup: boolean;
+  startupDelaySeconds: number;
+  disabledRecheckHours: number;
+};
+
+export type ReminderJobSettings = {
+  enabled: boolean;
+  runAtHourUtc: number;
+  runAtMinuteUtc: number;
+  runOnStartup: boolean;
+  startupDelaySeconds: number;
+  disabledRecheckHours: number;
+  withinDays: number;
+  onlyOverdue: boolean;
+  minDaysBetweenReminders: number;
+  markAsSent: boolean;
+};
+
+export type JobSettings = {
+  overdueSync: OverdueJobSettings;
+  reminderJob: ReminderJobSettings;
+};

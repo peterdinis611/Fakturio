@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const tabs = [
   { href: "/settings/company", label: "Firma" },
   { href: "/settings/appearance", label: "Vzhľad" },
+  { href: "/settings/jobs", label: "Joby" },
 ] as const;
 
 export function SettingsNav() {

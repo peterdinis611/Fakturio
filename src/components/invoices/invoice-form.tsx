@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import {
   updateInvoiceAction,
 } from "@/actions/invoices";
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
+import { LineTemplatesMenu } from "@/components/invoices/line-templates";
 import type { Invoice } from "@/lib/api/types";
 import type { z } from "zod";
 import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
@@ -176,6 +177,53 @@ export function InvoiceForm({
       0,
     );
   }, [watchedItems]);
+
+  const defaultVat = companyDefaults?.defaultVatRate ?? 23;
+
+  function addEmptyLine() {
+    append({
+      description: "",
+      unit: "ks",
+      quantity: 1,
+      unitPrice: 0,
+      vatRate: defaultVat,
+    });
+  }
+
+  useEffect(() => {
+    if (readOnly) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+
+      if (e.key === "Enter" && e.shiftKey) {
+        e.preventDefault();
+        addEmptyLine();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        void handleSubmit((values) => submit(values))();
+        return;
+      }
+
+      if (e.key === "Backspace" && e.shiftKey) {
+        const items = watchedItems ?? [];
+        if (items.length <= 1) return;
+        const last = items[items.length - 1];
+        if (last && !String(last.description ?? "").trim()) {
+          e.preventDefault();
+          remove(items.length - 1);
+        }
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable shortcuts for editor session
+  }, [readOnly, watchedItems, fields.length]);
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -384,26 +432,53 @@ export function InvoiceForm({
 
       <section className="panel flex flex-col gap-4 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-heading text-sm font-medium">Položky</h2>
+          <div>
+            <h2 className="font-heading text-sm font-medium">Položky</h2>
+            {!readOnly ? (
+              <p className="mt-0.5 text-[11px] text-faint">
+                ⌘/Ctrl+Enter uložiť · ⌘/Ctrl+Shift+Enter nový riadok ·
+                ⌘/Ctrl+Shift+⌫ zmazať prázdny
+              </p>
+            ) : null}
+          </div>
           {!readOnly ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={pending}
-              onClick={() =>
-                append({
-                  description: "",
-                  unit: "ks",
-                  quantity: 1,
-                  unitPrice: 0,
-                  vatRate: companyDefaults?.defaultVatRate ?? 23,
-                })
-              }
-            >
-              <PlusIcon />
-              Pridať položku
-            </Button>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <LineTemplatesMenu
+                disabled={pending}
+                currency={currency}
+                onApply={(t) =>
+                  append({
+                    description: t.description,
+                    unit: t.unit,
+                    quantity: 1,
+                    unitPrice: t.unitPrice,
+                    vatRate: t.vatRate,
+                  })
+                }
+                onSaveFromLine={() => {
+                  const items = watchedItems ?? [];
+                  const last = items[items.length - 1];
+                  if (!last) return null;
+                  return {
+                    description: String(last.description ?? ""),
+                    unit: String(last.unit ?? "ks"),
+                    unitPrice: Number(last.unitPrice) || 0,
+                    vatRate:
+                      last.vatRate != null ? Number(last.vatRate) : defaultVat,
+                  };
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={pending}
+                onClick={addEmptyLine}
+              >
+                <PlusIcon />
+                Pridať položku
+              </Button>
+            </div>
           ) : null}
         </div>
 

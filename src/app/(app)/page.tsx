@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { getReminders, listInvoices } from "@/actions/invoices";
-import { getReportOverview } from "@/actions/reports";
+import { getMonthlyRevenue, getReportOverview } from "@/actions/reports";
+import { CashflowTrend } from "@/components/dashboard/cashflow-trend";
 import { DashboardEmpty } from "@/components/dashboard/dashboard-empty";
 import { dueDaysLabel } from "@/components/dashboard/due-days";
+import {
+  buildTodayActions,
+  TodayActions,
+} from "@/components/dashboard/today-actions";
 import { PageHeader } from "@/components/layout/page-header";
 import { MotionItem } from "@/components/motion/page-motion";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -13,10 +18,13 @@ import { cn } from "@/lib/utils";
 export const metadata = { title: "Prehľad" };
 
 export default async function DashboardPage() {
-  const [overview, recent, reminders] = await Promise.all([
+  const year = new Date().getFullYear();
+  const [overview, recent, reminders, monthly, draftsPage] = await Promise.all([
     getReportOverview(),
     listInvoices({ page: 1, pageSize: 8 }),
     getReminders({ withinDays: 14 }),
+    getMonthlyRevenue(year),
+    listInvoices({ page: 1, pageSize: 5, status: "Draft" }),
   ]);
 
   const isEmpty = overview.totalInvoices === 0;
@@ -196,6 +204,26 @@ export default async function DashboardPage() {
           </div>
         ) : null}
       </MotionItem>
+
+      <div className="mb-10 grid gap-10 lg:grid-cols-2">
+        <MotionItem>
+          <TodayActions
+            actions={buildTodayActions({
+              overview,
+              reminders,
+              drafts: draftsPage.items,
+            })}
+          />
+        </MotionItem>
+        <MotionItem>
+          <CashflowTrend
+            currency={monthly.currency}
+            months={monthly.months}
+            yearPaidTotal={monthly.yearPaidTotal}
+            yearIssuedTotal={monthly.yearIssuedTotal}
+          />
+        </MotionItem>
+      </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
         <MotionItem>
