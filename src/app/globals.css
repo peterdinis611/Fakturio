@@ -125,6 +125,20 @@
   --sidebar-width: 220px;
   --sidebar: #e6e9ee;
   --sidebar-border: #cdd2da;
+
+  /* Clerk @clerk/ui shadcn theme reads these unprefixed tokens */
+  --background: var(--ground);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary-foreground: var(--primary-ink);
+  --secondary-foreground: var(--text);
+  --muted-foreground: var(--faint);
+  --accent-foreground: var(--text);
+  --destructive: var(--negative);
+  --input: var(--raised);
 }
 
 .dark {

@@ -1859,6 +1859,81 @@ html {
   background: transparent;
 }
 
+/* Hard contrast for Clerk buttons (shadcn theme + missing --primary-foreground) */
+.auth-shell-card .cl-socialButtonsBlockButton,
+.auth-shell-card .cl-socialButtonsBlockButton__google,
+.auth-shell-card button.cl-socialButtonsBlockButton {
+  background: var(--lp-surface) !important;
+  border: 1px solid var(--lp-border) !important;
+  color: var(--lp-ink) !important;
+}
+
+.auth-shell-card .cl-socialButtonsBlockButton span,
+.auth-shell-card .cl-socialButtonsProviderIcon__google + span,
+.auth-shell-card .cl-socialButtonsBlockButtonText {
+  color: var(--lp-ink) !important;
+}
+
+.dark .auth-shell-card .cl-socialButtonsBlockButton,
+.dark .auth-shell-card .cl-socialButtonsBlockButton__google,
+.dark .auth-shell-card button.cl-socialButtonsBlockButton {
+  background: #f2f2ee !important;
+  border-color: #f2f2ee !important;
+  color: #111110 !important;
+}
+
+.dark .auth-shell-card .cl-socialButtonsBlockButton span,
+.dark .auth-shell-card .cl-socialButtonsBlockButtonText {
+  color: #111110 !important;
+}
+
+.auth-shell-card .cl-formButtonPrimary,
+.auth-shell-card button.cl-formButtonPrimary {
+  background: var(--lp-ink) !important;
+  color: var(--lp-surface) !important;
+}
+
+.auth-shell-card .cl-formButtonPrimary span {
+  color: inherit !important;
+}
+
+.dark .auth-shell-card .cl-formButtonPrimary,
+.dark .auth-shell-card button.cl-formButtonPrimary {
+  background: var(--lp-teal) !important;
+  color: var(--lp-teal-ink) !important;
+}
+
+.auth-shell-card .cl-headerSubtitle,
+.auth-shell-card .cl-dividerText,
+.auth-shell-card .cl-formFieldLabel,
+.auth-shell-card .cl-footerActionText {
+  color: var(--lp-muted) !important;
+  opacity: 1 !important;
+}
+
+.dark .auth-shell-card .cl-headerSubtitle,
+.dark .auth-shell-card .cl-dividerText,
+.dark .auth-shell-card .cl-formFieldLabel {
+  color: #c4c4ba !important;
+}
+
+.auth-shell-card .cl-headerTitle {
+  color: var(--lp-ink) !important;
+}
+
+.auth-shell-card .cl-formFieldInput::placeholder {
+  color: var(--lp-muted) !important;
+  opacity: 0.85;
+}
+
+.dark .auth-shell-card .cl-formFieldInput::placeholder {
+  color: #9a9a90 !important;
+}
+
+.dark .auth-shell-card .cl-formFieldInput {
+  border-color: #3f3f38 !important;
+}
+
 .auth-panel-note {
   margin: 0;
   text-align: center;

@@ -24,7 +24,11 @@
     "cancel": "Zrušiť",
     "search": "Hľadať",
     "openMenu": "Otvoriť menu",
-    "closeMenu": "Zavrieť menu"
+    "closeMenu": "Zavrieť menu",
+    "themeLight": "Svetlý režim",
+    "themeDark": "Tmavý režim",
+    "themeEnableLight": "Zapnúť svetlý režim",
+    "themeEnableDark": "Zapnúť tmavý režim"
   },
   "Nav": {
     "dashboard": "Prehľad",

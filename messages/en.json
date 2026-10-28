@@ -24,7 +24,11 @@
     "cancel": "Cancel",
     "search": "Search",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "themeLight": "Light mode",
+    "themeDark": "Dark mode",
+    "themeEnableLight": "Switch to light mode",
+    "themeEnableDark": "Switch to dark mode"
   },
   "Nav": {
     "dashboard": "Overview",

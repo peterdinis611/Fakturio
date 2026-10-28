@@ -48,8 +48,9 @@ export const fakturioClerkLight = {
   elements: {
     ...sharedElements,
     socialButtonsBlockButton: `${sharedElements.socialButtonsBlockButton} !bg-[#f7f8fa] !border-[#cdd2da] !text-[#12151a] hover:!bg-[#eef0f3]`,
+    socialButtonsBlockButtonText: `${sharedElements.socialButtonsBlockButtonText} !text-[#12151a]`,
     formFieldInput: `${sharedElements.formFieldInput} !bg-[#eef0f3] !border-[#cdd2da] !text-[#12151a] focus:!border-[#0f766e]`,
-    formButtonPrimary: `${sharedElements.formButtonPrimary} !bg-[#12151a] !text-[#f7f8fa] hover:!bg-[#0f766e]`,
+    formButtonPrimary: `${sharedElements.formButtonPrimary} !bg-[#12151a] !text-[#f7f8fa] hover:!bg-[#0f766e] hover:!text-[#f7f8fa]`,
   },
 };
 
@@ -58,13 +59,13 @@ export const fakturioClerkDark = {
     colorPrimary: "#2dd4bf",
     colorPrimaryForeground: "#0e1a18",
     colorForeground: "#f2f2ee",
-    colorMutedForeground: "#a3a39a",
+    colorMutedForeground: "#c4c4ba",
     colorBackground: "#1a1a18",
     colorInput: "#242422",
     colorInputForeground: "#f2f2ee",
-    colorNeutral: "#a3a39a",
-    colorBorder: "#33332e",
-    colorMuted: "#242422",
+    colorNeutral: "#c4c4ba",
+    colorBorder: "#3f3f38",
+    colorMuted: "#2a2a26",
     colorDanger: "#f87171",
     colorRing: "#2dd4bf",
     colorShadow: "transparent",
@@ -75,9 +76,12 @@ export const fakturioClerkDark = {
   },
   elements: {
     ...sharedElements,
-    socialButtonsBlockButton: `${sharedElements.socialButtonsBlockButton} !bg-[#1a1a18] !border-[#33332e] !text-[#f2f2ee] hover:!bg-[#242422]`,
+    /* OAuth: light chip + dark ink — never inherit page foreground */
+    socialButtonsBlockButton: `${sharedElements.socialButtonsBlockButton} !bg-[#f2f2ee] !border-[#f2f2ee] !text-[#111110] hover:!bg-white`,
+    socialButtonsBlockButtonText: `${sharedElements.socialButtonsBlockButtonText} !text-[#111110]`,
     formFieldInput: `${sharedElements.formFieldInput} !bg-[#242422] !border-[#33332e] !text-[#f2f2ee] focus:!border-[#2dd4bf]`,
-    formButtonPrimary: `${sharedElements.formButtonPrimary} !bg-[#f2f2ee] !text-[#111110] hover:!bg-[#2dd4bf] hover:!text-[#0e1a18]`,
+    /* Primary: teal brand, dark ink — matches colorPrimaryForeground */
+    formButtonPrimary: `${sharedElements.formButtonPrimary} !bg-[#2dd4bf] !text-[#0e1a18] hover:!bg-[#5eead4] hover:!text-[#0e1a18]`,
   },
 };
 
