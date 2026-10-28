@@ -6,17 +6,10 @@ import {
   confirmPaymentImportAction,
   previewPaymentImportAction,
 } from "@/actions/payments";
+import { VirtualList } from "@/components/shared/virtual-list";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { actionErrorMessage } from "@/lib/action-utils";
 import type {
   PaymentImportPreviewResponse,
@@ -173,92 +166,77 @@ export function PaymentImportPanel() {
           </div>
 
           <div className="panel overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-10" />
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    #
-                  </TableHead>
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    VS
-                  </TableHead>
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    Suma
-                  </TableHead>
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    Faktúra
-                  </TableHead>
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    Stav
-                  </TableHead>
-                  <TableHead className="text-[12px] text-muted-foreground">
-                    Poznámka
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {preview.rows.map((row) => {
-                  const canSelect =
-                    row.matchStatus === "matched" && Boolean(row.invoiceId);
-                  const checked =
-                    canSelect && row.invoiceId
-                      ? selected.has(row.invoiceId)
-                      : false;
-                  return (
-                    <TableRow key={`${row.lineNumber}-${row.normalizedVariableSymbol}`}>
-                      <TableCell>
-                        {canSelect ? (
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={pending}
-                            onChange={() => toggle(row.invoiceId!)}
-                            aria-label={`Vybrať ${row.invoiceNumber}`}
-                          />
-                        ) : null}
-                      </TableCell>
-                      <TableCell className="data-num text-[13px]">
-                        {row.lineNumber}
-                      </TableCell>
-                      <TableCell className="data-num text-[13px]">
-                        {row.normalizedVariableSymbol ?? "—"}
-                      </TableCell>
-                      <TableCell className="data-num text-[13px]">
-                        {row.amount != null
-                          ? formatMoney(row.amount, row.invoiceCurrency ?? "EUR")
-                          : "—"}
-                      </TableCell>
-                      <TableCell>
-                        {row.invoiceNumber ? (
-                          <span className="font-medium">{row.invoiceNumber}</span>
-                        ) : (
-                          "—"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={cn(
-                            "text-[12px]",
-                            row.matchStatus === "matched" && "text-ink",
-                            row.matchStatus === "unmatched" &&
-                              "text-muted-foreground",
-                            row.matchStatus === "ambiguous" && "text-signal",
-                            row.matchStatus === "already_paid" &&
-                              "text-muted-foreground",
-                          )}
-                        >
-                          {statusLabel[row.matchStatus]}
-                        </span>
-                      </TableCell>
-                      <TableCell className="max-w-[14rem] truncate text-[12px] text-muted-foreground">
-                        {row.message ?? row.counterparty ?? "—"}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <div className="grid grid-cols-[2rem_2.5rem_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(6rem,1.4fr)] gap-2 border-b border-border px-3 py-2 text-[12px] text-muted-foreground">
+              <span />
+              <span>#</span>
+              <span>VS</span>
+              <span>Suma</span>
+              <span>Faktúra</span>
+              <span>Stav</span>
+              <span>Poznámka</span>
+            </div>
+            <VirtualList
+              items={preview.rows}
+              estimateSize={44}
+              maxHeight="22rem"
+              getItemKey={(row) =>
+                `${row.lineNumber}-${row.normalizedVariableSymbol ?? ""}`
+              }
+              renderItem={(row) => {
+                const canSelect =
+                  row.matchStatus === "matched" && Boolean(row.invoiceId);
+                const checked =
+                  canSelect && row.invoiceId
+                    ? selected.has(row.invoiceId)
+                    : false;
+                return (
+                  <div className="grid grid-cols-[2rem_2.5rem_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(6rem,1.4fr)] items-center gap-2 border-b border-border/80 px-3 py-2.5 text-[13px]">
+                    <span>
+                      {canSelect ? (
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          disabled={pending}
+                          onChange={() => toggle(row.invoiceId!)}
+                          aria-label={`Vybrať ${row.invoiceNumber}`}
+                        />
+                      ) : null}
+                    </span>
+                    <span className="data-num">{row.lineNumber}</span>
+                    <span className="data-num">
+                      {row.normalizedVariableSymbol ?? "—"}
+                    </span>
+                    <span className="data-num">
+                      {row.amount != null
+                        ? formatMoney(
+                            row.amount,
+                            row.invoiceCurrency ?? "EUR",
+                          )
+                        : "—"}
+                    </span>
+                    <span className="font-medium">
+                      {row.invoiceNumber ?? "—"}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[12px]",
+                        row.matchStatus === "matched" && "text-ink",
+                        row.matchStatus === "unmatched" &&
+                          "text-muted-foreground",
+                        row.matchStatus === "ambiguous" && "text-signal",
+                        row.matchStatus === "already_paid" &&
+                          "text-muted-foreground",
+                      )}
+                    >
+                      {statusLabel[row.matchStatus]}
+                    </span>
+                    <span className="truncate text-[12px] text-muted-foreground">
+                      {row.message ?? row.counterparty ?? "—"}
+                    </span>
+                  </div>
+                );
+              }}
+            />
           </div>
 
           <div className="flex justify-end gap-2">

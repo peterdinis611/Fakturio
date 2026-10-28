@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listCustomers } from "@/actions/customers";
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
 import { PageHeader } from "@/components/layout/page-header";
+import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,17 +35,11 @@ export default async function CustomersPage({
         actions={<CreateCustomerDialog />}
       />
 
-      <form className="mb-4 flex max-w-sm gap-2" action="/customers">
-        <input
-          name="q"
-          defaultValue={search}
-          placeholder="Meno, IČO, email…"
-          className="h-9 flex-1 rounded-[6px] border border-control bg-surface px-3 text-[14px] outline-none focus:ring-2 focus:ring-ink/15"
-        />
-        <Button type="submit" variant="secondary">
-          Hľadať
-        </Button>
-      </form>
+      <DebouncedSearchField
+        path="/customers"
+        initialQuery={search ?? ""}
+        placeholder="Meno, IČO, email…"
+      />
 
       {data.items.length === 0 ? (
         <div className="space-y-4">

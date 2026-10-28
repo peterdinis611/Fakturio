@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useState, useTransition } from "react";
+import { useDebouncer } from "@tanstack/react-pacer";
 import { cn } from "@/lib/utils";
 
 const DEBOUNCE_MS = 280;
@@ -20,23 +21,22 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
     syncFromUrl(initialQuery);
   }, [initialQuery]);
 
-  useEffect(() => {
-    const next = value.trim();
-    const current = initialQuery.trim();
-    if (next === current) return;
+  const debouncer = useDebouncer(
+    (next: string) => {
+      const trimmed = next.trim();
+      const current = initialQuery.trim();
+      if (trimmed === current) return;
 
-    const timer = window.setTimeout(() => {
       startTransition(() => {
-        if (!next) {
+        if (!trimmed) {
           router.replace("/search");
           return;
         }
-        router.replace(`/search?q=${encodeURIComponent(next)}`);
+        router.replace(`/search?q=${encodeURIComponent(trimmed)}`);
       });
-    }, DEBOUNCE_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [value, initialQuery, router]);
+    },
+    { wait: DEBOUNCE_MS },
+  );
 
   return (
     <div
@@ -57,7 +57,17 @@ export function SearchBox({ initialQuery }: { initialQuery: string }) {
         <input
           name="q"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            const next = e.target.value;
+            setValue(next);
+            debouncer.maybeExecute(next);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              debouncer.flush();
+            }
+          }}
           placeholder="Meno, IČO, číslo faktúry…"
           autoFocus
           autoComplete="off"

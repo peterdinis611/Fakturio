@@ -7,6 +7,7 @@ import {
   useTransition,
   type ComponentProps,
 } from "react";
+import { VirtualList } from "@/components/shared/virtual-list";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,7 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { parseCsv, type CsvTable } from "@/lib/preview/parse-csv";
 import { cn } from "@/lib/utils";
 
-const PREVIEW_ROWS = 80;
+const PREVIEW_ROWS = 200;
 
 export function CsvPreview({
   href,
@@ -161,39 +162,48 @@ export function CsvPreview({
                 Súbor je prázdny.
               </p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-max border-collapse text-left text-[12px]">
-                  <thead className="sticky top-0 z-10 bg-surface">
-                    <tr className="border-b border-rule">
-                      {table.headers.map((h, i) => (
-                        <th
-                          key={`${h}-${i}`}
-                          className="whitespace-nowrap px-3 py-2.5 font-medium text-muted-foreground"
-                        >
-                          {h || `Col ${i + 1}`}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.rows.map((row, ri) => (
-                      <tr
-                        key={ri}
-                        className="border-b border-rule/80 hover:bg-raised/40"
+              <div className="flex min-h-0 flex-col overflow-hidden">
+                <div className="overflow-x-auto">
+                  <div
+                    className="sticky top-0 z-10 grid min-w-max border-b border-rule bg-surface"
+                    style={{
+                      gridTemplateColumns: `repeat(${table.headers.length}, minmax(7rem, 1fr))`,
+                    }}
+                  >
+                    {table.headers.map((h, i) => (
+                      <div
+                        key={`${h}-${i}`}
+                        className="whitespace-nowrap px-3 py-2.5 text-[12px] font-medium text-muted-foreground"
+                      >
+                        {h || `Col ${i + 1}`}
+                      </div>
+                    ))}
+                  </div>
+                  <VirtualList
+                    items={table.rows}
+                    estimateSize={36}
+                    maxHeight="min(52vh, 420px)"
+                    getItemKey={(_, i) => i}
+                    renderItem={(row) => (
+                      <div
+                        className="grid min-w-max border-b border-rule/80 hover:bg-raised/40"
+                        style={{
+                          gridTemplateColumns: `repeat(${table.headers.length}, minmax(7rem, 1fr))`,
+                        }}
                       >
                         {table.headers.map((_, ci) => (
-                          <td
+                          <div
                             key={ci}
-                            className="max-w-[14rem] truncate px-3 py-2 font-mono text-ink tabular-nums"
+                            className="max-w-[14rem] truncate px-3 py-2 font-mono text-[12px] text-ink tabular-nums"
                             title={row[ci] ?? ""}
                           >
                             {row[ci] ?? ""}
-                          </td>
+                          </div>
                         ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                      </div>
+                    )}
+                  />
+                </div>
                 {truncated ? (
                   <p className="border-t border-rule px-5 py-3 text-[12px] text-faint">
                     Zobrazených prvých {PREVIEW_ROWS} riadkov — stiahni CSV pre

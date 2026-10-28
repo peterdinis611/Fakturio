@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import { listInvoices } from "@/actions/invoices";
 import { PageHeader } from "@/components/layout/page-header";
 import { CsvPreview } from "@/components/preview/csv-preview";
+import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
@@ -124,18 +125,15 @@ export default async function InvoicesPage({
         </Link>
       </div>
 
-      <form className="mb-4 flex max-w-sm gap-2" action="/invoices">
-        {status ? <input type="hidden" name="status" value={status} /> : null}
-        <input
-          name="q"
-          defaultValue={search}
-          placeholder="Číslo, zákazník…"
-          className="h-9 flex-1 rounded-[6px] border border-control bg-surface px-3 text-[14px] outline-none focus:ring-2 focus:ring-ink/15"
-        />
-        <Button type="submit" variant="secondary">
-          Hľadať
-        </Button>
-      </form>
+      <DebouncedSearchField
+        path="/invoices"
+        initialQuery={search ?? ""}
+        placeholder="Číslo, zákazník…"
+        extraParams={{
+          status,
+          overdue: overdueOnly ? "1" : undefined,
+        }}
+      />
 
       {data.items.length === 0 ? (
         <EmptyState
