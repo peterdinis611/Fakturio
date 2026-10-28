@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import { skSK } from "@clerk/localizations";
 import { shadcn } from "@clerk/ui/themes";
 import {
   Bricolage_Grotesque,
@@ -8,6 +9,7 @@ import {
 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { fakturioClerkLight } from "@/lib/clerk-appearance";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -114,7 +116,13 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-ground font-sans text-foreground">
         <ClerkProvider
-          appearance={{ theme: shadcn }}
+          localization={skSK}
+          appearance={{
+            theme: shadcn,
+            variables: fakturioClerkLight.variables,
+            signIn: fakturioClerkLight,
+            signUp: fakturioClerkLight,
+          }}
           signInUrl="/sign-in"
           signUpUrl="/sign-up"
           afterSignOutUrl="/"
