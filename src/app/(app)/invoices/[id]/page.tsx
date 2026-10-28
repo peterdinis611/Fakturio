@@ -45,6 +45,8 @@ export default async function InvoiceDetailPage({
     throw e;
   }
 
+  const showVat = invoice.sellerIsVatPayer !== false;
+
   return (
     <div>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
@@ -137,9 +139,11 @@ export default async function InvoiceDetailPage({
               <TableHead className="text-right text-[12px] text-muted-foreground">
                 Cena
               </TableHead>
-              <TableHead className="text-right text-[12px] text-muted-foreground">
-                DPH %
-              </TableHead>
+              {showVat ? (
+                <TableHead className="text-right text-[12px] text-muted-foreground">
+                  DPH %
+                </TableHead>
+              ) : null}
               <TableHead className="text-right text-[12px] text-muted-foreground">
                 Spolu
               </TableHead>
@@ -156,9 +160,11 @@ export default async function InvoiceDetailPage({
                 <TableCell className="money text-right">
                   {formatMoney(item.unitPrice, invoice.currency)}
                 </TableCell>
-                <TableCell className="data-num text-right">
-                  {item.vatRate}
-                </TableCell>
+                {showVat ? (
+                  <TableCell className="data-num text-right">
+                    {item.vatRate}
+                  </TableCell>
+                ) : null}
                 <TableCell className="money text-right">
                   {formatMoney(item.total, invoice.currency)}
                 </TableCell>
@@ -169,18 +175,26 @@ export default async function InvoiceDetailPage({
       </div>
 
       <div className="ml-auto max-w-xs space-y-1 text-[14px]">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Základ</span>
-          <span className="money">
-            {formatMoney(invoice.subtotal, invoice.currency)}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">DPH</span>
-          <span className="money">
-            {formatMoney(invoice.vatTotal, invoice.currency)}
-          </span>
-        </div>
+        {showVat ? (
+          <>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Základ</span>
+              <span className="money">
+                {formatMoney(invoice.subtotal, invoice.currency)}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">DPH</span>
+              <span className="money">
+                {formatMoney(invoice.vatTotal, invoice.currency)}
+              </span>
+            </div>
+          </>
+        ) : (
+          <p className="mb-2 text-[12px] text-muted-foreground">
+            Nie som platca DPH
+          </p>
+        )}
         <div className="flex justify-between border-t border-border pt-2 text-[16px]">
           <span className="font-medium">Celkom</span>
           <span className="money font-bold">

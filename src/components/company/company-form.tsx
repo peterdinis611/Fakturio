@@ -176,17 +176,27 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Input id="icDph" {...register("icDph")} />
         </Field>
         <Field className="sm:col-span-2">
-          <div className="flex items-center gap-2.5 rounded-[4px] border border-border bg-surface px-3 py-2.5">
-            <Checkbox
-              id="isVatPayer"
-              checked={isVatPayer}
-              onCheckedChange={(checked) =>
-                setValue("isVatPayer", checked === true)
-              }
-            />
-            <Label htmlFor="isVatPayer" className="font-normal">
-              Platca DPH
-            </Label>
+          <div className="flex flex-col gap-1.5 rounded-[4px] border border-border bg-surface px-3 py-2.5">
+            <div className="flex items-center gap-2.5">
+              <Checkbox
+                id="isVatPayer"
+                checked={isVatPayer}
+                onCheckedChange={(checked) =>
+                  setValue("isVatPayer", checked === true, {
+                    shouldDirty: true,
+                  })
+                }
+              />
+              <Label htmlFor="isVatPayer" className="font-normal">
+                Platca DPH
+              </Label>
+            </div>
+            {!isVatPayer ? (
+              <p className="pl-7 text-[12px] text-muted-foreground">
+                Režim neplatcu: na nových faktúrach bude DPH 0 % a PDF bez
+                stĺpca DPH (text „Nie som platca DPH“).
+              </p>
+            ) : null}
           </div>
         </Field>
         <Field className="sm:col-span-2">
@@ -270,8 +280,14 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             max={100}
             step="0.01"
             className="data-num"
+            disabled={!isVatPayer}
             {...register("defaultVatRate")}
           />
+          {!isVatPayer ? (
+            <p className="text-[11px] text-faint">
+              Pri neplatcovi sa predvolená sadzba nepoužíva.
+            </p>
+          ) : null}
         </Field>
         <Field>
           <Label htmlFor="defaultCurrency">Mena</Label>

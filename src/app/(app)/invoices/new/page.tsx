@@ -1,5 +1,6 @@
 import { listCustomers } from "@/actions/customers";
 import { getCompany } from "@/actions/company";
+import { listServices } from "@/actions/services";
 import { InvoiceForm } from "@/components/invoices/invoice-form";
 import { NewInvoiceNeedsCustomer } from "@/components/invoices/new-invoice-gate";
 import { PageHeader } from "@/components/layout/page-header";
@@ -12,9 +13,10 @@ export default async function NewInvoicePage({
   searchParams: Promise<{ customerId?: string }>;
 }) {
   const sp = await searchParams;
-  const [customers, company] = await Promise.all([
+  const [customers, company, services] = await Promise.all([
     listCustomers({ pageSize: 100 }),
     getCompany(),
+    listServices({ pageSize: 100, activeOnly: true }),
   ]);
 
   if (customers.items.length === 0) {
@@ -33,7 +35,11 @@ export default async function NewInvoicePage({
         description="Koncept môžeš vystaviť neskôr; PDF až po uložení."
         ledger={
           <>
-            <span>Predvolené DPH {company.defaultVatRate}%</span>
+            <span>
+              {company.isVatPayer
+                ? `Predvolené DPH ${company.defaultVatRate}%`
+                : "Neplatca DPH"}
+            </span>
             <span>Splatnosť {company.defaultDueDays} dní</span>
             <span>{company.defaultCurrency}</span>
           </>
@@ -42,6 +48,7 @@ export default async function NewInvoicePage({
       <InvoiceForm
         customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
         defaultCustomerId={sp.customerId}
+        catalogItems={services.items}
         companyDefaults={{
           defaultVatRate: company.defaultVatRate,
           defaultCurrency: company.defaultCurrency,
@@ -49,6 +56,7 @@ export default async function NewInvoicePage({
           bankIban: company.bankIban,
           bankBic: company.bankBic,
           defaultDueDays: company.defaultDueDays,
+          isVatPayer: company.isVatPayer,
         }}
       />
     </div>

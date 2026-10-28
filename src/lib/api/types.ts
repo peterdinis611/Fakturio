@@ -155,6 +155,7 @@ export type Invoice = {
   customerId: string;
   customer: InvoiceParty;
   seller: InvoiceParty | null;
+  sellerIsVatPayer?: boolean;
   issueDate: string;
   dueDate: string;
   deliveryDate: string | null;
@@ -423,4 +424,61 @@ export type ReminderJobSettings = {
 export type JobSettings = {
   overdueSync: OverdueJobSettings;
   reminderJob: ReminderJobSettings;
+};
+
+export type ServiceCatalogItem = {
+  id: string;
+  description: string;
+  unit: string;
+  unitPrice: number;
+  vatRate: number;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PaymentImportMatchStatus =
+  | "matched"
+  | "ambiguous"
+  | "unmatched"
+  | "already_paid"
+  | "skipped";
+
+export type PaymentImportRowResult = {
+  lineNumber: number;
+  rawVariableSymbol: string | null;
+  normalizedVariableSymbol: string | null;
+  amount: number | null;
+  bookingDate: string | null;
+  counterparty: string | null;
+  note: string | null;
+  matchStatus: PaymentImportMatchStatus;
+  invoiceId: string | null;
+  invoiceNumber: string | null;
+  invoiceTotal: number | null;
+  invoiceCurrency: string | null;
+  message: string | null;
+};
+
+export type PaymentImportPreviewResponse = {
+  totalRows: number;
+  matched: number;
+  ambiguous: number;
+  unmatched: number;
+  alreadyPaid: number;
+  skipped: number;
+  rows: PaymentImportRowResult[];
+};
+
+export type PaymentImportConfirmResult = {
+  invoiceId: string;
+  success: boolean;
+  message: string | null;
+};
+
+export type PaymentImportConfirmResponse = {
+  markedPaid: number;
+  failed: number;
+  results: PaymentImportConfirmResult[];
 };

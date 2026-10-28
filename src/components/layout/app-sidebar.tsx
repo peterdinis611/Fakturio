@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   BarChart3,
+  BookOpen,
   FileText,
   LayoutDashboard,
   Menu,
@@ -12,6 +13,7 @@ import {
   Search,
   Settings,
   Users,
+  Wallet,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -22,6 +24,8 @@ const nav = [
   { href: "/", label: "Prehľad", icon: LayoutDashboard },
   { href: "/invoices", label: "Faktúry", icon: FileText },
   { href: "/customers", label: "Zákazníci", icon: Users },
+  { href: "/services", label: "Katalóg", icon: BookOpen },
+  { href: "/payments/import", label: "Platby", icon: Wallet },
   { href: "/reminders", label: "Upomienky", icon: Bell },
   { href: "/reports", label: "Reporty", icon: BarChart3 },
   { href: "/search", label: "Hľadanie", icon: Search },

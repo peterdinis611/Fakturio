@@ -11,8 +11,9 @@ import {
   updateInvoiceAction,
 } from "@/actions/invoices";
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
+import { CatalogPicker } from "@/components/invoices/catalog-picker";
 import { LineTemplatesMenu } from "@/components/invoices/line-templates";
-import type { Invoice } from "@/lib/api/types";
+import type { Invoice, ServiceCatalogItem } from "@/lib/api/types";
 import type { z } from "zod";
 import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import {
@@ -42,6 +43,7 @@ type CompanyDefaults = {
   bankIban: string | null;
   bankBic: string | null;
   defaultDueDays: number;
+  isVatPayer: boolean;
 };
 
 type InvoiceFormProps = {
@@ -49,6 +51,7 @@ type InvoiceFormProps = {
   initial?: Invoice | null;
   companyDefaults?: CompanyDefaults;
   defaultCustomerId?: string;
+  catalogItems?: ServiceCatalogItem[];
 };
 
 function dateInputValue(value: string | null | undefined) {
@@ -89,10 +92,15 @@ function toFormValues(
         unit: item.unit,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        vatRate: item.vatRate,
+        vatRate: companyDefaults?.isVatPayer === false ? 0 : item.vatRate,
       })),
     };
   }
+
+  const vatDefault =
+    companyDefaults?.isVatPayer === false
+      ? 0
+      : (companyDefaults?.defaultVatRate ?? 23);
 
   return {
     customerId: defaultCustomerId ?? "",
@@ -113,7 +121,7 @@ function toFormValues(
         unit: "ks",
         quantity: 1,
         unitPrice: 0,
-        vatRate: companyDefaults?.defaultVatRate ?? 23,
+        vatRate: vatDefault,
       },
     ],
   };
@@ -135,12 +143,14 @@ export function InvoiceForm({
   initial,
   companyDefaults,
   defaultCustomerId,
+  catalogItems = [],
 }: InvoiceFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [customerOptions, setCustomerOptions] = useState(customers);
   const isEdit = Boolean(initial?.id);
   const readOnly = isEdit && initial!.status !== "Draft";
+  const isVatPayer = companyDefaults?.isVatPayer !== false;
 
   const form = useForm<InvoiceFormInput, unknown, InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -178,7 +188,9 @@ export function InvoiceForm({
     );
   }, [watchedItems]);
 
-  const defaultVat = companyDefaults?.defaultVatRate ?? 23;
+  const defaultVat = isVatPayer
+    ? (companyDefaults?.defaultVatRate ?? 23)
+    : 0;
 
   function addEmptyLine() {
     append({
@@ -187,6 +199,16 @@ export function InvoiceForm({
       quantity: 1,
       unitPrice: 0,
       vatRate: defaultVat,
+    });
+  }
+
+  function addFromCatalog(item: ServiceCatalogItem) {
+    append({
+      description: item.description,
+      unit: item.unit,
+      quantity: 1,
+      unitPrice: item.unitPrice,
+      vatRate: isVatPayer ? item.vatRate : 0,
     });
   }
 
@@ -233,10 +255,18 @@ export function InvoiceForm({
   }
 
   function submit(values: InvoiceFormValues, status?: "Draft" | "Issued") {
+    const payload = {
+      ...values,
+      items: values.items.map((item) => ({
+        ...item,
+        vatRate: isVatPayer ? item.vatRate : 0,
+      })),
+    };
+
     startTransition(async () => {
       const result = isEdit
-        ? await updateInvoiceAction({ ...values, id: initial!.id })
-        : await createInvoiceAction({ ...values, status: status ?? "Draft" });
+        ? await updateInvoiceAction({ ...payload, id: initial!.id })
+        : await createInvoiceAction({ ...payload, status: status ?? "Draft" });
 
       if (!result?.data) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
@@ -443,6 +473,15 @@ export function InvoiceForm({
           </div>
           {!readOnly ? (
             <div className="flex flex-wrap items-center gap-1.5">
+              {catalogItems.length > 0 ? (
+                <CatalogPicker
+                  disabled={pending}
+                  currency={currency}
+                  isVatPayer={isVatPayer}
+                  items={catalogItems}
+                  onPick={addFromCatalog}
+                />
+              ) : null}
               <LineTemplatesMenu
                 disabled={pending}
                 currency={currency}
@@ -452,7 +491,7 @@ export function InvoiceForm({
                     unit: t.unit,
                     quantity: 1,
                     unitPrice: t.unitPrice,
-                    vatRate: t.vatRate,
+                    vatRate: isVatPayer ? t.vatRate : 0,
                   })
                 }
                 onSaveFromLine={() => {
@@ -533,19 +572,26 @@ export function InvoiceForm({
                 />
                 <FieldError message={errors.items?.[index]?.unitPrice?.message} />
               </div>
-              <div className={cn(fieldClass, "sm:col-span-1")}>
-                <Label htmlFor={`items.${index}.vatRate`}>DPH</Label>
-                <Input
-                  id={`items.${index}.vatRate`}
-                  type="number"
-                  min={0}
-                  max={100}
-                  className="data-num"
-                  disabled={readOnly || pending}
-                  {...register(`items.${index}.vatRate`)}
-                />
-              </div>
-              <div className="flex items-end justify-between gap-2 sm:col-span-1 sm:flex-col sm:items-stretch">
+              {isVatPayer ? (
+                <div className={cn(fieldClass, "sm:col-span-1")}>
+                  <Label htmlFor={`items.${index}.vatRate`}>DPH</Label>
+                  <Input
+                    id={`items.${index}.vatRate`}
+                    type="number"
+                    min={0}
+                    max={100}
+                    className="data-num"
+                    disabled={readOnly || pending}
+                    {...register(`items.${index}.vatRate`)}
+                  />
+                </div>
+              ) : null}
+              <div
+                className={cn(
+                  "flex items-end justify-between gap-2 sm:flex-col sm:items-stretch",
+                  isVatPayer ? "sm:col-span-1" : "sm:col-span-2",
+                )}
+              >
                 <p className="data-num text-right text-sm font-medium text-signal sm:text-left">
                   {formatMoney(
                     lineTotal(
@@ -576,11 +622,16 @@ export function InvoiceForm({
         </div>
 
         <div className="ledger-strip justify-end border-b-0 pb-0">
-          <span>Celkom s DPH</span>
+          <span>{isVatPayer ? "Celkom s DPH" : "Celkom"}</span>
           <span className="data-num text-base font-semibold text-signal">
             {formatMoney(grandTotal, currency)}
           </span>
         </div>
+        {!isVatPayer ? (
+          <p className="text-[12px] text-muted-foreground">
+            Režim neplatcu DPH — sadzby sú 0 % a na PDF sa DPH nezobrazí.
+          </p>
+        ) : null}
       </section>
 
       <section className="panel flex flex-col gap-4 p-4">
