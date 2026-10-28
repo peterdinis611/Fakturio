@@ -1,35 +1,52 @@
 "use client";
 
-import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
-import { useLocale, useTranslations } from "next-intl";
-import { PageLoader } from "@/components/ui/spinner";
+import { SignIn, SignUp, useAuth } from "@clerk/nextjs";
+import { useLocale } from "next-intl";
+import { useEffect } from "react";
+import { useRouter } from "@/i18n/navigation";
+
+type Props = {
+  mode?: "sign-in" | "sign-up";
+};
 
 /**
- * Finishes Google/OAuth after the IdP redirect.
- * Kept minimal on purpose: no theme-dependent remounts, no overflow clipping,
- * so Clerk bot-protection / session transfer can complete.
+ * Path-based <SignIn>/<SignUp> finish Google OAuth on /sign-in/sso-callback.
+ * Do not use AuthenticateWithRedirectCallback here — that API is for custom
+ * useSignIn().sso() flows and leaves this page spinning forever.
  */
-export function SsoCallback() {
-  const t = useTranslations("Auth");
+export function SsoCallback({ mode = "sign-in" }: Props) {
   const locale = useLocale();
+  const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
+
   const signInPath = locale === "en" ? "/en/sign-in" : "/sign-in";
   const signUpPath = locale === "en" ? "/en/sign-up" : "/sign-up";
   const afterAuth = locale === "en" ? "/en/dashboard" : "/dashboard";
 
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
   return (
     <div className="auth-sso">
-      <PageLoader label={t("loadingSignIn")} />
-      {/* Required for Clerk bot / Turnstile challenges after OAuth */}
       <div id="clerk-captcha" />
-      <AuthenticateWithRedirectCallback
-        signInUrl={signInPath}
-        signUpUrl={signUpPath}
-        signInFallbackRedirectUrl={afterAuth}
-        signUpFallbackRedirectUrl={afterAuth}
-        signInForceRedirectUrl={afterAuth}
-        signUpForceRedirectUrl={afterAuth}
-        continueSignUpUrl={signUpPath}
-      />
+      {mode === "sign-up" ? (
+        <SignUp
+          routing="path"
+          path={signUpPath}
+          signInUrl={signInPath}
+          fallbackRedirectUrl={afterAuth}
+        />
+      ) : (
+        <SignIn
+          routing="path"
+          path={signInPath}
+          signUpUrl={signUpPath}
+          fallbackRedirectUrl={afterAuth}
+        />
+      )}
     </div>
   );
 }

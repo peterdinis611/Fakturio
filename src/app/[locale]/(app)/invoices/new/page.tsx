@@ -10,9 +10,10 @@ export const metadata = { title: "Nová faktúra" };
 export default async function NewInvoicePage({
   searchParams,
 }: {
-  searchParams: Promise<{ customerId?: string }>;
+  searchParams: Promise<{ customerId?: string; type?: string }>;
 }) {
   const sp = await searchParams;
+  const documentType = sp.type === "Proforma" ? "Proforma" : "Invoice";
   const [customers, company, services] = await Promise.all([
     listCustomers({ pageSize: 100 }),
     getCompany(),
@@ -31,8 +32,12 @@ export default async function NewInvoicePage({
   return (
     <div>
       <PageHeader
-        title="Nová faktúra"
-        description="Koncept môžeš vystaviť neskôr; PDF až po uložení."
+        title={documentType === "Proforma" ? "Nová zálohová" : "Nová faktúra"}
+        description={
+          documentType === "Proforma"
+            ? "Zálohová (ZF…) nie je daňový doklad — neskôr ju môžeš finalizovať."
+            : "Koncept môžeš vystaviť neskôr; PDF až po uložení."
+        }
         ledger={
           <>
             <span>
@@ -48,6 +53,7 @@ export default async function NewInvoicePage({
       <InvoiceForm
         customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
         defaultCustomerId={sp.customerId}
+        defaultDocumentType={documentType}
         catalogItems={services.items}
         companyDefaults={{
           defaultVatRate: company.defaultVatRate,

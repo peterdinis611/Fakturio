@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 export default async function SignUpSsoCallbackPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <SsoCallback />;
+  return <SsoCallback mode="sign-up" />;
 }

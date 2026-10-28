@@ -1856,8 +1856,13 @@ html {
   display: grid;
   place-items: center;
   padding: 2rem;
-  background: var(--lp-ground, #111110);
-  color: var(--lp-ink, #f2f2ee);
+  background: var(--lp-ground, #eef0f3);
+  color: var(--lp-ink, #12151a);
+}
+
+.dark .auth-sso {
+  background: #111110;
+  color: #f2f2ee;
 }
 
 .auth-shell-card .cl-rootBox,

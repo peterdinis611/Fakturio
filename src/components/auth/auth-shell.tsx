@@ -72,7 +72,6 @@ export function AuthShell({ mode }: AuthShellProps) {
                 routing="path"
                 path={signInPath}
                 signUpUrl={signUpPath}
-                forceRedirectUrl={afterAuth}
                 fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
@@ -82,7 +81,6 @@ export function AuthShell({ mode }: AuthShellProps) {
                 routing="path"
                 path={signUpPath}
                 signInUrl={signInPath}
-                forceRedirectUrl={afterAuth}
                 fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
