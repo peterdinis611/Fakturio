@@ -1,7 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
-import { skSK } from "@clerk/localizations";
-import { shadcn } from "@clerk/ui/themes";
 import {
   Bricolage_Grotesque,
   IBM_Plex_Mono,
@@ -9,7 +6,6 @@ import {
 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { fakturioClerkLight } from "@/lib/clerk-appearance";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -43,55 +39,24 @@ export const metadata: Metadata = {
   description:
     "Vystavuj faktúry, sleduj DPH a splatnosti a páruje platby podľa VS. Fakturio je jednoduchá fakturácia pre slovenských freelancerov a SZČO.",
   applicationName: "Fakturio",
-  authors: [{ name: "Fakturio" }],
-  creator: "Fakturio",
-  publisher: "Fakturio",
-  keywords: [
-    "fakturácia",
-    "faktúry",
-    "SZČO",
-    "freelancer",
-    "DPH",
-    "variabilný symbol",
-    "platby",
-    "Slovensko",
-    "Fakturio",
-  ],
   alternates: {
     canonical: "/",
-    languages: { sk: "/" },
+    languages: {
+      sk: "/",
+      en: "/en",
+      "x-default": "/",
+    },
   },
   openGraph: {
     type: "website",
     locale: "sk_SK",
+    alternateLocale: ["en_US"],
     url: "/",
     siteName: "Fakturio",
-    title: "Fakturio — fakturácia bez balastu",
-    description:
-      "Faktúry, DPH a platby podľa VS pre slovenských freelancerov a SZČO. Začni zadarmo.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Fakturio — fakturácia bez balastu",
-    description:
-      "Vystavuj faktúry, sleduj splatnosti a maj cashflow pod kontrolou.",
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
-  category: "business",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
   },
 };
 
@@ -115,23 +80,10 @@ export default function RootLayout({
       className={`${plexSans.variable} ${plexMono.variable} ${bricolage.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ground font-sans text-foreground">
-        <ClerkProvider
-          localization={skSK}
-          appearance={{
-            theme: shadcn,
-            variables: fakturioClerkLight.variables,
-            signIn: fakturioClerkLight,
-            signUp: fakturioClerkLight,
-          }}
-          signInUrl="/sign-in"
-          signUpUrl="/sign-up"
-          afterSignOutUrl="/"
-        >
-          <ThemeProvider>
-            {children}
-            <Toaster position="top-right" closeButton />
-          </ThemeProvider>
-        </ClerkProvider>
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-right" closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

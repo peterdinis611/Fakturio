@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { SignIn, SignUp } from "@clerk/nextjs";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@teispace/next-themes";
 import { useEffect, useState } from "react";
 import { AuthThemeSlot } from "@/components/landing/auth-theme-slot";
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
 import { PageLoader } from "@/components/ui/spinner";
+import { Link } from "@/i18n/navigation";
 import { fakturioClerkAppearance } from "@/lib/clerk-appearance";
 
 type AuthShellProps = {
@@ -13,6 +15,8 @@ type AuthShellProps = {
 };
 
 export function AuthShell({ mode }: AuthShellProps) {
+  const t = useTranslations("Auth");
+  const locale = useLocale();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -20,11 +24,17 @@ export function AuthShell({ mode }: AuthShellProps) {
 
   const isDark = mounted && resolvedTheme === "dark";
   const appearance = fakturioClerkAppearance(Boolean(isDark));
+  const signInPath = locale === "en" ? "/en/sign-in" : "/sign-in";
+  const signUpPath = locale === "en" ? "/en/sign-up" : "/sign-up";
+  const afterAuth = locale === "en" ? "/en/dashboard" : "/dashboard";
 
   return (
     <div className="auth-shell">
       <div className="auth-shell-glow" aria-hidden />
-      <AuthThemeSlot />
+      <div className="auth-shell-tools">
+        <LocaleSwitcher compact />
+        <AuthThemeSlot />
+      </div>
 
       <div className="auth-panel">
         <aside className="auth-panel-aside">
@@ -34,23 +44,17 @@ export function AuthShell({ mode }: AuthShellProps) {
           </Link>
           <div className="auth-panel-copy">
             <p className="auth-panel-eyebrow">
-              {mode === "sign-in" ? "Vitaj späť" : "Začni zadarmo"}
+              {mode === "sign-in" ? t("welcomeBack") : t("startFree")}
             </p>
             <h1>
-              {mode === "sign-in"
-                ? "Prihlásenie do Fakturio"
-                : "Vytvor si účet"}
+              {mode === "sign-in" ? t("signInTitle") : t("signUpTitle")}
             </h1>
-            <p>
-              {mode === "sign-in"
-                ? "Pokračuj vo faktúrach, splatnostiach a párovaní platieb."
-                : "Nastav firmu za pár minút a vystav prvú faktúru ešte dnes."}
-            </p>
+            <p>{mode === "sign-in" ? t("signInLead") : t("signUpLead")}</p>
           </div>
           <ul className="auth-panel-points">
-            <li>SK údaje · IČO, IBAN, VS</li>
-            <li>DPH režimy pre SZČO</li>
-            <li>Import platieb z banky</li>
+            <li>{t("pointSk")}</li>
+            <li>{t("pointVat")}</li>
+            <li>{t("pointPayments")}</li>
           </ul>
         </aside>
 
@@ -63,25 +67,23 @@ export function AuthShell({ mode }: AuthShellProps) {
             {!mounted ? (
               <PageLoader
                 label={
-                  mode === "sign-in"
-                    ? "Načítavam prihlásenie…"
-                    : "Načítavam registráciu…"
+                  mode === "sign-in" ? t("loadingSignIn") : t("loadingSignUp")
                 }
               />
             ) : mode === "sign-in" ? (
               <SignIn
                 routing="path"
-                path="/sign-in"
-                signUpUrl="/sign-up"
-                fallbackRedirectUrl="/dashboard"
+                path={signInPath}
+                signUpUrl={signUpPath}
+                fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
             ) : (
               <SignUp
                 routing="path"
-                path="/sign-up"
-                signInUrl="/sign-in"
-                fallbackRedirectUrl="/dashboard"
+                path={signUpPath}
+                signInUrl={signInPath}
+                fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
             )}
@@ -89,11 +91,13 @@ export function AuthShell({ mode }: AuthShellProps) {
           <p className="auth-panel-note">
             {mode === "sign-in" ? (
               <>
-                Nemáš účet? <Link href="/sign-up">Registrácia</Link>
+                {t("noAccount")}{" "}
+                <Link href="/sign-up">{t("signUpLink")}</Link>
               </>
             ) : (
               <>
-                Už máš účet? <Link href="/sign-in">Prihlásenie</Link>
+                {t("hasAccount")}{" "}
+                <Link href="/sign-in">{t("signInLink")}</Link>
               </>
             )}
           </p>

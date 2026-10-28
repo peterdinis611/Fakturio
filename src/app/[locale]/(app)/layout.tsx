@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { getCompanyStatus, getCompanySummary } from "@/actions/company";
 import { ensureCurrentUser } from "@/actions/users";
@@ -10,11 +10,13 @@ import {
   ScrollToTopButton,
 } from "@/components/layout/scroll-to-top";
 import { PageMotion } from "@/components/motion/page-motion";
+import { redirect } from "@/i18n/navigation";
 
 async function AppShell({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
   const { isAuthenticated } = await auth();
   if (!isAuthenticated) {
-    redirect("/sign-in");
+    redirect({ href: "/sign-in", locale });
   }
 
   try {
@@ -23,20 +25,27 @@ async function AppShell({ children }: { children: React.ReactNode }) {
     // Sync is best-effort; API may be down during first boot.
   }
 
-  let summary;
-  let status;
+  let loaded:
+    | {
+        summary: Awaited<ReturnType<typeof getCompanySummary>>;
+        status: Awaited<ReturnType<typeof getCompanyStatus>>;
+      }
+    | undefined;
   try {
-    [summary, status] = await Promise.all([
+    const [summary, status] = await Promise.all([
       getCompanySummary(),
       getCompanyStatus(),
     ]);
+    loaded = { summary, status };
   } catch {
-    redirect("/onboarding");
+    loaded = undefined;
   }
 
-  if (!summary.name?.trim()) {
-    redirect("/onboarding");
+  if (!loaded?.summary.name?.trim()) {
+    redirect({ href: "/onboarding", locale });
   }
+
+  const { summary, status } = loaded!;
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">

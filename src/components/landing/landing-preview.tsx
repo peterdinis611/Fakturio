@@ -8,46 +8,23 @@ import {
   useReducedMotion,
   useSpring,
 } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-const tabs = [
-  {
-    id: "overview",
-    label: "Prehľad",
-    kpis: [
-      { value: 24, suffix: "", label: "Vystavené", ring: 0.72 },
-      { value: 7, suffix: "", label: "Po splatnosti", ring: 0.28 },
-      { value: 12.8, suffix: "k", label: "EUR / mes.", ring: 0.86, decimals: 1 },
-    ],
-  },
-  {
-    id: "invoices",
-    label: "Faktúry",
-    rows: [
-      { code: "2026-014", client: "Studio Nova", amount: "420 €", status: "Zaplatené" },
-      { code: "2026-015", client: "Mlyn s.r.o.", amount: "1 180 €", status: "Splatnosť" },
-      { code: "2026-016", client: "Petra K.", amount: "95 €", status: "Koncept" },
-    ],
-  },
-  {
-    id: "payments",
-    label: "Platby",
-    rows: [
-      { code: "VS 26014", client: "Import CSV", amount: "420 €", status: "Spárované" },
-      { code: "VS 26011", client: "Import CSV", amount: "860 €", status: "Spárované" },
-      { code: "VS —", client: "Neznámy", amount: "50 €", status: "Čaká" },
-    ],
-  },
-] as const;
-
-function formatKpi(value: number, decimals?: number, suffix?: string) {
+function formatKpi(
+  value: number,
+  locale: string,
+  decimals?: number,
+  suffix?: string,
+) {
+  const tag = locale === "en" ? "en-US" : "sk-SK";
   const n =
     decimals != null
-      ? value.toLocaleString("sk-SK", {
+      ? value.toLocaleString(tag, {
           minimumFractionDigits: decimals,
           maximumFractionDigits: decimals,
         })
-      : Math.round(value).toLocaleString("sk-SK");
+      : Math.round(value).toLocaleString(tag);
   return `${n}${suffix ?? ""}`;
 }
 
@@ -84,6 +61,7 @@ function KpiCard({
   ring,
   decimals,
   active,
+  locale,
 }: {
   value: number;
   suffix?: string;
@@ -91,13 +69,14 @@ function KpiCard({
   ring: number;
   decimals?: number;
   active: boolean;
+  locale: string;
 }) {
   const n = useCountUp(value, active, decimals ?? 0);
   const deg = ring * 360;
 
   return (
     <div className="landing-kpi">
-      <strong>{formatKpi(n, decimals, suffix)}</strong>
+      <strong>{formatKpi(n, locale, decimals, suffix)}</strong>
       <span>{label}</span>
       <div
         className="landing-kpi-ring"
@@ -111,6 +90,8 @@ function KpiCard({
 }
 
 export function LandingPreview() {
+  const t = useTranslations("Landing");
+  const locale = useLocale();
   const [tab, setTab] = useState(0);
   const [inView, setInView] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -122,6 +103,81 @@ export function LandingPreview() {
   const rx = useSpring(mx, { stiffness: 180, damping: 22 });
   const ry = useSpring(my, { stiffness: 180, damping: 22 });
   const transform = useMotionTemplate`perspective(900px) rotateX(${ry}deg) rotateY(${rx}deg)`;
+
+  const tabs = useMemo(
+    () => [
+      {
+        id: "overview",
+        label: t("previewOverview"),
+        kpis: [
+          { value: 24, suffix: "", label: t("previewIssued"), ring: 0.72 },
+          { value: 7, suffix: "", label: t("previewOverdue"), ring: 0.28 },
+          {
+            value: 12.8,
+            suffix: "k",
+            label: t("previewMonth"),
+            ring: 0.86,
+            decimals: 1,
+          },
+        ],
+      },
+      {
+        id: "invoices",
+        label: t("previewInvoices"),
+        rows: [
+          {
+            code: "2026-014",
+            client: "Studio Nova",
+            amount: "420 €",
+            status: t("stampPaid"),
+            tone: "ok" as const,
+          },
+          {
+            code: "2026-015",
+            client: "Mlyn s.r.o.",
+            amount: "1 180 €",
+            status: t("invoiceDue"),
+            tone: "warn" as const,
+          },
+          {
+            code: "2026-016",
+            client: "Petra K.",
+            amount: "95 €",
+            status: "Draft",
+            tone: "muted" as const,
+          },
+        ],
+      },
+      {
+        id: "payments",
+        label: t("previewPayments"),
+        rows: [
+          {
+            code: "VS 26014",
+            client: "Import CSV",
+            amount: "420 €",
+            status: t("stampPaid"),
+            tone: "ok" as const,
+          },
+          {
+            code: "VS 26011",
+            client: "Import CSV",
+            amount: "860 €",
+            status: t("stampPaid"),
+            tone: "ok" as const,
+          },
+          {
+            code: "VS —",
+            client: "—",
+            amount: "50 €",
+            status: "…",
+            tone: "warn" as const,
+          },
+        ],
+      },
+    ],
+    [t],
+  );
 
   const selectTab = (i: number) => {
     setTab(i);
@@ -152,10 +208,10 @@ export function LandingPreview() {
   useEffect(() => {
     if (reduce || !inView || paused) return;
     const id = window.setInterval(() => {
-      setTab((t) => (t + 1) % tabs.length);
+      setTab((v) => (v + 1) % tabs.length);
     }, 4200);
     return () => clearInterval(id);
-  }, [reduce, inView, paused]);
+  }, [reduce, inView, paused, tabs.length]);
 
   const current = tabs[tab]!;
 
@@ -189,17 +245,21 @@ export function LandingPreview() {
         <span className={tab === 2 ? "is-lit" : undefined} />
       </div>
       <div className="landing-preview-main">
-        <div className="landing-preview-tabs" role="tablist" aria-label="Náhľad">
-          {tabs.map((t, i) => (
+        <div
+          className="landing-preview-tabs"
+          role="tablist"
+          aria-label={t("previewOverview")}
+        >
+          {tabs.map((item, i) => (
             <button
-              key={t.id}
+              key={item.id}
               type="button"
               role="tab"
               aria-selected={tab === i}
               className={tab === i ? "is-on" : undefined}
               onClick={() => selectTab(i)}
             >
-              {t.label}
+              {item.label}
             </button>
           ))}
         </div>
@@ -215,8 +275,13 @@ export function LandingPreview() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.28 }}
             >
-              {current.kpis.map((k) => (
-                <KpiCard key={k.label} {...k} active={inView && tab === 0} />
+              {current.kpis?.map((k) => (
+                <KpiCard
+                  key={k.label}
+                  {...k}
+                  locale={locale}
+                  active={inView && tab === 0}
+                />
               ))}
             </motion.div>
           ) : (
@@ -235,7 +300,7 @@ export function LandingPreview() {
                   <span className="landing-preview-client">{row.client}</span>
                   <span className="landing-preview-amt">{row.amount}</span>
                   <span
-                    className={`landing-preview-status status-${row.status === "Zaplatené" || row.status === "Spárované" ? "ok" : row.status === "Čaká" || row.status === "Splatnosť" ? "warn" : "muted"}`}
+                    className={`landing-preview-status status-${row.tone}`}
                   >
                     {row.status}
                   </span>
@@ -252,16 +317,19 @@ export function LandingPreview() {
         viewport={{ once: true }}
         transition={{ delay: 0.35, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        Zaplatené
+        {t("stampPaid")}
       </motion.span>
     </motion.div>
   );
 }
 
 export function LandingCashflowCard() {
+  const t = useTranslations("Landing");
+  const locale = useLocale();
   const reduce = useReducedMotion();
   const [drawn, setDrawn] = useState(false);
   const amount = useCountUp(1280, drawn);
+  const tag = locale === "en" ? "en-US" : "sk-SK";
 
   return (
     <motion.aside
@@ -274,12 +342,12 @@ export function LandingCashflowCard() {
       whileHover={reduce ? undefined : { y: -6, transition: { duration: 0.25 } }}
     >
       <div className="landing-stat-label">
-        <span>Cashflow trend</span>
+        <span>{t("cashflowLabel")}</span>
         <span className="landing-stat-dot" aria-hidden>
           €
         </span>
       </div>
-      <strong>{Math.round(amount).toLocaleString("sk-SK")} €</strong>
+      <strong>{Math.round(amount).toLocaleString(tag)} €</strong>
       <svg
         className="landing-stat-svg"
         viewBox="0 0 200 56"
@@ -310,7 +378,7 @@ export function LandingCashflowCard() {
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
         />
       </svg>
-      <p className="landing-stat-hint">+18 % oproti minulému mesiacu</p>
+      <p className="landing-stat-hint">{t("cashflowHint")}</p>
     </motion.aside>
   );
 }

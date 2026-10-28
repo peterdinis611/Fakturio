@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   BarChart3,
@@ -19,14 +17,20 @@ import {
   X,
 } from "lucide-react";
 import { Show, UserButton } from "@clerk/nextjs";
-import { Suspense } from "react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 function SidebarAuth() {
+  const t = useTranslations("Common");
+
   return (
-    <Suspense fallback={<div className="h-8 w-8 animate-pulse rounded-full bg-raised" />}>
+    <Suspense
+      fallback={<div className="h-8 w-8 animate-pulse rounded-full bg-raised" />}
+    >
       <Show when="signed-in">
         <div className="flex items-center gap-2 px-1 py-1">
           <UserButton
@@ -36,26 +40,26 @@ function SidebarAuth() {
               },
             }}
           />
-          <span className="text-[12px] text-muted-foreground">Účet</span>
+          <span className="text-[12px] text-muted-foreground">{t("account")}</span>
         </div>
       </Show>
     </Suspense>
   );
 }
 
-const nav = [
-  { href: "/dashboard", label: "Prehľad", icon: LayoutDashboard },
-  { href: "/invoices", label: "Faktúry", icon: FileText },
-  { href: "/customers", label: "Zákazníci", icon: Users },
-  { href: "/services", label: "Katalóg", icon: BookOpen },
-  { href: "/zivotopis", label: "Životopis", icon: IdCard },
-  { href: "/payments/import", label: "Platby", icon: Wallet },
-  { href: "/reminders", label: "Upomienky", icon: Bell },
-  { href: "/reports", label: "Reporty", icon: BarChart3 },
-  { href: "/search", label: "Hľadanie", icon: Search },
-  { href: "/profile", label: "Profil", icon: UserRound },
-  { href: "/settings", label: "Nastavenia", icon: Settings },
-];
+const navKeys = [
+  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
+  { href: "/invoices", key: "invoices", icon: FileText },
+  { href: "/customers", key: "customers", icon: Users },
+  { href: "/services", key: "services", icon: BookOpen },
+  { href: "/zivotopis", key: "resume", icon: IdCard },
+  { href: "/payments/import", key: "payments", icon: Wallet },
+  { href: "/reminders", key: "reminders", icon: Bell },
+  { href: "/reports", key: "reports", icon: BarChart3 },
+  { href: "/search", key: "search", icon: Search },
+  { href: "/profile", key: "profile", icon: UserRound },
+  { href: "/settings", key: "settings", icon: Settings },
+] as const;
 
 function NavLinks({
   pathname,
@@ -64,11 +68,12 @@ function NavLinks({
   pathname: string;
   onNavigate?: () => void;
 }) {
+  const t = useTranslations("Nav");
   const reduce = useReducedMotion();
 
   return (
     <nav className="flex flex-1 flex-col gap-px px-2">
-      {nav.map((item, i) => {
+      {navKeys.map((item, i) => {
         const active =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
@@ -102,7 +107,7 @@ function NavLinks({
                 />
               ) : null}
               <Icon className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
-              {item.label}
+              {t(item.key)}
             </Link>
           </motion.div>
         );
@@ -131,6 +136,7 @@ function Brand({ companyName }: { companyName?: string }) {
 
 export function AppSidebar({ companyName }: { companyName?: string }) {
   const pathname = usePathname();
+  const tc = useTranslations("Common");
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
 
@@ -147,7 +153,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
           type="button"
           className="inline-flex size-9 items-center justify-center text-muted-foreground hover:bg-raised hover:text-ink"
           aria-expanded={open}
-          aria-label={open ? "Zavrieť menu" : "Otvoriť menu"}
+          aria-label={open ? tc("closeMenu") : tc("openMenu")}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X className="size-4" /> : <Menu className="size-4" />}
@@ -166,7 +172,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
             <button
               type="button"
               className="absolute inset-0 bg-ink/25"
-              aria-label="Zavrieť"
+              aria-label={tc("closeMenu")}
               onClick={() => setOpen(false)}
             />
             <motion.aside
@@ -180,6 +186,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
                 <SidebarAuth />
+                <LocaleSwitcher compact className="px-1" />
                 <ThemeToggle />
               </div>
             </motion.aside>
@@ -192,6 +199,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
         <NavLinks pathname={pathname} />
         <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
           <SidebarAuth />
+          <LocaleSwitcher compact className="px-1" />
           <ThemeToggle />
         </div>
       </aside>

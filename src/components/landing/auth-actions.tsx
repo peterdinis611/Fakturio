@@ -1,39 +1,48 @@
-import Link from "next/link";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function LandingNavActions() {
+  const t = useTranslations("Landing");
+
   return (
     <div className="landing-nav-actions">
       <Link href="/sign-in" className="ghost">
-        Prihlásiť sa
+        {t("signIn")}
       </Link>
       <Link href="/sign-up" className="landing-btn landing-btn-teal">
-        Vytvoriť účet
+        {t("createAccount")}
       </Link>
     </div>
   );
 }
 
 export function LandingHeroActions() {
+  const t = useTranslations("Landing");
+
   return (
     <div className="landing-hero-cta">
       <Link href="/sign-up" className="landing-btn">
-        Začať zadarmo
+        {t("ctaStart")}
       </Link>
       <Link href="/sign-in" className="landing-btn landing-btn-outline">
-        Mám účet
+        {t("ctaHaveAccount")}
       </Link>
     </div>
   );
 }
 
 export function LandingCtaActions() {
+  const t = useTranslations("Landing");
+
   return (
     <div className="landing-cta-actions">
       <Link href="/sign-up" className="landing-btn landing-btn-teal">
-        Vytvoriť účet
+        {t("createAccount")}
       </Link>
       <Link href="/sign-in" className="landing-btn landing-btn-outline">
-        Prihlásiť sa
+        {t("signIn")}
       </Link>
     </div>
   );

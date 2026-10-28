@@ -1636,11 +1636,65 @@ html {
   z-index: 0;
 }
 
-.auth-shell-theme {
+.auth-shell-tools {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.locale-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: var(--lp-surface, #f7f8fa);
+  border: 1px solid color-mix(in oklab, var(--lp-border, #cdd2da) 80%, transparent);
+  box-shadow: var(--lp-shadow-soft, 0 10px 28px rgba(18, 21, 26, 0.05));
+}
+
+.locale-switcher-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--lp-muted, #5a6270);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.locale-switcher-btn:hover {
+  color: var(--lp-ink, #12151a);
+}
+
+.locale-switcher-btn.is-active {
+  background: var(--lp-ink, #12151a);
+  color: var(--lp-surface, #f7f8fa);
+}
+
+.locale-switcher-btn:disabled,
+.locale-switcher-btn.is-pending {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.landing-locale.locale-switcher {
+  background: var(--lp-surface);
+}
+
+.dark .locale-switcher {
+  background: var(--lp-surface, #1a1a18);
+  border-color: var(--lp-border, #33332e);
 }
 
 .dark .auth-shell {
