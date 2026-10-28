@@ -26,6 +26,7 @@ export function ClerkThemeProvider({
   afterSignOutUrl,
 }: Props) {
   const { resolvedTheme } = useTheme();
+  // Prefer light until theme is known — avoid flipping on first paint during OAuth return.
   const isDark = resolvedTheme === "dark";
   const appearance = useMemo(
     () => (isDark ? fakturioClerkDark : fakturioClerkLight),
@@ -44,6 +45,8 @@ export function ClerkThemeProvider({
       signInUrl={signInUrl}
       signUpUrl={signUpUrl}
       afterSignOutUrl={afterSignOutUrl}
+      // Keep UI prefetch so bot-protection challenges can render after Google OAuth.
+      prefetchUI
     >
       {children}
     </ClerkProvider>

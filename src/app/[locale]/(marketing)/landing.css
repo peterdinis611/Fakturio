@@ -1847,7 +1847,17 @@ html {
   width: 100%;
   border-radius: 1.15rem;
   background: transparent;
-  overflow: hidden;
+  /* visible: Clerk captcha / bot-protection dialogs must not be clipped */
+  overflow: visible;
+}
+
+.auth-sso {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: var(--lp-ground, #111110);
+  color: var(--lp-ink, #f2f2ee);
 }
 
 .auth-shell-card .cl-rootBox,

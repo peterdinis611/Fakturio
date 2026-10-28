@@ -65,8 +65,10 @@ export function AuthShell({ mode }: AuthShellProps) {
             Fakturio
           </Link>
           <div className="auth-shell-card">
+            {/* Stable key: theme appearance updates must not remount mid-OAuth */}
             {mode === "sign-in" ? (
               <SignIn
+                key="sign-in"
                 routing="path"
                 path={signInPath}
                 signUpUrl={signUpPath}
@@ -76,6 +78,7 @@ export function AuthShell({ mode }: AuthShellProps) {
               />
             ) : (
               <SignUp
+                key="sign-up"
                 routing="path"
                 path={signUpPath}
                 signInUrl={signInPath}
@@ -84,6 +87,7 @@ export function AuthShell({ mode }: AuthShellProps) {
                 appearance={appearance}
               />
             )}
+            <div id="clerk-captcha" />
           </div>
           <p className="auth-panel-note">
             {mode === "sign-in" ? (
