@@ -12,11 +12,17 @@ import {
 import {
   Banknote,
   Bell,
+  Briefcase,
+  Check,
   FileSpreadsheet,
+  Laptop,
   Menu,
   Package,
   Receipt,
+  Shield,
   Upload,
+  UserRound,
+  Users,
   X,
 } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
@@ -37,11 +43,56 @@ import {
 import { LandingThemeToggle } from "@/components/landing/landing-theme-toggle";
 
 const navLinks = [
-  { href: "#uvod", id: "uvod", label: "Domov" },
-  { href: "#funkcie", id: "funkcie", label: "Funkcie" },
-  { href: "#postup", id: "postup", label: "Postup" },
-  { href: "#faq", id: "faq", label: "FAQ" },
-  { href: "#zacat", id: "zacat", label: "Začať" },
+  { href: "/#uvod", id: "uvod", label: "Domov" },
+  { href: "/#funkcie", id: "funkcie", label: "Funkcie" },
+  { href: "/#pre-koho", id: "pre-koho", label: "Pre koho" },
+  { href: "/#postup", id: "postup", label: "Postup" },
+  { href: "/#faq", id: "faq", label: "FAQ" },
+  { href: "/#zacat", id: "zacat", label: "Začať" },
+] as const;
+
+const audiences = [
+  {
+    title: "SZČO",
+    body: "Neplatca DPH, EUR, IČO a IBAN. Faktúra bez tabuľky a Word šablóny.",
+    Icon: UserRound,
+  },
+  {
+    title: "Freelancer",
+    body: "Opakovaní klienti, katalóg služieb a prehľad, kto ešte nezaplatil.",
+    Icon: Laptop,
+  },
+  {
+    title: "Malý tím",
+    body: "Jedna firma, spoločný prehľad splatností a export pre účtovníka.",
+    Icon: Users,
+  },
+] as const;
+
+const compareRows = [
+  { label: "Číslovanie & VS", excel: "Ručne / skript", fakturio: "Automaticky" },
+  { label: "DPH režimy", excel: "Vlastné vzorce", fakturio: "Neplatca / platca" },
+  { label: "Párovanie platieb", excel: "Hľadanie vo VS", fakturio: "Import CSV" },
+  { label: "Splatnosti", excel: "Farbičky v bunkách", fakturio: "Prehľad + joby" },
+  { label: "Export účtovníkovi", excel: "Copy-paste", fakturio: "CSV / PDF" },
+] as const;
+
+const trustItems = [
+  {
+    title: "SK prax",
+    body: "IČO, DIČ, IBAN, VS a EUR — bez úprav pre zahraničné šablóny.",
+    Icon: Briefcase,
+  },
+  {
+    title: "Tvoje dáta",
+    body: "Firemné záznamy ostávajú v tvojej inštancii, účet je oddelený.",
+    Icon: Shield,
+  },
+  {
+    title: "Bez kreditky",
+    body: "Začni zadarmo. Nastavenie firmy a prvá faktúra za pár minút.",
+    Icon: Check,
+  },
 ] as const;
 
 const features = [
@@ -216,9 +267,9 @@ export function LandingShell() {
 
   return (
     <div className="landing">
-      <a href="#uvod" className="landing-skip">
+      <Link href="/#uvod" className="landing-skip">
         Preskočiť na obsah
-      </a>
+      </Link>
 
       <motion.div
         className="landing-progress"
@@ -236,14 +287,14 @@ export function LandingShell() {
 
         <nav className="landing-pill-nav" aria-label="Sekcie">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               aria-current={active === link.id ? "page" : undefined}
               onClick={(e) => onNavClick(e, link.id)}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -274,13 +325,13 @@ export function LandingShell() {
             transition={{ duration: 0.22 }}
           >
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={(e) => onNavClick(e, link.id)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <Link href="/sign-in" onClick={() => setMenuOpen(false)}>
               Prihlásiť sa
@@ -360,6 +411,26 @@ export function LandingShell() {
         </LandingStagger>
       </section>
 
+      <section className="landing-section" id="pre-koho" aria-label="Pre koho">
+        <LandingReveal className="landing-section-head">
+          <h2>Pre koho je Fakturio</h2>
+          <p>Nie ERP. Nástroj na faktúry, splatnosti a cashflow — v slovenskej praxi.</p>
+        </LandingReveal>
+        <LandingStagger className="landing-audience">
+          {audiences.map((a) => (
+            <LandingStaggerItem key={a.title}>
+              <article className="landing-audience-card">
+                <span className="landing-audience-icon" aria-hidden>
+                  <a.Icon strokeWidth={1.75} className="size-5" />
+                </span>
+                <h3>{a.title}</h3>
+                <p>{a.body}</p>
+              </article>
+            </LandingStaggerItem>
+          ))}
+        </LandingStagger>
+      </section>
+
       <section className="landing-section" id="postup" aria-label="Postup">
         <LandingReveal className="landing-section-head">
           <h2>Tri kroky a môžeš fakturovať</h2>
@@ -375,6 +446,124 @@ export function LandingShell() {
                 ) : null}
                 <h3>{s.title}</h3>
                 <p>{s.body}</p>
+              </article>
+            </LandingStaggerItem>
+          ))}
+        </LandingStagger>
+      </section>
+
+      <section
+        className="landing-section"
+        id="porovnanie"
+        aria-label="Porovnanie s Excelom"
+      >
+        <LandingReveal className="landing-section-head landing-section-head-wide">
+          <h2>Namiesto Excelu a Word šablón</h2>
+          <p>
+            Tabuľka zvládne všetko — kým nezabudneš VS, sadzbu alebo kto ešte
+            dlží.
+          </p>
+        </LandingReveal>
+        <LandingReveal>
+          <div className="landing-compare" role="table" aria-label="Porovnanie">
+            <div className="landing-compare-head" role="row">
+              <span role="columnheader">Čo riešiš</span>
+              <span role="columnheader">Excel</span>
+              <span role="columnheader">Fakturio</span>
+            </div>
+            {compareRows.map((row) => (
+              <div className="landing-compare-row" role="row" key={row.label}>
+                <span role="cell">{row.label}</span>
+                <span role="cell" className="is-muted">
+                  {row.excel}
+                </span>
+                <span role="cell" className="is-good">
+                  <Check className="size-3.5" strokeWidth={2.5} aria-hidden />
+                  {row.fakturio}
+                </span>
+              </div>
+            ))}
+          </div>
+        </LandingReveal>
+      </section>
+
+      <section className="landing-section" id="ukazka" aria-label="Ukážka faktúry">
+        <div className="landing-sample">
+          <LandingReveal className="landing-sample-copy">
+            <p className="landing-eyebrow">Ukážka</p>
+            <h2>Faktúra, ktorú pozná klient aj banka</h2>
+            <p>
+              Číslo, VS, splatnosť a platobný pás — pripravené na odoslanie.
+              Bez ručného kopírovania do PDF šablóny.
+            </p>
+            <ul className="landing-sample-points">
+              <li>Režim neplatcu DPH</li>
+              <li>VS zhodný s číslom faktúry</li>
+              <li>IBAN a QR pripravené na doplnenie</li>
+            </ul>
+          </LandingReveal>
+          <LandingReveal delay={0.1}>
+            <article className="landing-invoice" aria-label="Náhľad faktúry">
+              <header className="landing-invoice-top">
+                <div>
+                  <strong>FAKTÚRA</strong>
+                  <span>2026-016</span>
+                </div>
+                <div className="landing-invoice-stamp">Vystavená</div>
+              </header>
+              <div className="landing-invoice-parties">
+                <div>
+                  <span>Dodávateľ</span>
+                  <p>Peter Dinis · SZČO</p>
+                  <p>IČO 12 345 678</p>
+                </div>
+                <div>
+                  <span>Odberateľ</span>
+                  <p>Studio Nova s.r.o.</p>
+                  <p>Bratislava</p>
+                </div>
+              </div>
+              <div className="landing-invoice-lines">
+                <div>
+                  <span>UX konzultácia</span>
+                  <strong>420,00 €</strong>
+                </div>
+                <div>
+                  <span>Doprava / režijné</span>
+                  <strong>35,00 €</strong>
+                </div>
+              </div>
+              <footer className="landing-invoice-foot">
+                <div>
+                  <span>VS</span>
+                  <strong>2026016</strong>
+                </div>
+                <div>
+                  <span>Splatnosť</span>
+                  <strong>14. 11. 2026</strong>
+                </div>
+                <div>
+                  <span>Celkom</span>
+                  <strong>455,00 €</strong>
+                </div>
+              </footer>
+            </article>
+          </LandingReveal>
+        </div>
+      </section>
+
+      <section className="landing-section landing-trust-section" aria-label="Dôvera">
+        <LandingStagger className="landing-trust">
+          {trustItems.map((t) => (
+            <LandingStaggerItem key={t.title}>
+              <article className="landing-trust-item">
+                <span className="landing-trust-icon" aria-hidden>
+                  <t.Icon strokeWidth={1.75} className="size-4" />
+                </span>
+                <div>
+                  <h3>{t.title}</h3>
+                  <p>{t.body}</p>
+                </div>
               </article>
             </LandingStaggerItem>
           ))}
@@ -440,12 +629,40 @@ export function LandingShell() {
       </LandingReveal>
 
       <footer className="landing-foot">
-        <span>Fakturio · fakturácia pre SK</span>
-        <div className="landing-foot-links">
-          <Link href="/sign-in">Prihlásenie</Link>
-          <Link href="/sign-up">Registrácia</Link>
+        <div className="landing-foot-brand">
+          <span className="landing-mark" aria-hidden>
+            F
+          </span>
+          <div>
+            <strong>Fakturio</strong>
+            <p>Fakturácia pre SK freelancerov a SZČO</p>
+          </div>
         </div>
-        <span>© {new Date().getFullYear()}</span>
+        <div className="landing-foot-cols">
+          <div>
+            <span>Produkt</span>
+            <Link href="/#funkcie" onClick={(e) => onNavClick(e, "funkcie")}>
+              Funkcie
+            </Link>
+            <Link href="/#porovnanie" onClick={(e) => onNavClick(e, "porovnanie")}>
+              Porovnanie
+            </Link>
+            <Link href="/#ukazka" onClick={(e) => onNavClick(e, "ukazka")}>
+              Ukážka
+            </Link>
+          </div>
+          <div>
+            <span>Účet</span>
+            <Link href="/sign-in">Prihlásenie</Link>
+            <Link href="/sign-up">Registrácia</Link>
+            <Link href="/#faq" onClick={(e) => onNavClick(e, "faq")}>
+              FAQ
+            </Link>
+          </div>
+        </div>
+        <p className="landing-foot-copy">
+          © {new Date().getFullYear()} Fakturio
+        </p>
       </footer>
     </div>
   );

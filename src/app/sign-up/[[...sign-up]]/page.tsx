@@ -1,11 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { SignUp } from "@clerk/nextjs";
 import { Suspense } from "react";
 import { AuthThemeSlot } from "@/components/landing/auth-theme-slot";
 import { PageLoader } from "@/components/ui/spinner";
 import "@/app/(marketing)/landing.css";
 
-export const metadata = { title: "Registrácia" };
+export const metadata: Metadata = {
+  title: "Registrácia",
+  description: "Vytvor si účet vo Fakturio a vystav prvú faktúru ešte dnes.",
+  robots: { index: false, follow: false },
+};
 
 export default function SignUpPage() {
   return (
