@@ -2,8 +2,9 @@
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/ui/themes";
+import { ui } from "@clerk/ui";
 import { useTheme } from "@teispace/next-themes";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import {
   fakturioClerkDark,
   fakturioClerkLight,
@@ -25,19 +26,18 @@ export function ClerkThemeProvider({
   afterSignOutUrl,
 }: Props) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const isDark = mounted && resolvedTheme === "dark";
-  const appearance = isDark ? fakturioClerkDark : fakturioClerkLight;
+  const isDark = resolvedTheme === "dark";
+  const appearance = useMemo(
+    () => (isDark ? fakturioClerkDark : fakturioClerkLight),
+    [isDark],
+  );
 
   return (
     <ClerkProvider
+      ui={ui}
       localization={localization}
       appearance={{
         theme: shadcn,
-        ...appearance,
         variables: appearance.variables,
         elements: appearance.elements,
       }}

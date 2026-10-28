@@ -5,11 +5,13 @@ import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
+function isApiOrTrpc(pathname: string) {
+  return pathname.startsWith("/api") || pathname.startsWith("/trpc");
+}
+
 export default clerkMiddleware(async (_auth, req) => {
-  if (
-    req.nextUrl.pathname.startsWith("/api") ||
-    req.nextUrl.pathname.startsWith("/__clerk")
-  ) {
+  // Keep API out of locale rewrites; let Clerk still decorate the request.
+  if (isApiOrTrpc(req.nextUrl.pathname)) {
     return NextResponse.next();
   }
 

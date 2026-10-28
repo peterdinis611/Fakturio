@@ -12,10 +12,12 @@ import {
 import { PageMotion } from "@/components/motion/page-motion";
 import { redirect } from "@/i18n/navigation";
 
+export const dynamic = "force-dynamic";
+
 async function AppShell({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
-  const { isAuthenticated } = await auth();
-  if (!isAuthenticated) {
+  const session = await auth();
+  if (!session.isAuthenticated) {
     redirect({ href: "/sign-in", locale });
   }
 

@@ -6,7 +6,6 @@ import { useTheme } from "@teispace/next-themes";
 import { useEffect, useState } from "react";
 import { AuthThemeSlot } from "@/components/landing/auth-theme-slot";
 import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
-import { PageLoader } from "@/components/ui/spinner";
 import { Link } from "@/i18n/navigation";
 import { fakturioClerkAppearance } from "@/lib/clerk-appearance";
 
@@ -22,6 +21,8 @@ export function AuthShell({ mode }: AuthShellProps) {
 
   useEffect(() => setMounted(true), []);
 
+  // Default light until mounted — but NEVER delay mounting SignIn/SignUp.
+  // Delaying breaks /sign-in/sso-callback after Google OAuth.
   const isDark = mounted && resolvedTheme === "dark";
   const appearance = fakturioClerkAppearance(Boolean(isDark));
   const signInPath = locale === "en" ? "/en/sign-in" : "/sign-in";
@@ -64,17 +65,12 @@ export function AuthShell({ mode }: AuthShellProps) {
             Fakturio
           </Link>
           <div className="auth-shell-card">
-            {!mounted ? (
-              <PageLoader
-                label={
-                  mode === "sign-in" ? t("loadingSignIn") : t("loadingSignUp")
-                }
-              />
-            ) : mode === "sign-in" ? (
+            {mode === "sign-in" ? (
               <SignIn
                 routing="path"
                 path={signInPath}
                 signUpUrl={signUpPath}
+                forceRedirectUrl={afterAuth}
                 fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
@@ -83,6 +79,7 @@ export function AuthShell({ mode }: AuthShellProps) {
                 routing="path"
                 path={signUpPath}
                 signInUrl={signInPath}
+                forceRedirectUrl={afterAuth}
                 fallbackRedirectUrl={afterAuth}
                 appearance={appearance}
               />
