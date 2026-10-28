@@ -1,5 +1,8 @@
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { getCompanyStatus, getCompanySummary } from "@/actions/company";
+import { ensureCurrentUser } from "@/actions/users";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { CompanyBanner } from "@/components/layout/company-banner";
 import {
@@ -8,11 +11,18 @@ import {
 } from "@/components/layout/scroll-to-top";
 import { PageMotion } from "@/components/motion/page-motion";
 
-export default async function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function AppShell({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = await auth();
+  if (!isAuthenticated) {
+    redirect("/sign-in");
+  }
+
+  try {
+    await ensureCurrentUser();
+  } catch {
+    // Sync is best-effort; API may be down during first boot.
+  }
+
   let summary;
   let status;
   try {
@@ -42,5 +52,17 @@ export default async function AppLayout({
       </div>
       <ScrollToTopButton />
     </div>
+  );
+}
+
+export default function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <AppShell>{children}</AppShell>
+    </Suspense>
   );
 }

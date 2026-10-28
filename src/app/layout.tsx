@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import { shadcn } from "@clerk/ui/themes";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -24,7 +26,11 @@ export const metadata: Metadata = {
   description: "Fakturácia pre slovenských freelancerov a SZČO",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="sk"
@@ -32,10 +38,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ground font-sans text-foreground">
-        <ThemeProvider>
-          {children}
-          <Toaster position="top-right" closeButton />
-        </ThemeProvider>
+        <ClerkProvider
+          appearance={{ theme: shadcn }}
+          signInUrl="/sign-in"
+          signUpUrl="/sign-up"
+          afterSignOutUrl="/"
+        >
+          <ThemeProvider>
+            {children}
+            <Toaster position="top-right" closeButton />
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

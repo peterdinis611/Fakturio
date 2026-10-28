@@ -13,16 +13,38 @@ import {
   Bell,
   Search,
   Settings,
+  UserRound,
   Users,
   Wallet,
   X,
 } from "lucide-react";
+import { Show, UserButton } from "@clerk/nextjs";
+import { Suspense } from "react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/utils";
 
+function SidebarAuth() {
+  return (
+    <Suspense fallback={<div className="h-8 w-8 animate-pulse rounded-full bg-raised" />}>
+      <Show when="signed-in">
+        <div className="flex items-center gap-2 px-1 py-1">
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "size-8",
+              },
+            }}
+          />
+          <span className="text-[12px] text-muted-foreground">Účet</span>
+        </div>
+      </Show>
+    </Suspense>
+  );
+}
+
 const nav = [
-  { href: "/", label: "Prehľad", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Prehľad", icon: LayoutDashboard },
   { href: "/invoices", label: "Faktúry", icon: FileText },
   { href: "/customers", label: "Zákazníci", icon: Users },
   { href: "/services", label: "Katalóg", icon: BookOpen },
@@ -31,6 +53,7 @@ const nav = [
   { href: "/reminders", label: "Upomienky", icon: Bell },
   { href: "/reports", label: "Reporty", icon: BarChart3 },
   { href: "/search", label: "Hľadanie", icon: Search },
+  { href: "/profile", label: "Profil", icon: UserRound },
   { href: "/settings", label: "Nastavenia", icon: Settings },
 ];
 
@@ -47,9 +70,7 @@ function NavLinks({
     <nav className="flex flex-1 flex-col gap-px px-2">
       {nav.map((item, i) => {
         const active =
-          item.href === "/"
-            ? pathname === "/"
-            : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
 
         return (
@@ -92,7 +113,7 @@ function NavLinks({
 
 function Brand({ companyName }: { companyName?: string }) {
   return (
-    <Link href="/" className="block px-4 py-5">
+    <Link href="/dashboard" className="block px-4 py-5">
       <div className="flex items-center gap-2.5">
         <span className="stamp" aria-hidden>
           F
@@ -116,7 +137,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
   return (
     <>
       <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 md:hidden">
-        <Link href="/" className="flex items-center gap-2 text-ink">
+        <Link href="/dashboard" className="flex items-center gap-2 text-ink">
           <span className="stamp" aria-hidden>
             F
           </span>
@@ -158,6 +179,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
               <Brand companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
+                <SidebarAuth />
                 <ThemeToggle />
               </div>
             </motion.aside>
@@ -169,6 +191,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
         <Brand companyName={companyName} />
         <NavLinks pathname={pathname} />
         <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
+          <SidebarAuth />
           <ThemeToggle />
         </div>
       </aside>
