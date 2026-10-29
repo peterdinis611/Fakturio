@@ -20,9 +20,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
-import { UserMenu } from "@/components/layout/user-menu";
+import { SidebarAccount } from "@/components/layout/sidebar-account";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -171,10 +169,8 @@ export function AppSidebar({
             >
               <Brand companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
-              <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-                <UserMenu email={userEmail} />
-                <LocaleSwitcher compact className="px-1" />
-                <ThemeToggle />
+              <div className="mt-auto">
+                <SidebarAccount email={userEmail} />
               </div>
             </motion.aside>
           </motion.div>
@@ -184,10 +180,8 @@ export function AppSidebar({
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <Brand companyName={companyName} />
         <NavLinks pathname={pathname} />
-        <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-          <UserMenu email={userEmail} />
-          <LocaleSwitcher compact className="px-1" />
-          <ThemeToggle />
+        <div className="mt-auto">
+          <SidebarAccount email={userEmail} />
         </div>
       </aside>
     </>

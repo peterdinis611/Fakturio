@@ -6,6 +6,10 @@ import { Pin, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { deleteNoteAction } from "@/actions/notes";
 import { NoteForm } from "@/components/notes/note-form";
+import {
+  isRichNoteBody,
+  noteBodyPlain,
+} from "@/components/notes/rich-text-editor";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,7 +69,7 @@ export function NotesBoard({ items }: Props) {
               Nová poznámka
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-xl">
             <DialogHeader>
               <DialogTitle>Nová poznámka</DialogTitle>
             </DialogHeader>
@@ -115,9 +119,20 @@ export function NotesBoard({ items }: Props) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-3">
-                <p className="line-clamp-5 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">
-                  {note.body?.trim() ? note.body : "—"}
-                </p>
+                {noteBodyPlain(note.body) ? (
+                  isRichNoteBody(note.body) ? (
+                    <div
+                      className="note-body note-body--clamp text-[13px] leading-relaxed text-muted-foreground"
+                      dangerouslySetInnerHTML={{ __html: note.body }}
+                    />
+                  ) : (
+                    <p className="line-clamp-5 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">
+                      {note.body}
+                    </p>
+                  )
+                ) : (
+                  <p className="text-[13px] text-muted-foreground">—</p>
+                )}
               </CardContent>
               <CardFooter className="justify-end gap-1 border-t border-rule bg-raised/20">
                 <Button
@@ -152,7 +167,7 @@ export function NotesBoard({ items }: Props) {
           if (!open) setEditItem(null);
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>Upraviť poznámku</DialogTitle>
           </DialogHeader>

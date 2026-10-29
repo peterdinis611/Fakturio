@@ -12,11 +12,11 @@ import {
   type NoteFormInput,
   type NoteFormValues,
 } from "@/lib/validations/notes";
+import { RichTextEditor } from "@/components/notes/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
   initial?: Note | null;
@@ -80,12 +80,18 @@ export function NoteForm({ initial, onDone }: Props) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="body">Text</Label>
-        <Textarea
-          id="body"
-          rows={6}
-          disabled={pending}
-          placeholder="Čo si treba zapamätať…"
-          {...register("body")}
+        <Controller
+          control={control}
+          name="body"
+          render={({ field }) => (
+            <RichTextEditor
+              id="body"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              disabled={pending}
+              placeholder="Čo si treba zapamätať…"
+            />
+          )}
         />
         {errors.body ? (
           <p className="text-xs text-destructive">{errors.body.message}</p>
