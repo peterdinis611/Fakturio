@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { returnValidationErrors } from "next-safe-action";
+import { cache } from "react";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
 import type {
@@ -16,23 +17,23 @@ import {
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { companySchema } from "@/entities/company/model/schema";
 
-export async function getCompany(): Promise<CompanySettings> {
+export const getCompany = cache(async (): Promise<CompanySettings> => {
   return apiFetch<CompanySettings>("/api/company", {
-    next: { tags: ["company"], revalidate: 30 },
+    next: { tags: ["company"], revalidate: 60 },
   });
-}
+});
 
-export async function getCompanySummary(): Promise<CompanySummary> {
+export const getCompanySummary = cache(async (): Promise<CompanySummary> => {
   return apiFetch<CompanySummary>("/api/company/summary", {
-    next: { tags: ["company"], revalidate: 30 },
+    next: { tags: ["company"], revalidate: 60 },
   });
-}
+});
 
-export async function getCompanyStatus(): Promise<CompanyCompleteness> {
+export const getCompanyStatus = cache(async (): Promise<CompanyCompleteness> => {
   return apiFetch<CompanyCompleteness>("/api/company/status", {
-    next: { tags: ["company"], revalidate: 30 },
+    next: { tags: ["company"], revalidate: 60 },
   });
-}
+});
 
 export const updateCompanyAction = actionClient
   .inputSchema(companySchema)

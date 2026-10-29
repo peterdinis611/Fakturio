@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { NavLink } from "@/widgets/app-shell/nav-link";
 import { SidebarAccount } from "@/widgets/app-shell/sidebar-account";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/utils";
@@ -48,47 +49,36 @@ function NavLinks({
   onNavigate?: () => void;
 }) {
   const t = useTranslations("Nav");
-  const reduce = useReducedMotion();
 
   return (
     <nav className="flex flex-1 flex-col gap-px px-2">
-      {navKeys.map((item, i) => {
+      {navKeys.map((item) => {
         const active =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
 
         return (
-          <motion.div
+          <NavLink
             key={item.href}
-            initial={reduce ? false : { opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: 0.25,
-              delay: reduce ? 0 : 0.025 * i,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            href={item.href}
+            onClick={onNavigate}
+            active={active}
+            className={cn(
+              "flex h-9 items-center gap-2.5 px-2.5 text-[14px] transition-colors duration-150",
+              active
+                ? "bg-active font-medium text-ink"
+                : "text-muted-foreground hover:bg-raised/80 hover:text-ink",
+            )}
           >
-            <Link
-              href={item.href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "relative flex h-9 items-center gap-2.5 px-2.5 text-[14px] transition-colors duration-150",
-                active
-                  ? "bg-active font-medium text-ink"
-                  : "text-muted-foreground hover:bg-raised/80 hover:text-ink",
-              )}
-            >
-              {active ? (
-                <span
-                  aria-hidden
-                  className="absolute inset-y-1.5 left-0 w-0.5 bg-ink"
-                />
-              ) : null}
-              <Icon className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
-              {t(item.key)}
-            </Link>
-          </motion.div>
+            {active ? (
+              <span
+                aria-hidden
+                className="absolute inset-y-1.5 left-0 w-0.5 bg-ink"
+              />
+            ) : null}
+            <Icon className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
+            {t(item.key)}
+          </NavLink>
         );
       })}
     </nav>

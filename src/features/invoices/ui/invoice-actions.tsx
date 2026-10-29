@@ -236,7 +236,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
               Zrušiť
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Zrušiť doklad</DialogTitle>
               <DialogDescription>
@@ -301,7 +301,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         <>
           <Button type="button" size="sm" variant="ghost" asChild>
             <Link href={pdfInline} target="_blank" rel="noopener noreferrer">
-              Náhľad PDF
+              Náhľad PDF · QR
             </Link>
           </Button>
           <Button type="button" size="sm" variant="ghost" asChild>

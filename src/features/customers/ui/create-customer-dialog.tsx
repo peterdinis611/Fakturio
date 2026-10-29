@@ -32,7 +32,7 @@ export function CreateCustomerDialog({
       <DialogTrigger asChild>
         {trigger ?? <Button type="button">Pridať zákazníka</Button>}
       </DialogTrigger>
-      <DialogContent className="max-h-[min(90vh,40rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Nový zákazník</DialogTitle>
           <DialogDescription>

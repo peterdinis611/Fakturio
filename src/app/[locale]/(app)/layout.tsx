@@ -12,39 +12,24 @@ import { PageMotion } from "@/shared/ui/motion/page-motion";
 import { isOnboardingSkipped } from "@/shared/lib/onboarding";
 import { redirect } from "@/i18n/navigation";
 
-export const dynamic = "force-dynamic";
-
 async function AppShell({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
-  const user = await getCurrentUser();
+
+  const [user, summary, status, skipped] = await Promise.all([
+    getCurrentUser(),
+    getCompanySummary().catch(() => null),
+    getCompanyStatus().catch(() => null),
+    isOnboardingSkipped(),
+  ]);
+
   if (!user) {
     redirect({ href: "/sign-in", locale });
   }
 
-  let loaded:
-    | {
-        summary: Awaited<ReturnType<typeof getCompanySummary>>;
-        status: Awaited<ReturnType<typeof getCompanyStatus>>;
-      }
-    | undefined;
-  try {
-    const [summary, status] = await Promise.all([
-      getCompanySummary(),
-      getCompanyStatus(),
-    ]);
-    loaded = { summary, status };
-  } catch {
-    loaded = undefined;
-  }
-
-  const hasCompanyName = Boolean(loaded?.summary.name?.trim());
-  const skipped = await isOnboardingSkipped();
+  const hasCompanyName = Boolean(summary?.name?.trim());
   if (!hasCompanyName && !skipped) {
     redirect({ href: "/onboarding", locale });
   }
-
-  const summary = loaded?.summary;
-  const status = loaded?.status;
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">

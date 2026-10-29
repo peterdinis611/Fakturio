@@ -1,6 +1,6 @@
 "use client";
 
-import { BriefcaseBusiness, Building2, Palette } from "lucide-react";
+import { Building2, CalendarClock, Palette } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/utils";
@@ -8,7 +8,7 @@ import { cn } from "@/shared/lib/utils";
 const tabs = [
   { href: "/settings/company", label: "Firma", icon: Building2 },
   { href: "/settings/appearance", label: "Vzhľad", icon: Palette },
-  { href: "/settings/jobs", label: "Joby", icon: BriefcaseBusiness },
+  { href: "/settings/jobs", label: "Automatizácia", icon: CalendarClock },
 ] as const;
 
 export function SettingsNav() {

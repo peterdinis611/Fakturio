@@ -23,8 +23,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/card";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PhoneInput } from "@/shared/ui/phone-input";
 import { Separator } from "@/shared/ui/separator";
 import {
   Select,
@@ -59,15 +61,6 @@ const PAYMENT_METHODS = [
   { value: "cash", label: "Hotovosť" },
   { value: "card", label: "Karta" },
   { value: "other", label: "Iné" },
-] as const;
-
-const COUNTRIES = [
-  { value: "SK", label: "Slovensko" },
-  { value: "CZ", label: "Česko" },
-  { value: "AT", label: "Rakúsko" },
-  { value: "HU", label: "Maďarsko" },
-  { value: "PL", label: "Poľsko" },
-  { value: "DE", label: "Nemecko" },
 ] as const;
 
 const CURRENCIES = [
@@ -196,6 +189,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   } = form;
 
   const isVatPayer = watch("isVatPayer");
+  const country = watch("country");
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -325,7 +319,18 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="phone">Telefón</Label>
-          <Input id="phone" type="tel" {...register("phone")} />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneInput
+                id="phone"
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                countryCode={country || "SK"}
+              />
+            )}
+          />
         </Field>
         <Field>
           <Label htmlFor="website">Web</Label>
@@ -356,21 +361,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             control={control}
             name="country"
             render={({ field }) => (
-              <Select value={field.value || "SK"} onValueChange={field.onChange}>
-                <SelectTrigger
-                  id="country"
-                  className="h-9 w-full rounded-[4px] border-border bg-ground"
-                >
-                  <SelectValue placeholder="Krajina" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRIES.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CountrySelect
+                id="country"
+                value={field.value || "SK"}
+                onChange={field.onChange}
+              />
             )}
           />
         </Field>

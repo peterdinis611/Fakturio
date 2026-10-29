@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/ui/table";
+import { countryLabel } from "@/shared/lib/countries";
 import { emptyDash, formatDate, formatMoney } from "@/shared/lib/format";
 import { isApiError } from "@/shared/api/errors";
 
@@ -53,7 +54,9 @@ export default async function CustomerDetailPage({
     <div>
       <PageHeader
         title={customer.name}
-        description={[customer.city, customer.country].filter(Boolean).join(" · ")}
+        description={[customer.city, countryLabel(customer.country)]
+          .filter(Boolean)
+          .join(" · ")}
         ledger={
           <>
             <span>IČO {emptyDash(customer.ico)}</span>
@@ -85,7 +88,7 @@ export default async function CustomerDetailPage({
           <p>
             {emptyDash(customer.postalCode)} {emptyDash(customer.city)}
           </p>
-          <p>{customer.country}</p>
+          <p>{countryLabel(customer.country)}</p>
         </div>
       </div>
 

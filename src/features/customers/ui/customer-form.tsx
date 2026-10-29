@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/shared/toast";
 import type { z } from "zod";
@@ -18,8 +18,10 @@ import {
 } from "@/entities/customer/model/schema";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { CountrySelect } from "@/shared/ui/country-select";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PhoneInput } from "@/shared/ui/phone-input";
 
 type CustomerFormInput = z.input<typeof customerSchema>;
 
@@ -70,9 +72,13 @@ export function CustomerForm({
   const {
     register,
     handleSubmit,
+    control,
+    watch,
     setError,
     formState: { errors },
   } = form;
+
+  const country = watch("country");
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -150,7 +156,18 @@ export function CustomerForm({
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-phone">Telefón</Label>
-          <Input id="customer-phone" type="tel" {...register("phone")} />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneInput
+                id="customer-phone"
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                countryCode={country || "SK"}
+              />
+            )}
+          />
           <FieldError message={errors.phone?.message} />
         </div>
         <div className={cn(fieldClass, "sm:col-span-2")}>
@@ -174,7 +191,17 @@ export function CustomerForm({
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-country">Krajina</Label>
-          <Input id="customer-country" {...register("country")} />
+          <Controller
+            control={control}
+            name="country"
+            render={({ field }) => (
+              <CountrySelect
+                id="customer-country"
+                value={field.value || "SK"}
+                onChange={field.onChange}
+              />
+            )}
+          />
           <FieldError message={errors.country?.message} />
         </div>
       </div>

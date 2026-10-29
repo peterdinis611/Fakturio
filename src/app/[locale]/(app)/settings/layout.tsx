@@ -10,7 +10,7 @@ export default function SettingsLayout({
     <div className="mx-auto w-full max-w-2xl">
       <PageHeader
         title="Nastavenia"
-        description="Firma na faktúrach, vzhľad a plánovanie jobov."
+        description="Firma na faktúrach, vzhľad a automatické kontroly."
       />
       <SettingsNav />
       {children}

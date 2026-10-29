@@ -8,19 +8,20 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const container: Variants = {
   hidden: {},
   show: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.04 },
+    transition: { staggerChildren: 0.04, delayChildren: 0 },
   },
 };
 
 const item: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0.01, y: 8 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease },
+    transition: { duration: 0.22, ease },
   },
 };
 
+/** Keep content visible immediately — avoid “blank then fade” after navigation. */
 export function PageMotion({
   children,
   className,
@@ -38,7 +39,7 @@ export function PageMotion({
     <motion.div
       className={className}
       variants={container}
-      initial="hidden"
+      initial="show"
       animate="show"
     >
       {children}
@@ -60,7 +61,12 @@ export function MotionItem({
   }
 
   return (
-    <motion.div className={className} variants={item}>
+    <motion.div
+      className={className}
+      variants={item}
+      initial="hidden"
+      animate="show"
+    >
       {children}
     </motion.div>
   );
@@ -84,9 +90,9 @@ export function FadeIn({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0.2, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease, delay }}
+      transition={{ duration: 0.22, ease, delay }}
     >
       {children}
     </motion.div>

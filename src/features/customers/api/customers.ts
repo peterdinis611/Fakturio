@@ -20,7 +20,7 @@ export async function listCustomers(params?: {
       pageSize: params?.pageSize ?? 20,
       search: params?.search,
     },
-    next: { tags: ["customers"], revalidate: 20 },
+    next: { tags: ["customers"], revalidate: 30 },
   });
 }
 

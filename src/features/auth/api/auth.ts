@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { cache } from "react";
 import { z } from "zod";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
@@ -67,6 +68,7 @@ export const registerAction = actionClient
         cache: "no-store",
       });
       const user = await persistSession(data);
+      revalidateTag("auth-user", "max");
       revalidatePath("/", "layout");
       return user;
     } catch (error) {
@@ -88,6 +90,7 @@ export const loginAction = actionClient
         cache: "no-store",
       });
       const user = await persistSession(data);
+      revalidateTag("auth-user", "max");
       revalidatePath("/", "layout");
       return user;
     } catch (error) {
@@ -97,17 +100,21 @@ export const loginAction = actionClient
 
 export async function logoutAction(): Promise<void> {
   await clearAccessToken();
+  revalidateTag("auth-user", "max");
   revalidatePath("/", "layout");
 }
 
-export async function getCurrentUser(): Promise<AppUser | null> {
+/** Per-request dedupe + short HTTP cache — layout used to hit /me on every nav. */
+export const getCurrentUser = cache(async (): Promise<AppUser | null> => {
   const token = await getAccessToken();
   if (!token) return null;
 
   try {
-    return await apiFetch<AppUser>("/api/auth/me", { cache: "no-store" });
+    return await apiFetch<AppUser>("/api/auth/me", {
+      next: { tags: ["auth-user"], revalidate: 60 },
+    });
   } catch {
     await clearAccessToken();
     return null;
   }
-}
+});

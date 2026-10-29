@@ -69,7 +69,7 @@ export function NotesBoard({ items }: Props) {
               Nová poznámka
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
+          <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle>Nová poznámka</DialogTitle>
             </DialogHeader>
@@ -167,7 +167,7 @@ export function NotesBoard({ items }: Props) {
           if (!open) setEditItem(null);
         }}
       >
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Upraviť poznámku</DialogTitle>
           </DialogHeader>

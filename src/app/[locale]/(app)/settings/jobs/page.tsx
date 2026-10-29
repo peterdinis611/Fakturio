@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 
-export const metadata = { title: "Joby" };
+export const metadata = { title: "Automatizácia" };
 
 export default async function JobsSettingsPage() {
   const settings = await getJobSettings();
@@ -17,15 +17,10 @@ export default async function JobsSettingsPage() {
     <div className="mx-auto max-w-[42rem] space-y-5">
       <Card size="sm" className="rounded-[6px] bg-surface ring-border">
         <CardHeader className="border-b border-rule pb-3">
-          <CardTitle className="text-[15px]">Background joby</CardTitle>
+          <CardTitle className="text-[15px]">Automatické kontroly</CardTitle>
           <CardDescription>
-            Plánovanie Overdue sync a Reminder jobu. Predvolené hodnoty sú z{" "}
-            <span className="font-mono text-[12px] text-ink">appsettings</span>
-            , úpravy sa ukladajú do{" "}
-            <span className="font-mono text-[12px] text-ink">
-              data/job-settings.json
-            </span>
-            .
+            Denne skontroluje splatnosti a pripraví upomienky. Čas je v UTC
+            (na Slovensku +1 h v zime, +2 h v lete).
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">

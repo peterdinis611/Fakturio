@@ -57,7 +57,7 @@ export async function listInvoices(params?: {
       search: params?.search,
       overdueOnly: params?.overdueOnly,
     },
-    next: { tags: ["invoices"], revalidate: 15 },
+    next: { tags: ["invoices"], revalidate: 30 },
   });
 }
 
