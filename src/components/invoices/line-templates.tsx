@@ -18,7 +18,7 @@ import {
   type LineTemplate,
 } from "@/lib/line-templates";
 import { formatMoney } from "@/lib/format";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 export function LineTemplatesMenu({
   disabled,

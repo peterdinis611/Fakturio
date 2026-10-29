@@ -7,10 +7,10 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="mx-auto w-full max-w-2xl">
       <PageHeader
         title="Nastavenia"
-        description="Firma na faktúrach a vzhľad aplikácie."
+        description="Firma na faktúrach, vzhľad a plánovanie jobov."
       />
       <SettingsNav />
       {children}

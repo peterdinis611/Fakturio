@@ -3,11 +3,13 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   cancelInvoiceAction,
+  createCreditNoteAction,
   deleteInvoiceAction,
   duplicateInvoiceAction,
+  finalizeProformaAction,
   issueInvoiceAction,
   markPaidAction,
 } from "@/actions/invoices";
@@ -44,6 +46,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   const pdfInline = `/api/pdf/${invoice.id}?disposition=inline`;
   const pdfDownload = `/api/pdf/${invoice.id}?disposition=attachment`;
   const xml = buildInvoiceXml(invoice);
+  const docType = invoice.documentType ?? "Invoice";
 
   function run(
     action: () => Promise<{ data?: unknown; serverError?: string; validationErrors?: unknown }>,
@@ -61,13 +64,13 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   }
 
   function handleIssue() {
-    run(() => issueInvoiceAction({ id: invoice.id }), "Faktúra bola vystavená");
+    run(() => issueInvoiceAction({ id: invoice.id }), "Doklad bol vystavený");
   }
 
   function handleMarkPaid() {
     run(
       () => markPaidAction({ id: invoice.id }),
-      "Faktúra bola označená ako zaplatená",
+      "Doklad bol označený ako zaplatený",
     );
   }
 
@@ -78,7 +81,47 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Duplikácia zlyhala");
         return;
       }
-      toast.success("Faktúra bola duplikovaná");
+      toast.success("Doklad bol duplikovaný");
+      router.push(`/invoices/${result.data.id}`);
+    });
+  }
+
+  function handleCreditNote() {
+    if (
+      !window.confirm(
+        `Vytvoriť dobropis k faktúre ${invoice.number}? Skopírujú sa položky a vystaví sa nový doklad (DOB…).`,
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const result = await createCreditNoteAction({ id: invoice.id });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Dobropis zlyhal");
+        return;
+      }
+      toast.success("Dobropis bol vytvorený");
+      router.push(`/invoices/${result.data.id}`);
+    });
+  }
+
+  function handleFinalizeProforma() {
+    if (
+      !window.confirm(
+        `Vystaviť daňový doklad zo zálohovej ${invoice.number}?`,
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const result = await finalizeProformaAction({ id: invoice.id });
+      if (!result?.data) {
+        toast.error(
+          actionErrorMessage(result ?? {}) ?? "Vystavenie faktúry zlyhalo",
+        );
+        return;
+      }
+      toast.success("Faktúra bola vystavená zo zálohovej");
       router.push(`/invoices/${result.data.id}`);
     });
   }
@@ -113,7 +156,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Zrušenie zlyhalo");
         return;
       }
-      toast.success("Faktúra bola zrušená");
+      toast.success("Doklad bol zrušený");
       setCancelOpen(false);
       setCancelReason("");
       router.refresh();
@@ -128,6 +171,17 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
     invoice.status === "Issued" ||
     invoice.status === "Overdue";
   const canDelete = invoice.status === "Draft";
+  const canCreditNote =
+    docType === "Invoice" &&
+    (invoice.status === "Issued" ||
+      invoice.status === "Paid" ||
+      invoice.status === "Overdue");
+  const canFinalizeProforma =
+    docType === "Proforma" &&
+    (invoice.status === "Issued" ||
+      invoice.status === "Paid" ||
+      invoice.status === "Overdue");
+  const canDuplicate = docType !== "CreditNote";
   const showPdf =
     invoice.status !== "Draft" && invoice.status !== "Cancelled";
 
@@ -151,6 +205,30 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         </Button>
       ) : null}
 
+      {canCreditNote ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          disabled={pending}
+          onClick={handleCreditNote}
+        >
+          Dobropis
+        </Button>
+      ) : null}
+
+      {canFinalizeProforma ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          disabled={pending}
+          onClick={handleFinalizeProforma}
+        >
+          Daňový doklad
+        </Button>
+      ) : null}
+
       {canCancel ? (
         <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
           <DialogTrigger asChild>
@@ -160,9 +238,9 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Zrušiť faktúru</DialogTitle>
+              <DialogTitle>Zrušiť doklad</DialogTitle>
               <DialogDescription>
-                Uveď dôvod zrušenia faktúry {invoice.number}.
+                Uveď dôvod zrušenia dokladu {invoice.number}.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-1.5">
@@ -195,15 +273,17 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         </Dialog>
       ) : null}
 
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        disabled={pending}
-        onClick={handleDuplicate}
-      >
-        Duplikovať
-      </Button>
+      {canDuplicate ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          disabled={pending}
+          onClick={handleDuplicate}
+        >
+          Duplikovať
+        </Button>
+      ) : null}
 
       {canDelete ? (
         <Button
@@ -231,7 +311,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
           </Button>
           <XmlPreview
             title={`XML · ${invoice.number}`}
-            description="Štruktúrovaný náhľad faktúry (Fakturio XML). Nie je oficiálny e-fakturačný formát."
+            description="Štruktúrovaný náhľad dokladu (Fakturio XML). Nie je oficiálny e-fakturačný formát."
             xml={xml}
             fileName={`${invoice.number}.xml`}
           />

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import {
   createInvoiceAction,
@@ -13,7 +13,12 @@ import {
 import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
 import { CatalogPicker } from "@/components/invoices/catalog-picker";
 import { LineTemplatesMenu } from "@/components/invoices/line-templates";
-import type { Invoice, ServiceCatalogItem } from "@/lib/api/types";
+import type {
+  Invoice,
+  InvoiceDocumentType,
+  ServiceCatalogItem,
+} from "@/lib/api/types";
+import { documentTypeLabel } from "@/lib/format";
 import type { z } from "zod";
 import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import {
@@ -23,6 +28,7 @@ import {
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,6 +57,7 @@ type InvoiceFormProps = {
   initial?: Invoice | null;
   companyDefaults?: CompanyDefaults;
   defaultCustomerId?: string;
+  defaultDocumentType?: InvoiceDocumentType;
   catalogItems?: ServiceCatalogItem[];
 };
 
@@ -143,11 +150,17 @@ export function InvoiceForm({
   initial,
   companyDefaults,
   defaultCustomerId,
+  defaultDocumentType = "Invoice",
   catalogItems = [],
 }: InvoiceFormProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [customerOptions, setCustomerOptions] = useState(customers);
+  const [documentType, setDocumentType] = useState<InvoiceDocumentType>(
+    initial?.documentType === "Proforma" || defaultDocumentType === "Proforma"
+      ? "Proforma"
+      : "Invoice",
+  );
   const isEdit = Boolean(initial?.id);
   const readOnly = isEdit && initial!.status !== "Draft";
   const isVatPayer = companyDefaults?.isVatPayer !== false;
@@ -266,7 +279,12 @@ export function InvoiceForm({
     startTransition(async () => {
       const result = isEdit
         ? await updateInvoiceAction({ ...payload, id: initial!.id })
-        : await createInvoiceAction({ ...payload, status: status ?? "Draft" });
+        : await createInvoiceAction({
+            ...payload,
+            status: status ?? "Draft",
+            documentType:
+              documentType === "Proforma" ? "Proforma" : "Invoice",
+          });
 
       if (!result?.data) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
@@ -275,13 +293,16 @@ export function InvoiceForm({
       }
 
       if (isEdit) {
-        toast.success("Faktúra bola uložená");
+        toast.success("Doklad bol uložený");
         router.refresh();
         return;
       }
 
+      const label = documentTypeLabel(documentType);
       toast.success(
-        status === "Issued" ? "Faktúra bola vystavená" : "Koncept bol vytvorený",
+        status === "Issued"
+          ? `${label} bola vystavená`
+          : `Koncept (${label.toLowerCase()}) bol vytvorený`,
       );
       router.push(`/invoices/${result.data.id}`);
     });
@@ -301,6 +322,35 @@ export function InvoiceForm({
       <section className="panel flex flex-col gap-4 p-4">
         <h2 className="font-heading text-sm font-medium">Základné údaje</h2>
         <div className="grid gap-4 sm:grid-cols-2">
+          {!isEdit ? (
+            <div className={fieldClass}>
+              <Label>Typ dokladu</Label>
+              <Select
+                value={documentType}
+                onValueChange={(v) =>
+                  setDocumentType(v as "Invoice" | "Proforma")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Invoice">Faktúra</SelectItem>
+                  <SelectItem value="Proforma">Zálohová / proforma</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[12px] text-muted-foreground">
+                Zálohové majú sériu ZF…; daňový doklad FA / bez prefixu.
+              </p>
+            </div>
+          ) : (
+            <div className={fieldClass}>
+              <Label>Typ dokladu</Label>
+              <p className="text-[14px] font-medium text-ink">
+                {documentTypeLabel(initial?.documentType)}
+              </p>
+            </div>
+          )}
           <div className={cn(fieldClass, "sm:col-span-2")}>
             <div className="flex items-center justify-between gap-2">
               <Label>Zákazník</Label>
@@ -353,31 +403,53 @@ export function InvoiceForm({
           </div>
           <div className={fieldClass}>
             <Label htmlFor="issueDate">Dátum vystavenia</Label>
-            <Input
-              id="issueDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("issueDate")}
+            <Controller
+              control={control}
+              name="issueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="issueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Vystavenie"
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.issueDate?.message} />
           </div>
           <div className={fieldClass}>
             <Label htmlFor="dueDate">Dátum splatnosti</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("dueDate")}
+            <Controller
+              control={control}
+              name="dueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="dueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Splatnosť"
+                  fromDate={watch("issueDate") || undefined}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.dueDate?.message} />
           </div>
           <div className={fieldClass}>
             <Label htmlFor="deliveryDate">Dátum dodania</Label>
-            <Input
-              id="deliveryDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("deliveryDate")}
+            <Controller
+              control={control}
+              name="deliveryDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="deliveryDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Dodanie"
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.deliveryDate?.message} />
           </div>

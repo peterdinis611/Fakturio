@@ -1,49 +1,59 @@
 import { getCompany } from "@/actions/company";
 import { CompanyForm } from "@/components/company/company-form";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Firma" };
 
 export default async function CompanySettingsPage() {
   const company = await getCompany();
   const c = company.completeness;
+  const missing = c.items.filter((i) => i.isRequired && !i.isComplete);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <h2 className="text-[15px] font-medium text-ink">Firma</h2>
-          <p className="mt-1 text-[14px] text-muted-foreground">
-            {c.isReadyToInvoice
-              ? "Údaje dodávateľa na faktúrach a PDF."
-              : `${c.percentComplete}% hotové — doplň povinné polia.`}
+    <div className="space-y-4">
+      <div className="rounded-[6px] border border-border bg-surface px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <h2 className="text-[15px] font-medium text-ink">Firma</h2>
+            <Badge
+              variant="outline"
+              className={cn(
+                "rounded-[4px]",
+                c.isReadyToInvoice
+                  ? "border-positive/35 text-positive"
+                  : "border-border text-muted-foreground",
+              )}
+            >
+              {c.isReadyToInvoice ? "Pripravené" : "Doplniť"}
+            </Badge>
+          </div>
+          <p className="data-num text-[12px] text-muted-foreground">
+            {c.completedRequired}/{c.totalRequired} · {c.percentComplete}%
           </p>
         </div>
-        <p className="ledger-strip mb-0 border-0 pb-0">
-          <span>
-            {c.completedRequired}/{c.totalRequired} povinných
-          </span>
-          <span
-            className={c.isReadyToInvoice ? "text-positive" : "text-warning"}
-          >
-            {c.isReadyToInvoice ? "Pripravené" : "Doplniť"}
-          </span>
-        </p>
-      </div>
 
-      {!c.isReadyToInvoice ? (
-        <ul className="mb-6 max-w-[40rem] space-y-1 border border-border bg-surface px-4 py-3 text-[13px]">
-          {c.items
-            .filter((i) => i.isRequired && !i.isComplete)
-            .map((i) => (
-              <li key={i.key} className="text-warning">
+        <Progress value={c.percentComplete} className="mt-2.5 h-1" />
+
+        {!c.isReadyToInvoice && missing.length > 0 ? (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {missing.map((i) => (
+              <Badge
+                key={i.key}
+                variant="secondary"
+                className="rounded-[4px] font-normal text-muted-foreground"
+              >
                 {i.label}
-                {i.hint ? (
-                  <span className="text-muted-foreground"> — {i.hint}</span>
-                ) : null}
-              </li>
+              </Badge>
             ))}
-        </ul>
-      ) : null}
+          </div>
+        ) : (
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            Údaje dodávateľa na faktúrach a PDF.
+          </p>
+        )}
+      </div>
 
       <CompanyForm initial={company} mode="settings" />
     </div>

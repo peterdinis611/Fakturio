@@ -3,9 +3,11 @@
 import { useTheme } from "@teispace/next-themes";
 import { motion, useReducedMotion } from "motion/react";
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 export function LandingThemeToggle() {
+  const t = useTranslations("Common");
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const reduce = useReducedMotion();
@@ -19,8 +21,8 @@ export function LandingThemeToggle() {
       type="button"
       className="landing-theme-toggle"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Zapnúť svetlý režim" : "Zapnúť tmavý režim"}
-      title={isDark ? "Svetlý režim" : "Tmavý režim"}
+      aria-label={isDark ? t("themeEnableLight") : t("themeEnableDark")}
+      title={isDark ? t("themeLight") : t("themeDark")}
     >
       {mounted ? (
         <motion.span

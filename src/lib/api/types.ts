@@ -5,6 +5,36 @@ export type InvoiceStatus =
   | "Cancelled"
   | "Overdue";
 
+export type InvoiceDocumentType = "Invoice" | "Proforma" | "CreditNote";
+
+export type AuditAction =
+  | "Created"
+  | "Updated"
+  | "Issued"
+  | "Paid"
+  | "Cancelled"
+  | "ReminderSent"
+  | "Deleted"
+  | "Duplicated"
+  | "OverdueMarked"
+  | "CreditNoteCreated"
+  | "ProformaFinalized";
+
+export type AuditLogEntry = {
+  id: string;
+  occurredAt: string;
+  action: AuditAction;
+  entityType: string;
+  entityId: string | null;
+  entityNumber: string | null;
+  actorUserId: string | null;
+  actorClerkUserId: string | null;
+  actorDisplayName: string | null;
+  actorEmail: string | null;
+  summary: string;
+  detailsJson: string | null;
+};
+
 export type PagedResponse<T> = {
   items: T[];
   page: number;
@@ -135,6 +165,7 @@ export type InvoiceItem = {
 export type InvoiceListItem = {
   id: string;
   number: string;
+  documentType: InvoiceDocumentType;
   status: InvoiceStatus;
   customerId: string;
   customerName: string;
@@ -145,12 +176,15 @@ export type InvoiceListItem = {
   total: number;
   isOverdue: boolean;
   daysUntilDue: number | null;
+  relatedInvoiceId: string | null;
+  relatedInvoiceNumber: string | null;
   createdAt: string;
 };
 
 export type Invoice = {
   id: string;
   number: string;
+  documentType: InvoiceDocumentType;
   status: InvoiceStatus;
   customerId: string;
   customer: InvoiceParty;
@@ -172,6 +206,8 @@ export type Invoice = {
   bankIban: string | null;
   bankBic: string | null;
   notes: string | null;
+  relatedInvoiceId: string | null;
+  relatedInvoiceNumber: string | null;
   subtotal: number;
   vatTotal: number;
   total: number;
@@ -204,7 +240,18 @@ export type CreateInvoiceInput = {
   bankBic?: string | null;
   notes?: string | null;
   status?: InvoiceStatus | null;
+  documentType?: InvoiceDocumentType | null;
   items: InvoiceItemInput[];
+};
+
+export type InvoiceStatusResponse = {
+  id: string;
+  number: string;
+  documentType: InvoiceDocumentType;
+  status: InvoiceStatus;
+  paidAt: string | null;
+  cancelReason: string | null;
+  cancelledAt: string | null;
 };
 
 export type UpdateInvoiceInput = {
@@ -221,15 +268,6 @@ export type UpdateInvoiceInput = {
   bankBic?: string | null;
   notes?: string | null;
   items: InvoiceItemInput[];
-};
-
-export type InvoiceStatusResponse = {
-  id: string;
-  number: string;
-  status: InvoiceStatus;
-  paidAt: string | null;
-  cancelReason: string | null;
-  cancelledAt: string | null;
 };
 
 export type InvoiceStats = {
@@ -251,6 +289,7 @@ export type InvoiceStats = {
 export type InvoiceReminder = {
   id: string;
   number: string;
+  documentType?: InvoiceDocumentType;
   status: InvoiceStatus;
   customerId: string;
   customerName: string;
@@ -475,14 +514,28 @@ export type ResumeEntry = {
 
 export type AppUser = {
   id: string;
-  clerkUserId: string;
-  email: string | null;
+  email: string;
   firstName: string | null;
   lastName: string | null;
   imageUrl: string | null;
   createdAt: string;
   updatedAt: string;
   lastSeenAt: string | null;
+};
+
+export type Note = {
+  id: string;
+  title: string;
+  body: string;
+  isPinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AuthResponse = {
+  accessToken: string;
+  expiresAt: string;
+  user: AppUser;
 };
 
 export type PaymentImportMatchStatus =

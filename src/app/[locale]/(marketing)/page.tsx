@@ -1,9 +1,7 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LandingShell } from "@/components/landing/landing-shell";
-import { redirect } from "@/i18n/navigation";
+import { SignedInRedirect } from "@/components/landing/signed-in-redirect";
 import { routing } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -26,14 +24,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: locale === "en" ? "/en" : "/",
     },
   };
-}
-
-async function SignedInRedirect({ locale }: { locale: string }) {
-  const { isAuthenticated } = await auth();
-  if (isAuthenticated) {
-    redirect({ href: "/dashboard", locale });
-  }
-  return null;
 }
 
 export default async function LandingPage({ params }: Props) {
@@ -62,9 +52,7 @@ export default async function LandingPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Suspense fallback={null}>
-        <SignedInRedirect locale={locale} />
-      </Suspense>
+      <SignedInRedirect />
       <LandingShell />
     </>
   );

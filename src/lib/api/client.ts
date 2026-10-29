@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAccessToken } from "@/lib/auth/session";
 import { ApiError } from "./errors";
 import type { ApiProblem } from "./types";
 
@@ -10,8 +10,7 @@ export function getApiBaseUrl() {
 
 async function getAuthHeader(): Promise<Record<string, string>> {
   try {
-    const session = await auth();
-    const token = await session.getToken();
+    const token = await getAccessToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   } catch {
     return {};
@@ -25,6 +24,8 @@ type RequestOptions = {
   headers?: HeadersInit;
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
+  /** Skip reading the session cookie (login/register). */
+  skipAuth?: boolean;
 };
 
 function buildUrl(path: string, searchParams?: RequestOptions["searchParams"]) {
@@ -63,8 +64,16 @@ export async function apiFetch<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, searchParams, headers, cache, next } = options;
-  const authHeader = await getAuthHeader();
+  const {
+    method = "GET",
+    body,
+    searchParams,
+    headers,
+    cache,
+    next,
+    skipAuth,
+  } = options;
+  const authHeader = skipAuth ? {} : await getAuthHeader();
   const res = await fetch(buildUrl(path, searchParams), {
     method,
     headers: {

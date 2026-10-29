@@ -3,7 +3,7 @@
 import { useTransition, type ComponentProps } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { updateJobSettingsAction } from "@/actions/jobs";
 import { actionErrorMessage } from "@/lib/action-utils";
 import type { JobSettings } from "@/lib/api/types";

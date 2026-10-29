@@ -9,6 +9,8 @@ import {
   LayoutDashboard,
   Menu,
   Bell,
+  NotebookPen,
+  ScrollText,
   Search,
   Settings,
   UserRound,
@@ -16,36 +18,11 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { Show, UserButton } from "@clerk/nextjs";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+import { SidebarAccount } from "@/components/layout/sidebar-account";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-
-function SidebarAuth() {
-  const t = useTranslations("Common");
-
-  return (
-    <Suspense
-      fallback={<div className="h-8 w-8 animate-pulse rounded-full bg-raised" />}
-    >
-      <Show when="signed-in">
-        <div className="flex items-center gap-2 px-1 py-1">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "size-8",
-              },
-            }}
-          />
-          <span className="text-[12px] text-muted-foreground">{t("account")}</span>
-        </div>
-      </Show>
-    </Suspense>
-  );
-}
 
 const navKeys = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -53,8 +30,10 @@ const navKeys = [
   { href: "/customers", key: "customers", icon: Users },
   { href: "/services", key: "services", icon: BookOpen },
   { href: "/zivotopis", key: "resume", icon: IdCard },
+  { href: "/notes", key: "notes", icon: NotebookPen },
   { href: "/payments/import", key: "payments", icon: Wallet },
   { href: "/reminders", key: "reminders", icon: Bell },
+  { href: "/logs", key: "logs", icon: ScrollText },
   { href: "/reports", key: "reports", icon: BarChart3 },
   { href: "/search", key: "search", icon: Search },
   { href: "/profile", key: "profile", icon: UserRound },
@@ -134,7 +113,13 @@ function Brand({ companyName }: { companyName?: string }) {
   );
 }
 
-export function AppSidebar({ companyName }: { companyName?: string }) {
+export function AppSidebar({
+  companyName,
+  userEmail,
+}: {
+  companyName?: string;
+  userEmail?: string | null;
+}) {
   const pathname = usePathname();
   const tc = useTranslations("Common");
   const [open, setOpen] = useState(false);
@@ -184,10 +169,8 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
             >
               <Brand companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
-              <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-                <SidebarAuth />
-                <LocaleSwitcher compact className="px-1" />
-                <ThemeToggle />
+              <div className="mt-auto">
+                <SidebarAccount email={userEmail} />
               </div>
             </motion.aside>
           </motion.div>
@@ -197,10 +180,8 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <Brand companyName={companyName} />
         <NavLinks pathname={pathname} />
-        <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-          <SidebarAuth />
-          <LocaleSwitcher compact className="px-1" />
-          <ThemeToggle />
+        <div className="mt-auto">
+          <SidebarAccount email={userEmail} />
         </div>
       </aside>
     </>

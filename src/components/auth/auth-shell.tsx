@@ -1,14 +1,10 @@
 "use client";
 
-import { SignIn, SignUp } from "@clerk/nextjs";
-import { useLocale, useTranslations } from "next-intl";
-import { useTheme } from "@teispace/next-themes";
-import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { AuthForm } from "@/components/auth/auth-form";
 import { AuthThemeSlot } from "@/components/landing/auth-theme-slot";
 import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
-import { PageLoader } from "@/components/ui/spinner";
 import { Link } from "@/i18n/navigation";
-import { fakturioClerkAppearance } from "@/lib/clerk-appearance";
 
 type AuthShellProps = {
   mode: "sign-in" | "sign-up";
@@ -16,17 +12,6 @@ type AuthShellProps = {
 
 export function AuthShell({ mode }: AuthShellProps) {
   const t = useTranslations("Auth");
-  const locale = useLocale();
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const isDark = mounted && resolvedTheme === "dark";
-  const appearance = fakturioClerkAppearance(Boolean(isDark));
-  const signInPath = locale === "en" ? "/en/sign-in" : "/sign-in";
-  const signUpPath = locale === "en" ? "/en/sign-up" : "/sign-up";
-  const afterAuth = locale === "en" ? "/en/dashboard" : "/dashboard";
 
   return (
     <div className="auth-shell">
@@ -64,29 +49,7 @@ export function AuthShell({ mode }: AuthShellProps) {
             Fakturio
           </Link>
           <div className="auth-shell-card">
-            {!mounted ? (
-              <PageLoader
-                label={
-                  mode === "sign-in" ? t("loadingSignIn") : t("loadingSignUp")
-                }
-              />
-            ) : mode === "sign-in" ? (
-              <SignIn
-                routing="path"
-                path={signInPath}
-                signUpUrl={signUpPath}
-                fallbackRedirectUrl={afterAuth}
-                appearance={appearance}
-              />
-            ) : (
-              <SignUp
-                routing="path"
-                path={signUpPath}
-                signInUrl={signInPath}
-                fallbackRedirectUrl={afterAuth}
-                appearance={appearance}
-              />
-            )}
+            <AuthForm mode={mode} />
           </div>
           <p className="auth-panel-note">
             {mode === "sign-in" ? (

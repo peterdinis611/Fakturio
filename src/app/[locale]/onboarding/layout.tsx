@@ -1,10 +1,14 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { getCurrentUser } from "@/actions/auth";
+import { redirect } from "@/i18n/navigation";
+
+export const dynamic = "force-dynamic";
 
 async function Guard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = await auth();
-  if (!isAuthenticated) redirect("/sign-in");
+  const locale = await getLocale();
+  const user = await getCurrentUser();
+  if (!user) redirect({ href: "/sign-in", locale });
   return children;
 }
 

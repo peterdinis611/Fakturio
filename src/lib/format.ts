@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { enUS, sk } from "date-fns/locale";
-import type { InvoiceStatus } from "@/lib/api/types";
+import type { AuditAction, InvoiceDocumentType, InvoiceStatus } from "@/lib/api/types";
 
 type FormatLocale = "sk" | "en";
 
@@ -92,4 +92,44 @@ export function statusLabelFor(
 export function emptyDash(value: string | number | null | undefined) {
   if (value === null || value === undefined || value === "") return "—";
   return String(value);
+}
+
+const documentTypeLabelSk: Record<InvoiceDocumentType, string> = {
+  Invoice: "Faktúra",
+  Proforma: "Zálohová",
+  CreditNote: "Dobropis",
+};
+
+const documentTypeLabelEn: Record<InvoiceDocumentType, string> = {
+  Invoice: "Invoice",
+  Proforma: "Proforma",
+  CreditNote: "Credit note",
+};
+
+export function documentTypeLabel(
+  type: InvoiceDocumentType | null | undefined,
+  locale: FormatLocale = "sk",
+) {
+  if (!type) return documentTypeLabelSk.Invoice;
+  return locale === "en"
+    ? documentTypeLabelEn[type]
+    : documentTypeLabelSk[type];
+}
+
+const auditActionLabelSk: Record<AuditAction, string> = {
+  Created: "Vytvorenie",
+  Updated: "Úprava",
+  Issued: "Vystavenie",
+  Paid: "Úhrada",
+  Cancelled: "Zrušenie",
+  ReminderSent: "Upomienka",
+  Deleted: "Zmazanie",
+  Duplicated: "Duplikácia",
+  OverdueMarked: "Po splatnosti",
+  CreditNoteCreated: "Dobropis",
+  ProformaFinalized: "Záloha → faktúra",
+};
+
+export function auditActionLabel(action: AuditAction) {
+  return auditActionLabelSk[action] ?? action;
 }

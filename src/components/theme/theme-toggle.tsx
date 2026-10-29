@@ -3,10 +3,12 @@
 import { useTheme } from "@teispace/next-themes";
 import { motion, useReducedMotion } from "motion/react";
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export function ThemeToggle({ className }: { className?: string }) {
+  const t = useTranslations("Common");
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const reduce = useReducedMotion();
@@ -23,7 +25,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         className,
       )}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Zapnúť svetlý režim" : "Zapnúť tmavý režim"}
+      aria-label={isDark ? t("themeEnableLight") : t("themeEnableDark")}
     >
       <span className="relative size-4 shrink-0">
         {mounted ? (
@@ -42,7 +44,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           </motion.span>
         ) : null}
       </span>
-      <span>{isDark ? "Tmavý režim" : "Svetlý režim"}</span>
+      <span>{isDark ? t("themeDark") : t("themeLight")}</span>
     </button>
   );
 }

@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   createResumeEntryAction,
   updateResumeEntryAction,
@@ -19,6 +19,7 @@ import {
 } from "@/lib/validations/resume";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -144,20 +145,35 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="startDate">Od</Label>
-          <Input
-            id="startDate"
-            type="date"
-            disabled={pending}
-            {...register("startDate")}
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field }) => (
+              <DatePicker
+                id="startDate"
+                value={field.value}
+                disabled={pending}
+                placeholder="Začiatok"
+                onChange={field.onChange}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="endDate">Do</Label>
-          <Input
-            id="endDate"
-            type="date"
-            disabled={pending || isCurrent}
-            {...register("endDate")}
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field }) => (
+              <DatePicker
+                id="endDate"
+                value={field.value}
+                disabled={pending || isCurrent}
+                placeholder="Koniec"
+                fromDate={watch("startDate") || undefined}
+                onChange={field.onChange}
+              />
+            )}
           />
           {errors.endDate ? (
             <p className="text-xs text-destructive">{errors.endDate.message}</p>

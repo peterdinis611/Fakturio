@@ -14,7 +14,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { isApiError } from "@/lib/api/errors";
-import { emptyDash, formatDate, formatMoney } from "@/lib/format";
+import {
+  documentTypeLabel,
+  emptyDash,
+  formatDate,
+  formatMoney,
+} from "@/lib/format";
 import { buildInvoiceXml } from "@/lib/preview/invoice-xml";
 
 export async function generateMetadata({
@@ -52,6 +57,9 @@ export default async function InvoiceDetailPage({
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">
+              {documentTypeLabel(invoice.documentType)}
+            </span>
             <StatusBadge status={invoice.status} />
             {invoice.isOverdue ? (
               <span className="text-[12px] font-medium text-negative">
@@ -68,6 +76,17 @@ export default async function InvoiceDetailPage({
               {formatDate(invoice.dueDate)}
             </span>
           </p>
+          {invoice.relatedInvoiceId && invoice.relatedInvoiceNumber ? (
+            <p className="mt-1 text-[13px] text-muted-foreground">
+              K dokladu{" "}
+              <Link
+                href={`/invoices/${invoice.relatedInvoiceId}`}
+                className="data-num font-medium text-ink hover:underline"
+              >
+                {invoice.relatedInvoiceNumber}
+              </Link>
+            </p>
+          ) : null}
           {/* Signature: platobný pás */}
           <div className="ledger-strip mt-3 mb-0">
             <span>VS {emptyDash(invoice.variableSymbol)}</span>

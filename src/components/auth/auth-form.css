@@ -1,0 +1,32 @@
+.password-rules {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--raised) 55%, transparent);
+}
+
+.password-rules li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  transition: color 160ms ease;
+}
+
+.password-rules li[data-ok="true"] {
+  color: var(--positive);
+}
+
+.password-rules-mark {
+  flex: none;
+  width: 0.9rem;
+  text-align: center;
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}

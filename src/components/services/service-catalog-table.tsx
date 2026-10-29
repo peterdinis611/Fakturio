@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteServiceAction } from "@/actions/services";
 import { ServiceCatalogForm } from "@/components/services/service-catalog-form";

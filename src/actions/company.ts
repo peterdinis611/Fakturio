@@ -9,6 +9,10 @@ import type {
   CompanySettings,
   CompanySummary,
 } from "@/lib/api/types";
+import {
+  clearOnboardingSkipped,
+  setOnboardingSkipped,
+} from "@/lib/onboarding";
 import { ActionError, actionClient } from "@/lib/safe-action";
 import { companySchema } from "@/lib/validations/company";
 
@@ -38,6 +42,9 @@ export const updateCompanyAction = actionClient
         method: "PUT",
         body: parsedInput,
       });
+      if (parsedInput.name.trim()) {
+        await clearOnboardingSkipped();
+      }
       revalidateTag("company", "max");
       revalidatePath("/", "layout");
       revalidatePath("/settings/company");
@@ -62,3 +69,10 @@ export const updateCompanyAction = actionClient
       throw error;
     }
   });
+
+/** Soft-skip: allow app access and finish company setup later. */
+export async function skipOnboardingAction(): Promise<void> {
+  await setOnboardingSkipped();
+  revalidatePath("/", "layout");
+  revalidatePath("/onboarding");
+}

@@ -8,6 +8,7 @@ import { isApiError } from "@/lib/api/errors";
 import type {
   CreateInvoiceInput,
   Invoice,
+  InvoiceDocumentType,
   InvoiceListItem,
   InvoiceReminder,
   InvoiceStats,
@@ -41,6 +42,7 @@ export async function listInvoices(params?: {
   page?: number;
   pageSize?: number;
   status?: InvoiceStatus;
+  documentType?: InvoiceDocumentType;
   customerId?: string;
   search?: string;
   overdueOnly?: boolean;
@@ -50,6 +52,7 @@ export async function listInvoices(params?: {
       page: params?.page ?? 1,
       pageSize: params?.pageSize ?? 20,
       status: params?.status,
+      documentType: params?.documentType,
       customerId: params?.customerId,
       search: params?.search,
       overdueOnly: params?.overdueOnly,
@@ -86,6 +89,7 @@ export async function getReminders(params?: {
 const createInvoiceSchema = invoiceSchema.and(
   z.object({
     status: z.enum(["Draft", "Issued"]).optional().default("Draft"),
+    documentType: z.enum(["Invoice", "Proforma"]).optional().default("Invoice"),
   }),
 );
 
@@ -119,10 +123,11 @@ function throwMappedApiError(schema: z.ZodType, error: unknown): never {
 export const createInvoiceAction = actionClient
   .inputSchema(createInvoiceSchema)
   .action(async ({ parsedInput }) => {
-    const { status, ...values } = parsedInput;
+    const { status, documentType, ...values } = parsedInput;
     const body: CreateInvoiceInput = {
       ...values,
       status: status ?? "Draft",
+      documentType: documentType ?? "Invoice",
     };
 
     try {
@@ -283,3 +288,39 @@ export const syncOverdueAction = actionClient.action(async () => {
     throw error;
   }
 });
+
+export const createCreditNoteAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      const data = await apiFetch<Invoice>(`/api/invoices/${id}/credit-note`, {
+        method: "POST",
+        body: {},
+      });
+      revalidateInvoices(id);
+      revalidateInvoices(data.id);
+      revalidateTag("audit-logs", "max");
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });
+
+export const finalizeProformaAction = actionClient
+  .inputSchema(invoiceIdSchema)
+  .action(async ({ parsedInput: { id } }) => {
+    try {
+      const data = await apiFetch<Invoice>(
+        `/api/invoices/${id}/finalize-proforma`,
+        { method: "POST", body: {} },
+      );
+      revalidateInvoices(id);
+      revalidateInvoices(data.id);
+      revalidateTag("audit-logs", "max");
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message);
+      throw error;
+    }
+  });

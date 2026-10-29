@@ -1,14 +1,26 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   confirmPaymentImportAction,
   previewPaymentImportAction,
 } from "@/actions/payments";
+import { CsvUploader } from "@/components/payments/csv-uploader";
 import { VirtualList } from "@/components/shared/virtual-list";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { actionErrorMessage } from "@/lib/action-utils";
 import type {
@@ -29,6 +41,7 @@ const statusLabel: Record<PaymentImportRowResult["matchStatus"], string> = {
 export function PaymentImportPanel() {
   const [pending, startTransition] = useTransition();
   const [csvText, setCsvText] = useState("");
+  const [fileName, setFileName] = useState<string | null>(null);
   const [preview, setPreview] = useState<PaymentImportPreviewResponse | null>(
     null,
   );
@@ -97,54 +110,82 @@ export function PaymentImportPanel() {
       setPreview(null);
       setSelected(new Set());
       setCsvText("");
+      setFileName(null);
     });
   }
 
-  function onFile(file: File | undefined) {
-    if (!file) return;
+  function onFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
       setCsvText(String(reader.result ?? ""));
+      setFileName(file.name);
       setPreview(null);
     };
     reader.readAsText(file);
   }
 
   return (
-    <div className="space-y-6">
-      <section className="panel flex flex-col gap-4 p-4">
-        <div>
-          <h2 className="font-heading text-sm font-medium">Bankový CSV</h2>
-          <p className="mt-1 text-[13px] text-muted-foreground">
-            Export z banky (Tatra, SLSP, VÚB…). Hľadáme stĺpec VS / variabilný
-            symbol a párme ho na vystavené faktúry.
-          </p>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="csv-file">Súbor</Label>
-          <input
-            id="csv-file"
-            type="file"
-            accept=".csv,text/csv,text/plain"
-            className="text-[13px] text-muted-foreground file:mr-3 file:rounded-[4px] file:border file:border-border file:bg-surface file:px-3 file:py-1.5 file:text-[13px] file:text-ink"
-            onChange={(e) => onFile(e.target.files?.[0])}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="csv-text">Alebo vlož CSV</Label>
-          <Textarea
-            id="csv-text"
-            rows={8}
-            className="font-mono text-[12px]"
-            placeholder={"Dátum;VS;Suma;Protistrana\n12.03.2026;20260001;120.00;Firma s.r.o."}
-            value={csvText}
-            onChange={(e) => {
-              setCsvText(e.target.value);
-              setPreview(null);
-            }}
-          />
-        </div>
-        <div className="flex justify-end">
+    <div className="mx-auto max-w-3xl space-y-6">
+      <Card size="sm" className="rounded-[6px] bg-surface ring-border">
+        <CardHeader className="border-b border-rule pb-3">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <CardTitle className="text-[15px]">Bankový CSV</CardTitle>
+              <CardDescription className="mt-1 max-w-xl">
+                Export z banky (Tatra, SLSP, VÚB…). Hľadáme stĺpec VS /
+                variabilný symbol a párme ho na vystavené faktúry.
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="rounded-[4px] text-[10px]">
+              VS párovanie
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4 pt-4">
+          <div className="space-y-1.5">
+            <Label>Súbor</Label>
+            <CsvUploader
+              disabled={pending}
+              fileName={fileName}
+              onFile={onFile}
+              onClear={() => {
+                setFileName(null);
+                setCsvText("");
+                setPreview(null);
+              }}
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Separator className="flex-1" />
+            <span className="text-[11px] font-medium tracking-[0.08em] text-faint uppercase">
+              alebo
+            </span>
+            <Separator className="flex-1" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="csv-text">Vlož CSV text</Label>
+            <Textarea
+              id="csv-text"
+              rows={7}
+              className="font-mono text-[12px]"
+              placeholder={
+                "Dátum;VS;Suma;Protistrana\n12.03.2026;20260001;120.00;Firma s.r.o."
+              }
+              value={csvText}
+              disabled={pending}
+              onChange={(e) => {
+                setCsvText(e.target.value);
+                setFileName(null);
+                setPreview(null);
+              }}
+            />
+          </div>
+        </CardContent>
+
+        <CardFooter className="justify-end border-t border-rule bg-raised/20">
           <Button
             type="button"
             disabled={pending || !csvText.trim()}
@@ -152,17 +193,27 @@ export function PaymentImportPanel() {
           >
             Párovanie VS
           </Button>
-        </div>
-      </section>
+        </CardFooter>
+      </Card>
 
       {preview ? (
         <section className="space-y-4">
-          <div className="ledger-strip">
-            <span>Riadky {preview.totalRows}</span>
-            <span>Zhody {preview.matched}</span>
-            <span>Nejednoznačné {preview.ambiguous}</span>
-            <span>Bez faktúry {preview.unmatched}</span>
-            <span>Už zaplatené {preview.alreadyPaid}</span>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge variant="secondary" className="rounded-[4px] data-num">
+              Riadky {preview.totalRows}
+            </Badge>
+            <Badge variant="outline" className="rounded-[4px] data-num">
+              Zhody {preview.matched}
+            </Badge>
+            <Badge variant="outline" className="rounded-[4px] data-num">
+              Nejednoznačné {preview.ambiguous}
+            </Badge>
+            <Badge variant="outline" className="rounded-[4px] data-num">
+              Bez faktúry {preview.unmatched}
+            </Badge>
+            <Badge variant="outline" className="rounded-[4px] data-num">
+              Už zaplatené {preview.alreadyPaid}
+            </Badge>
           </div>
 
           <div className="panel overflow-hidden">
@@ -193,11 +244,10 @@ export function PaymentImportPanel() {
                   <div className="grid grid-cols-[2rem_2.5rem_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(6rem,1.4fr)] items-center gap-2 border-b border-border/80 px-3 py-2.5 text-[13px]">
                     <span>
                       {canSelect ? (
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={checked}
                           disabled={pending}
-                          onChange={() => toggle(row.invoiceId!)}
+                          onCheckedChange={() => toggle(row.invoiceId!)}
                           aria-label={`Vybrať ${row.invoiceNumber}`}
                         />
                       ) : null}

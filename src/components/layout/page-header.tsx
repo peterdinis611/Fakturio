@@ -10,7 +10,7 @@ export function PageHeader({
   ledger,
 }: {
   title: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
   ledger?: ReactNode;
 }) {
@@ -23,9 +23,13 @@ export function PageHeader({
               {title}
             </h1>
             {description ? (
-              <p className="mt-1 max-w-2xl text-[14px] text-muted-foreground">
-                {description}
-              </p>
+              typeof description === "string" ? (
+                <p className="mt-1 max-w-2xl text-[14px] text-muted-foreground">
+                  {description}
+                </p>
+              ) : (
+                <div className="mt-1 max-w-2xl">{description}</div>
+              )
             ) : null}
             {ledger ? (
               <div className="ledger-strip mt-3 mb-0 border-0 pb-0">{ledger}</div>
