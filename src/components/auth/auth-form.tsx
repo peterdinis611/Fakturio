@@ -3,17 +3,29 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { loginAction, registerAction } from "@/actions/auth";
 import { actionErrorMessage } from "@/lib/action-utils";
+import {
+  evaluatePasswordRules,
+  type PasswordRuleId,
+} from "@/lib/password";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import "./auth-form.css";
 
 type AuthFormProps = {
   mode: "sign-in" | "sign-up";
+};
+
+const RULE_LABEL: Record<PasswordRuleId, "passwordRuleMin" | "passwordRuleUpper" | "passwordRuleLower" | "passwordRuleSpecial"> = {
+  minLength: "passwordRuleMin",
+  upper: "passwordRuleUpper",
+  lower: "passwordRuleLower",
+  special: "passwordRuleSpecial",
 };
 
 export function AuthForm({ mode }: AuthFormProps) {
@@ -26,6 +38,11 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const passwordRules = useMemo(
+    () => evaluatePasswordRules(password),
+    [password],
+  );
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -111,6 +128,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             minLength={mode === "sign-up" ? 8 : 1}
             disabled={pending}
             className="pr-10"
+            aria-describedby={mode === "sign-up" ? "password-rules" : undefined}
           />
           <button
             type="button"
@@ -127,6 +145,18 @@ export function AuthForm({ mode }: AuthFormProps) {
             )}
           </button>
         </div>
+        {mode === "sign-up" ? (
+          <ul id="password-rules" className="password-rules" aria-live="polite">
+            {passwordRules.map((rule) => (
+              <li key={rule.id} data-ok={rule.ok ? "true" : "false"}>
+                <span className="password-rules-mark" aria-hidden>
+                  {rule.ok ? "✓" : "·"}
+                </span>
+                {t(RULE_LABEL[rule.id])}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {error ? <p className="text-xs text-destructive">{error}</p> : null}

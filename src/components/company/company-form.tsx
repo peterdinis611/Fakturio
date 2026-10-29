@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import "./company-form.css";
 
 type CompanyFormInput = z.input<typeof companySchema>;
 
@@ -77,23 +78,28 @@ function Field({
 }
 
 function Section({
+  index,
   title,
   hint,
   children,
 }: {
+  index: string;
   title: string;
   hint?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-rule py-7 last:border-0">
-      <div className="mb-4">
-        <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
-        {hint ? (
-          <p className="mt-0.5 text-[13px] text-muted-foreground">{hint}</p>
-        ) : null}
+    <section className="company-section">
+      <div className="company-section-head">
+        <div>
+          <h2>{title}</h2>
+          {hint ? <p>{hint}</p> : null}
+        </div>
+        <span className="company-section-index" aria-hidden>
+          {index}
+        </span>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">{children}</div>
+      <div className="company-section-grid">{children}</div>
     </section>
   );
 }
@@ -149,10 +155,16 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-[40rem]"
+      className={cn(
+        mode === "onboarding" ? "company-form-sections" : "mx-auto w-full max-w-[40rem] space-y-3",
+      )}
       noValidate
     >
-      <Section title="Identita" hint="Čo ide do hlavičky faktúry.">
+      <Section
+        index="01"
+        title="Identita"
+        hint="Čo ide do hlavičky faktúry."
+      >
         <Field className="sm:col-span-2">
           <Label htmlFor="name">Názov firmy</Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
@@ -176,7 +188,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Input id="icDph" {...register("icDph")} />
         </Field>
         <Field className="sm:col-span-2">
-          <div className="flex flex-col gap-1.5 rounded-[4px] border border-border bg-surface px-3 py-2.5">
+          <div className="flex flex-col gap-1.5 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
             <div className="flex items-center gap-2.5">
               <Checkbox
                 id="isVatPayer"
@@ -225,7 +237,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section title="Adresa">
+      <Section index="02" title="Adresa">
         <Field className="sm:col-span-2">
           <Label htmlFor="street">Ulica</Label>
           <Input id="street" {...register("street")} />
@@ -244,7 +256,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section title="Banka" hint="Predvolený účet na faktúrach.">
+      <Section index="03" title="Banka" hint="Predvolený účet na faktúrach.">
         <Field className="sm:col-span-2">
           <Label htmlFor="bankIban">IBAN</Label>
           <Input id="bankIban" className="data-num" {...register("bankIban")} />
@@ -259,7 +271,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section title="Predvolené hodnoty" hint="Použijú sa pri novej faktúre.">
+      <Section
+        index="04"
+        title="Predvolené hodnoty"
+        hint="Použijú sa pri novej faktúre."
+      >
         <Field>
           <Label htmlFor="defaultDueDays">Splatnosť (dni)</Label>
           <Input
@@ -336,7 +352,13 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <div className="sticky bottom-0 -mx-1 flex items-center justify-between gap-3 border-t border-border bg-ground/95 px-1 py-4 backdrop-blur-[1px]">
+      <div
+        className={
+          mode === "onboarding"
+            ? "company-form-footer"
+            : "sticky bottom-0 -mx-1 flex items-center justify-between gap-3 border-t border-border bg-ground/95 px-1 py-4 backdrop-blur-[1px]"
+        }
+      >
         <p className="text-[12px] text-muted-foreground">
           Zmeny sa prejavia na nových faktúrach.
         </p>

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { apiFetch } from "@/lib/api/client";
 import { isApiError } from "@/lib/api/errors";
@@ -11,18 +12,39 @@ import {
   setAccessToken,
 } from "@/lib/auth/session";
 import { ActionError, actionClient } from "@/lib/safe-action";
+import { passwordMeetsPolicy } from "@/lib/password";
 
-const registerSchema = z.object({
-  email: z.email("Neplatný e-mail"),
-  password: z.string().min(8, "Heslo musí mať aspoň 8 znakov").max(128),
-  firstName: z.string().trim().max(100).optional().or(z.literal("")),
-  lastName: z.string().trim().max(100).optional().or(z.literal("")),
-});
+async function authSchemas() {
+  const t = await getTranslations("Auth");
+  return {
+    register: z.object({
+      email: z.email(t("emailInvalid")),
+      password: z
+        .string()
+        .min(8, t("passwordTooShort"))
+        .max(128)
+        .refine(passwordMeetsPolicy, t("passwordWeak")),
+      firstName: z.string().trim().max(100).optional().or(z.literal("")),
+      lastName: z.string().trim().max(100).optional().or(z.literal("")),
+    }),
+    login: z.object({
+      email: z.email(t("emailInvalid")),
+      password: z.string().min(1, t("passwordRequired")).max(128),
+    }),
+  };
+}
 
-const loginSchema = z.object({
-  email: z.email("Neplatný e-mail"),
-  password: z.string().min(1, "Heslo je povinné").max(128),
-});
+async function mapAuthApiError(error: unknown): Promise<never> {
+  const t = await getTranslations("Auth");
+  if (isApiError(error)) {
+    const code = error.problem.code;
+    if (code === "duplicate_email") throw new ActionError(t("emailTaken"));
+    if (code === "unauthorized" || error.status === 401)
+      throw new ActionError(t("invalidCredentials"));
+    throw new ActionError(error.message || t("authFailed"));
+  }
+  throw error;
+}
 
 async function persistSession(data: AuthResponse) {
   await setAccessToken(data.accessToken, data.expiresAt);
@@ -30,7 +52,7 @@ async function persistSession(data: AuthResponse) {
 }
 
 export const registerAction = actionClient
-  .inputSchema(registerSchema)
+  .inputSchema(async () => (await authSchemas()).register)
   .action(async ({ parsedInput }) => {
     try {
       const data = await apiFetch<AuthResponse>("/api/auth/register", {
@@ -48,13 +70,12 @@ export const registerAction = actionClient
       revalidatePath("/", "layout");
       return user;
     } catch (error) {
-      if (isApiError(error)) throw new ActionError(error.message);
-      throw error;
+      await mapAuthApiError(error);
     }
   });
 
 export const loginAction = actionClient
-  .inputSchema(loginSchema)
+  .inputSchema(async () => (await authSchemas()).login)
   .action(async ({ parsedInput }) => {
     try {
       const data = await apiFetch<AuthResponse>("/api/auth/login", {
@@ -70,8 +91,7 @@ export const loginAction = actionClient
       revalidatePath("/", "layout");
       return user;
     } catch (error) {
-      if (isApiError(error)) throw new ActionError(error.message);
-      throw error;
+      await mapAuthApiError(error);
     }
   });
 
