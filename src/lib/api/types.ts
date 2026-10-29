@@ -523,6 +523,15 @@ export type AppUser = {
   lastSeenAt: string | null;
 };
 
+export type Note = {
+  id: string;
+  title: string;
+  body: string;
+  isPinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AuthResponse = {
   accessToken: string;
   expiresAt: string;

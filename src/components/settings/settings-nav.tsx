@@ -17,7 +17,7 @@ export function SettingsNav() {
   return (
     <nav
       aria-label="Sekcie nastavení"
-      className="mb-6 flex flex-wrap gap-1.5 rounded-[6px] border border-border bg-raised/35 p-1"
+      className="mb-6 grid grid-cols-3 gap-1 rounded-[6px] border border-border bg-raised/35 p-1"
     >
       {tabs.map((tab) => {
         const active =
@@ -29,7 +29,7 @@ export function SettingsNav() {
             href={tab.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-[4px] px-3 py-1.5 text-[13px] transition-colors",
+              "inline-flex items-center justify-center gap-1.5 rounded-[4px] px-2 py-2 text-[13px] transition-colors sm:px-3",
               active
                 ? "bg-surface font-medium text-ink shadow-sm ring-1 ring-border"
                 : "text-muted-foreground hover:bg-surface/60 hover:text-ink",

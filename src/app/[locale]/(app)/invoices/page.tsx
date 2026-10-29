@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { listInvoices } from "@/actions/invoices";
+import {
+  InvoiceFilters,
+  InvoiceLifecycleHint,
+} from "@/components/invoices/invoice-filters";
 import { PageHeader } from "@/components/layout/page-header";
 import { CsvPreview } from "@/components/preview/csv-preview";
 import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
@@ -21,27 +25,10 @@ import {
   documentTypeLabel,
   formatDate,
   formatMoney,
-  statusLabel,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Faktúry" };
-
-const statuses: (InvoiceStatus | "all")[] = [
-  "all",
-  "Draft",
-  "Issued",
-  "Paid",
-  "Overdue",
-  "Cancelled",
-];
-
-const documentTypes: (InvoiceDocumentType | "all")[] = [
-  "all",
-  "Invoice",
-  "Proforma",
-  "CreditNote",
-];
 
 export default async function InvoicesPage({
   searchParams,
@@ -78,11 +65,7 @@ export default async function InvoicesPage({
     <div>
       <PageHeader
         title="Faktúry"
-        description={
-          overdueOnly
-            ? "Len po splatnosti: označiť úhradu alebo poslať upomienku."
-            : "Koncept → vystavená → zaplatená. Číslo a VS sú v detaile."
-        }
+        description={<InvoiceLifecycleHint overdueOnly={overdueOnly} />}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <CsvPreview
@@ -110,66 +93,11 @@ export default async function InvoicesPage({
         }
       />
 
-      <div className="mb-2 flex flex-wrap items-center gap-1">
-        {documentTypes.map((t) => {
-          const href =
-            t === "all"
-              ? `/invoices${status ? `?status=${status}` : ""}${overdueOnly ? `${status ? "&" : "?"}overdue=1` : ""}`
-              : `/invoices?type=${t}${status ? `&status=${status}` : ""}${overdueOnly ? "&overdue=1" : ""}`;
-          const active = (t === "all" && !documentType) || documentType === t;
-          return (
-            <Link
-              key={t}
-              href={href}
-              className={cn(
-                "rounded-[4px] px-2 py-1 text-[12px] font-medium",
-                active
-                  ? "bg-ink text-surface"
-                  : "text-muted-foreground hover:bg-raised hover:text-ink",
-              )}
-            >
-              {t === "all" ? "Všetky typy" : documentTypeLabel(t)}
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="mb-3 flex flex-wrap items-center gap-1 border-b border-border pb-0">
-        {statuses.map((s) => {
-          const typeQs = documentType ? `&type=${documentType}` : "";
-          const href =
-            s === "all"
-              ? `/invoices${documentType ? `?type=${documentType}` : ""}${overdueOnly ? `${documentType ? "&" : "?"}overdue=1` : ""}`
-              : `/invoices?status=${s}${typeQs}${overdueOnly ? "&overdue=1" : ""}`;
-          const active = (s === "all" && !status) || status === s;
-          return (
-            <Link
-              key={s}
-              href={href}
-              className={cn(
-                "relative -mb-px border-b-2 px-2.5 py-2 text-[13px] font-medium",
-                active
-                  ? "border-ink text-ink"
-                  : "border-transparent text-muted-foreground hover:text-ink",
-              )}
-            >
-              {s === "all" ? "Všetky" : statusLabel[s]}
-            </Link>
-          );
-        })}
-        <div className="flex-1" />
-        <Link
-          href={overdueOnly ? "/invoices" : "/invoices?overdue=1"}
-          className={cn(
-            "mb-1 rounded-[6px] px-2 py-1 text-[12px] font-medium",
-            overdueOnly
-              ? "bg-pill-negative-bg text-pill-negative-ink"
-              : "text-muted-foreground hover:bg-raised",
-          )}
-        >
-          Po splatnosti
-        </Link>
-      </div>
+      <InvoiceFilters
+        status={status}
+        documentType={documentType}
+        overdueOnly={overdueOnly}
+      />
 
       <DebouncedSearchField
         path="/invoices"

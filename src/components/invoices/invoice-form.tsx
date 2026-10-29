@@ -28,6 +28,7 @@ import {
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -402,31 +403,53 @@ export function InvoiceForm({
           </div>
           <div className={fieldClass}>
             <Label htmlFor="issueDate">Dátum vystavenia</Label>
-            <Input
-              id="issueDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("issueDate")}
+            <Controller
+              control={control}
+              name="issueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="issueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Vystavenie"
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.issueDate?.message} />
           </div>
           <div className={fieldClass}>
             <Label htmlFor="dueDate">Dátum splatnosti</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("dueDate")}
+            <Controller
+              control={control}
+              name="dueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="dueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Splatnosť"
+                  fromDate={watch("issueDate") || undefined}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.dueDate?.message} />
           </div>
           <div className={fieldClass}>
             <Label htmlFor="deliveryDate">Dátum dodania</Label>
-            <Input
-              id="deliveryDate"
-              type="date"
-              disabled={readOnly || pending}
-              {...register("deliveryDate")}
+            <Controller
+              control={control}
+              name="deliveryDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="deliveryDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Dodanie"
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.deliveryDate?.message} />
           </div>

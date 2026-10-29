@@ -130,28 +130,46 @@ function Section({
   title,
   hint,
   children,
+  quiet,
 }: {
   index: string;
   title: string;
   hint?: string;
   children: React.ReactNode;
+  quiet?: boolean;
 }) {
   return (
-    <Card size="sm" className="rounded-[6px] bg-surface ring-border">
-      <CardHeader className="border-b border-rule pb-3">
+    <Card
+      size="sm"
+      className={cn(
+        "rounded-[6px] border-border bg-surface shadow-none",
+        quiet ? "border-border/80" : "ring-1 ring-border",
+      )}
+    >
+      <CardHeader className={cn("border-b border-rule", quiet ? "pb-2.5" : "pb-3")}>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle className="text-[13px] font-semibold tracking-[0.06em] uppercase">
+            <CardTitle
+              className={cn(
+                quiet
+                  ? "text-[14px] font-medium tracking-normal normal-case"
+                  : "text-[13px] font-semibold tracking-[0.06em] uppercase",
+              )}
+            >
               {title}
             </CardTitle>
-            {hint ? <CardDescription className="mt-1">{hint}</CardDescription> : null}
+            {hint && !quiet ? (
+              <CardDescription className="mt-1">{hint}</CardDescription>
+            ) : null}
           </div>
-          <Badge variant="outline" className="rounded-[4px] font-mono text-[10px]">
-            {index}
-          </Badge>
+          {!quiet ? (
+            <Badge variant="outline" className="rounded-[4px] font-mono text-[10px]">
+              {index}
+            </Badge>
+          ) : null}
         </div>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className={quiet ? "pt-3.5" : "pt-4"}>
         <div className="company-section-grid">{children}</div>
       </CardContent>
     </Card>
@@ -217,7 +235,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       )}
       noValidate
     >
-      <Section index="01" title="Identita" hint="Čo ide do hlavičky faktúry.">
+      <Section
+        index="01"
+        title="Identita"
+        hint="Čo ide do hlavičky faktúry."
+        quiet={mode === "settings"}
+      >
         <Field className="sm:col-span-2">
           <Label htmlFor="name">Názov firmy</Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
@@ -233,7 +256,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 value={field.value || undefined}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger id="legalForm" className="w-full">
+                <SelectTrigger
+                  id="legalForm"
+                  className="h-9 w-full rounded-[4px] border-border bg-ground"
+                >
                   <SelectValue placeholder="Vyber…" />
                 </SelectTrigger>
                 <SelectContent>
@@ -311,7 +337,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section index="02" title="Adresa">
+      <Section index="02" title="Adresa" quiet={mode === "settings"}>
         <Field className="sm:col-span-2">
           <Label htmlFor="street">Ulica</Label>
           <Input id="street" {...register("street")} />
@@ -331,7 +357,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             name="country"
             render={({ field }) => (
               <Select value={field.value || "SK"} onValueChange={field.onChange}>
-                <SelectTrigger id="country" className="w-full">
+                <SelectTrigger
+                  id="country"
+                  className="h-9 w-full rounded-[4px] border-border bg-ground"
+                >
                   <SelectValue placeholder="Krajina" />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,7 +376,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section index="03" title="Banka" hint="Predvolený účet na faktúrach.">
+      <Section
+        index="03"
+        title="Banka"
+        hint="Predvolený účet na faktúrach."
+        quiet={mode === "settings"}
+      >
         <Field className="sm:col-span-2">
           <Label htmlFor="bankIban">IBAN</Label>
           <Input id="bankIban" className="data-num" {...register("bankIban")} />
@@ -366,6 +400,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         index="04"
         title="Predvolené hodnoty"
         hint="Použijú sa pri novej faktúre."
+        quiet={mode === "settings"}
       >
         <Field>
           <Label htmlFor="defaultDueDays">Splatnosť (dni)</Label>
@@ -401,7 +436,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 value={field.value || "EUR"}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger id="defaultCurrency" className="w-full">
+                <SelectTrigger
+                  id="defaultCurrency"
+                  className="h-9 w-full rounded-[4px] border-border bg-ground"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -429,7 +467,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 value={field.value || undefined}
                 onValueChange={field.onChange}
               >
-                <SelectTrigger id="defaultPaymentMethod" className="w-full">
+                <SelectTrigger
+                  id="defaultPaymentMethod"
+                  className="h-9 w-full rounded-[4px] border-border bg-ground"
+                >
                   <SelectValue placeholder="Vyber…" />
                 </SelectTrigger>
                 <SelectContent>

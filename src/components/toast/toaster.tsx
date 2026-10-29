@@ -11,6 +11,9 @@ import {
 } from "@/lib/toast";
 import "./toast.css";
 
+const EMPTY_TOASTS: ToastRecord[] = [];
+const getServerToasts = () => EMPTY_TOASTS;
+
 const MARK: Record<ToastVariant, string> = {
   default: "i",
   success: "OK",
@@ -70,7 +73,7 @@ export function Toaster() {
   const toasts = useSyncExternalStore(
     subscribeToasts,
     getToasts,
-    () => [] as ToastRecord[],
+    getServerToasts,
   );
 
   if (toasts.length === 0) return null;
