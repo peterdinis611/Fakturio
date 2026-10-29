@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   createResumeEntryAction,
   updateResumeEntryAction,

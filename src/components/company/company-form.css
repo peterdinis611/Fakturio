@@ -5,50 +5,6 @@
   max-width: 42rem;
 }
 
-.company-section {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  padding: 1.15rem 1.15rem 1.25rem;
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--text) 4%, transparent);
-}
-
-.company-section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.company-section-head h2 {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.company-section-head p {
-  margin: 0.25rem 0 0;
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--muted);
-}
-
-.company-section-index {
-  flex: none;
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  color: var(--faint);
-}
-
 .company-section-grid {
   display: grid;
   gap: 0.9rem;
@@ -65,7 +21,7 @@
   bottom: 0;
   z-index: 5;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
   margin-top: 1.25rem;

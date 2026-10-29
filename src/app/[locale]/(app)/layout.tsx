@@ -9,6 +9,7 @@ import {
   ScrollToTopButton,
 } from "@/components/layout/scroll-to-top";
 import { PageMotion } from "@/components/motion/page-motion";
+import { isOnboardingSkipped } from "@/lib/onboarding";
 import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
@@ -36,18 +37,24 @@ async function AppShell({ children }: { children: React.ReactNode }) {
     loaded = undefined;
   }
 
-  if (!loaded?.summary.name?.trim()) {
+  const hasCompanyName = Boolean(loaded?.summary.name?.trim());
+  const skipped = await isOnboardingSkipped();
+  if (!hasCompanyName && !skipped) {
     redirect({ href: "/onboarding", locale });
   }
 
-  const { summary, status } = loaded!;
+  const summary = loaded?.summary;
+  const status = loaded?.status;
 
   return (
     <div className="flex min-h-full flex-col md:flex-row">
       <ScrollRestoration />
-      <AppSidebar companyName={summary.name} userEmail={user!.email} />
+      <AppSidebar
+        companyName={summary?.name || undefined}
+        userEmail={user!.email}
+      />
       <div className="flex min-w-0 flex-1 flex-col">
-        <CompanyBanner status={status} />
+        {status ? <CompanyBanner status={status} /> : null}
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="mx-auto w-full max-w-[1152px]">
             <PageMotion>{children}</PageMotion>

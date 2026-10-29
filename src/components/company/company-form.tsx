@@ -2,9 +2,9 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { updateCompanyAction } from "@/actions/company";
 import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";
 import type { CompanySettings } from "@/lib/api/types";
@@ -14,11 +14,28 @@ import {
   type CompanyFormValues,
 } from "@/lib/validations/company";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { SkipOnboardingButton } from "@/components/company/skip-onboarding-button";
 import "./company-form.css";
 
 type CompanyFormInput = z.input<typeof companySchema>;
@@ -27,6 +44,37 @@ type CompanyFormProps = {
   initial: CompanySettings;
   mode: "onboarding" | "settings";
 };
+
+const LEGAL_FORMS = [
+  { value: "s.r.o.", label: "s.r.o." },
+  { value: "SZČO", label: "SZČO" },
+  { value: "a.s.", label: "a.s." },
+  { value: "v.o.s.", label: "v.o.s." },
+  { value: "k.s.", label: "k.s." },
+  { value: "iné", label: "Iné" },
+] as const;
+
+const PAYMENT_METHODS = [
+  { value: "bank_transfer", label: "Bankový prevod" },
+  { value: "cash", label: "Hotovosť" },
+  { value: "card", label: "Karta" },
+  { value: "other", label: "Iné" },
+] as const;
+
+const COUNTRIES = [
+  { value: "SK", label: "Slovensko" },
+  { value: "CZ", label: "Česko" },
+  { value: "AT", label: "Rakúsko" },
+  { value: "HU", label: "Maďarsko" },
+  { value: "PL", label: "Poľsko" },
+  { value: "DE", label: "Nemecko" },
+] as const;
+
+const CURRENCIES = [
+  { value: "EUR", label: "EUR" },
+  { value: "CZK", label: "CZK" },
+  { value: "USD", label: "USD" },
+] as const;
 
 function toFormValues(initial: CompanySettings): CompanyFormInput {
   return {
@@ -89,18 +137,24 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="company-section">
-      <div className="company-section-head">
-        <div>
-          <h2>{title}</h2>
-          {hint ? <p>{hint}</p> : null}
+    <Card size="sm" className="rounded-[6px] bg-surface ring-border">
+      <CardHeader className="border-b border-rule pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-[13px] font-semibold tracking-[0.06em] uppercase">
+              {title}
+            </CardTitle>
+            {hint ? <CardDescription className="mt-1">{hint}</CardDescription> : null}
+          </div>
+          <Badge variant="outline" className="rounded-[4px] font-mono text-[10px]">
+            {index}
+          </Badge>
         </div>
-        <span className="company-section-index" aria-hidden>
-          {index}
-        </span>
-      </div>
-      <div className="company-section-grid">{children}</div>
-    </section>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="company-section-grid">{children}</div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -119,6 +173,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     setError,
     watch,
     setValue,
+    control,
     formState: { errors },
   } = form;
 
@@ -156,15 +211,13 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     <form
       onSubmit={handleSubmit(onSubmit)}
       className={cn(
-        mode === "onboarding" ? "company-form-sections" : "mx-auto w-full max-w-[40rem] space-y-3",
+        mode === "onboarding"
+          ? "company-form-sections"
+          : "company-form-sections w-full",
       )}
       noValidate
     >
-      <Section
-        index="01"
-        title="Identita"
-        hint="Čo ide do hlavičky faktúry."
-      >
+      <Section index="01" title="Identita" hint="Čo ide do hlavičky faktúry.">
         <Field className="sm:col-span-2">
           <Label htmlFor="name">Názov firmy</Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
@@ -172,7 +225,27 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="legalForm">Právna forma</Label>
-          <Input id="legalForm" placeholder="s.r.o., SZČO…" {...register("legalForm")} />
+          <Controller
+            control={control}
+            name="legalForm"
+            render={({ field }) => (
+              <Select
+                value={field.value || undefined}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger id="legalForm" className="w-full">
+                  <SelectValue placeholder="Vyber…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEGAL_FORMS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </Field>
         <Field>
           <Label htmlFor="ico">IČO</Label>
@@ -188,27 +261,28 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Input id="icDph" {...register("icDph")} />
         </Field>
         <Field className="sm:col-span-2">
-          <div className="flex flex-col gap-1.5 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
-            <div className="flex items-center gap-2.5">
-              <Checkbox
-                id="isVatPayer"
-                checked={isVatPayer}
-                onCheckedChange={(checked) =>
-                  setValue("isVatPayer", checked === true, {
-                    shouldDirty: true,
-                  })
-                }
-              />
+          <div className="flex items-center justify-between gap-3 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
+            <div className="min-w-0">
               <Label htmlFor="isVatPayer" className="font-normal">
                 Platca DPH
               </Label>
+              {!isVatPayer ? (
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  Na faktúrach bude DPH 0 % a text „Nie som platca DPH“.
+                </p>
+              ) : (
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  IČ DPH je povinné pri platcovi.
+                </p>
+              )}
             </div>
-            {!isVatPayer ? (
-              <p className="pl-7 text-[12px] text-muted-foreground">
-                Režim neplatcu: na nových faktúrach bude DPH 0 % a PDF bez
-                stĺpca DPH (text „Nie som platca DPH“).
-              </p>
-            ) : null}
+            <Switch
+              id="isVatPayer"
+              checked={isVatPayer}
+              onCheckedChange={(checked) =>
+                setValue("isVatPayer", checked, { shouldDirty: true })
+              }
+            />
           </div>
         </Field>
         <Field className="sm:col-span-2">
@@ -250,9 +324,26 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Label htmlFor="postalCode">PSČ</Label>
           <Input id="postalCode" className="data-num" {...register("postalCode")} />
         </Field>
-        <Field>
+        <Field className="sm:col-span-2">
           <Label htmlFor="country">Krajina</Label>
-          <Input id="country" {...register("country")} />
+          <Controller
+            control={control}
+            name="country"
+            render={({ field }) => (
+              <Select value={field.value || "SK"} onValueChange={field.onChange}>
+                <SelectTrigger id="country" className="w-full">
+                  <SelectValue placeholder="Krajina" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </Field>
       </Section>
 
@@ -299,19 +390,29 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             disabled={!isVatPayer}
             {...register("defaultVatRate")}
           />
-          {!isVatPayer ? (
-            <p className="text-[11px] text-faint">
-              Pri neplatcovi sa predvolená sadzba nepoužíva.
-            </p>
-          ) : null}
         </Field>
         <Field>
           <Label htmlFor="defaultCurrency">Mena</Label>
-          <Input
-            id="defaultCurrency"
-            maxLength={3}
-            className="data-num uppercase"
-            {...register("defaultCurrency")}
+          <Controller
+            control={control}
+            name="defaultCurrency"
+            render={({ field }) => (
+              <Select
+                value={field.value || "EUR"}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger id="defaultCurrency" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </Field>
         <Field>
@@ -320,10 +421,26 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="defaultPaymentMethod">Spôsob platby</Label>
-          <Input
-            id="defaultPaymentMethod"
-            placeholder="bank_transfer"
-            {...register("defaultPaymentMethod")}
+          <Controller
+            control={control}
+            name="defaultPaymentMethod"
+            render={({ field }) => (
+              <Select
+                value={field.value || undefined}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger id="defaultPaymentMethod" className="w-full">
+                  <SelectValue placeholder="Vyber…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </Field>
         <Field>
@@ -359,9 +476,17 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             : "sticky bottom-0 -mx-1 flex items-center justify-between gap-3 border-t border-border bg-ground/95 px-1 py-4 backdrop-blur-[1px]"
         }
       >
-        <p className="text-[12px] text-muted-foreground">
-          Zmeny sa prejavia na nových faktúrach.
-        </p>
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-[12px] text-muted-foreground">
+            Zmeny sa prejavia na nových faktúrach.
+          </p>
+          {mode === "onboarding" ? (
+            <>
+              <Separator className="my-1 max-w-40 opacity-60" />
+              <SkipOnboardingButton />
+            </>
+          ) : null}
+        </div>
         <Button type="submit" disabled={pending}>
           {pending
             ? "Ukladám…"

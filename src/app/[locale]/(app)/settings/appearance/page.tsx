@@ -1,17 +1,28 @@
 import { AppearanceForm } from "@/components/settings/appearance-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export const metadata = { title: "Vzhľad" };
 
 export default function AppearanceSettingsPage() {
   return (
-    <div>
-      <div className="mb-4 max-w-lg">
-        <h2 className="text-[15px] font-medium text-ink">Téma</h2>
-        <p className="mt-1 text-[14px] text-muted-foreground">
-          Farba rozhrania. Platí len v tomto prehliadači.
-        </p>
-      </div>
-      <AppearanceForm />
+    <div className="mx-auto max-w-[42rem]">
+      <Card size="sm" className="rounded-[6px] bg-surface ring-border">
+        <CardHeader className="border-b border-rule pb-3">
+          <CardTitle className="text-[15px]">Téma</CardTitle>
+          <CardDescription>
+            Farba rozhrania. Platí len v tomto prehliadači.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <AppearanceForm />
+        </CardContent>
+      </Card>
     </div>
   );
 }

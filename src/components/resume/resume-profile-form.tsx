@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { updateResumeProfileAction } from "@/actions/resume";
 import type { ResumeProfile } from "@/lib/api/types";
 import { actionErrorMessage, toFieldErrors } from "@/lib/action-utils";

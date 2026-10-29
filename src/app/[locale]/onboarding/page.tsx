@@ -1,5 +1,11 @@
+import { InfoIcon } from "lucide-react";
 import { getCompany } from "@/actions/company";
 import { CompanyForm } from "@/components/company/company-form";
+import { SkipOnboardingButton } from "@/components/company/skip-onboarding-button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { Link } from "@/i18n/navigation";
 import "./onboarding.css";
 
@@ -20,7 +26,12 @@ export default async function OnboardingPage() {
           </Link>
 
           <div className="onboarding-aside-copy">
-            <p className="onboarding-eyebrow">Krok 1 · Firma</p>
+            <Badge
+              variant="outline"
+              className="rounded-[4px] border-ring/40 text-[10px] tracking-[0.12em] text-ring uppercase"
+            >
+              Krok 1 · Firma
+            </Badge>
             <h1>Nastavenie firmy</h1>
             <p>
               Údaje do hlavičky faktúry a platobného pásu. Neskôr ich upravíš vo
@@ -28,7 +39,7 @@ export default async function OnboardingPage() {
             </p>
           </div>
 
-          <div className="onboarding-progress">
+          <div className="onboarding-progress space-y-2">
             <div className="onboarding-progress-meta">
               <span>
                 Hotové{" "}
@@ -36,21 +47,11 @@ export default async function OnboardingPage() {
                   {c.completedRequired}/{c.totalRequired}
                 </strong>
               </span>
-              <strong className="data-num">{c.percentComplete}%</strong>
+              <Badge variant="secondary" className="rounded-[4px] data-num">
+                {c.percentComplete}%
+              </Badge>
             </div>
-            <div
-              className="onboarding-progress-track"
-              role="progressbar"
-              aria-valuenow={c.percentComplete}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="Dokončenosť povinných údajov"
-            >
-              <div
-                className="onboarding-progress-fill"
-                style={{ width: `${c.percentComplete}%` }}
-              />
-            </div>
+            <Progress value={c.percentComplete} aria-label="Dokončenosť" />
           </div>
 
           <ul className="onboarding-checklist">
@@ -70,6 +71,19 @@ export default async function OnboardingPage() {
               </li>
             ))}
           </ul>
+
+          <Separator />
+
+          <Alert className="border-border bg-raised/40">
+            <InfoIcon />
+            <AlertTitle>Môžeš to doplniť neskôr</AlertTitle>
+            <AlertDescription>
+              Preskoč onboarding a firmu nastav vo Firma. Banner ti pripomenie
+              chýbajúce údaje.
+            </AlertDescription>
+          </Alert>
+
+          <SkipOnboardingButton />
         </aside>
 
         <main className="onboarding-main">
@@ -83,6 +97,9 @@ export default async function OnboardingPage() {
               Hotové {c.completedRequired} z {c.totalRequired} povinných ·{" "}
               {c.percentComplete}%
             </p>
+            <div className="mt-3">
+              <SkipOnboardingButton />
+            </div>
           </div>
 
           <CompanyForm initial={company} mode="onboarding" />
