@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAccessToken } from "@/lib/auth/session";
 import { ApiError } from "./errors";
 import type { ApiProblem } from "./types";
 
@@ -8,12 +8,10 @@ export function getApiBaseUrl() {
   return process.env.API_BASE_URL?.replace(/\/$/, "") || DEFAULT_BASE;
 }
 
-/** Optional actor id for audit trail — not a JWT. Auth stays in Clerk/Next.js. */
-async function getActorHeaders(): Promise<Record<string, string>> {
+async function getAuthHeader(): Promise<Record<string, string>> {
   try {
-    const session = await auth();
-    const userId = session.userId;
-    return userId ? { "X-Clerk-User-Id": userId } : {};
+    const token = await getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
   } catch {
     return {};
   }
@@ -26,6 +24,8 @@ type RequestOptions = {
   headers?: HeadersInit;
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
+  /** Skip reading the session cookie (login/register). */
+  skipAuth?: boolean;
 };
 
 function buildUrl(path: string, searchParams?: RequestOptions["searchParams"]) {
@@ -64,14 +64,22 @@ export async function apiFetch<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, searchParams, headers, cache, next } = options;
-  const actorHeaders = await getActorHeaders();
+  const {
+    method = "GET",
+    body,
+    searchParams,
+    headers,
+    cache,
+    next,
+    skipAuth,
+  } = options;
+  const authHeader = skipAuth ? {} : await getAuthHeader();
   const res = await fetch(buildUrl(path, searchParams), {
     method,
     headers: {
       Accept: "application/json",
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...actorHeaders,
+      ...authHeader,
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -99,9 +107,9 @@ export async function apiFetchBlob(
   searchParams?: RequestOptions["searchParams"],
   accept = "application/pdf, text/csv, */*",
 ): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
-  const actorHeaders = await getActorHeaders();
+  const authHeader = await getAuthHeader();
   const res = await fetch(buildUrl(path, searchParams), {
-    headers: { Accept: accept, ...actorHeaders },
+    headers: { Accept: accept, ...authHeader },
     cache: "no-store",
   });
 

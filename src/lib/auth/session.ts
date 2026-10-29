@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
+import { AUTH_COOKIE } from "@/lib/auth/constants";
 
-export const AUTH_COOKIE = "fakturio_token";
+export { AUTH_COOKIE };
 
 export async function getAccessToken(): Promise<string | null> {
   const jar = await cookies();

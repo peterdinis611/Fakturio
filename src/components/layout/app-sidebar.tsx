@@ -17,36 +17,13 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { Show, UserButton } from "@clerk/nextjs";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { LocaleSwitcher } from "@/components/i18n/locale-switcher";
+import { UserMenu } from "@/components/layout/user-menu";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-
-function SidebarAuth() {
-  const t = useTranslations("Common");
-
-  return (
-    <Suspense
-      fallback={<div className="h-8 w-8 animate-pulse rounded-full bg-raised" />}
-    >
-      <Show when="signed-in">
-        <div className="flex items-center gap-2 px-1 py-1">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "size-8",
-              },
-            }}
-          />
-          <span className="text-[12px] text-muted-foreground">{t("account")}</span>
-        </div>
-      </Show>
-    </Suspense>
-  );
-}
 
 const navKeys = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -136,7 +113,13 @@ function Brand({ companyName }: { companyName?: string }) {
   );
 }
 
-export function AppSidebar({ companyName }: { companyName?: string }) {
+export function AppSidebar({
+  companyName,
+  userEmail,
+}: {
+  companyName?: string;
+  userEmail?: string | null;
+}) {
   const pathname = usePathname();
   const tc = useTranslations("Common");
   const [open, setOpen] = useState(false);
@@ -187,7 +170,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
               <Brand companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-                <SidebarAuth />
+                <UserMenu email={userEmail} />
                 <LocaleSwitcher compact className="px-1" />
                 <ThemeToggle />
               </div>
@@ -200,7 +183,7 @@ export function AppSidebar({ companyName }: { companyName?: string }) {
         <Brand companyName={companyName} />
         <NavLinks pathname={pathname} />
         <div className="mt-auto space-y-1 border-t border-sidebar-border p-2">
-          <SidebarAuth />
+          <UserMenu email={userEmail} />
           <LocaleSwitcher compact className="px-1" />
           <ThemeToggle />
         </div>

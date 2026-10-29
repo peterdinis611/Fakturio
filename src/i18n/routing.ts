@@ -4,7 +4,6 @@ export const routing = defineRouting({
   locales: ["sk", "en"],
   defaultLocale: "sk",
   localePrefix: "as-needed",
-  // Avoid Accept-Language redirects during Clerk OAuth / SSO callbacks.
   localeDetection: false,
 });
 

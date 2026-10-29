@@ -28,7 +28,8 @@
     "themeLight": "Light mode",
     "themeDark": "Dark mode",
     "themeEnableLight": "Switch to light mode",
-    "themeEnableDark": "Switch to dark mode"
+    "themeEnableDark": "Switch to dark mode",
+    "signOut": "Sign out"
   },
   "Nav": {
     "dashboard": "Overview",
@@ -59,7 +60,17 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "signUpLink": "Sign up",
-    "signInLink": "Sign in"
+    "signInLink": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "signInSubmit": "Sign in",
+    "signUpSubmit": "Create account",
+    "submitting": "Please wait…",
+    "authFailed": "Authentication failed",
+    "signedIn": "Signed in",
+    "registered": "Account created"
   },
   "Landing": {
     "skip": "Skip to content",

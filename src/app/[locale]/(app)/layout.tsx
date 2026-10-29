@@ -1,8 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { getCompanyStatus, getCompanySummary } from "@/actions/company";
-import { ensureCurrentUser } from "@/actions/users";
+import { getCurrentUser } from "@/actions/auth";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { CompanyBanner } from "@/components/layout/company-banner";
 import {
@@ -16,15 +15,9 @@ export const dynamic = "force-dynamic";
 
 async function AppShell({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
-  const session = await auth();
-  if (!session.isAuthenticated) {
+  const user = await getCurrentUser();
+  if (!user) {
     redirect({ href: "/sign-in", locale });
-  }
-
-  try {
-    await ensureCurrentUser();
-  } catch {
-    // Sync is best-effort; API may be down during first boot.
   }
 
   let loaded:
@@ -52,7 +45,7 @@ async function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-full flex-col md:flex-row">
       <ScrollRestoration />
-      <AppSidebar companyName={summary.name} />
+      <AppSidebar companyName={summary.name} userEmail={user!.email} />
       <div className="flex min-w-0 flex-1 flex-col">
         <CompanyBanner status={status} />
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">

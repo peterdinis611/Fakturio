@@ -281,7 +281,8 @@ export function InvoiceForm({
         : await createInvoiceAction({
             ...payload,
             status: status ?? "Draft",
-            documentType,
+            documentType:
+              documentType === "Proforma" ? "Proforma" : "Invoice",
           });
 
       if (!result?.data) {

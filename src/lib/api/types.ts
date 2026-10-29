@@ -514,14 +514,19 @@ export type ResumeEntry = {
 
 export type AppUser = {
   id: string;
-  clerkUserId: string;
-  email: string | null;
+  email: string;
   firstName: string | null;
   lastName: string | null;
   imageUrl: string | null;
   createdAt: string;
   updatedAt: string;
   lastSeenAt: string | null;
+};
+
+export type AuthResponse = {
+  accessToken: string;
+  expiresAt: string;
+  user: AppUser;
 };
 
 export type PaymentImportMatchStatus =

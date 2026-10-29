@@ -28,7 +28,8 @@
     "themeLight": "Svetlý režim",
     "themeDark": "Tmavý režim",
     "themeEnableLight": "Zapnúť svetlý režim",
-    "themeEnableDark": "Zapnúť tmavý režim"
+    "themeEnableDark": "Zapnúť tmavý režim",
+    "signOut": "Odhlásiť sa"
   },
   "Nav": {
     "dashboard": "Prehľad",
@@ -59,7 +60,17 @@
     "noAccount": "Nemáš účet?",
     "hasAccount": "Už máš účet?",
     "signUpLink": "Registrácia",
-    "signInLink": "Prihlásenie"
+    "signInLink": "Prihlásenie",
+    "email": "E-mail",
+    "password": "Heslo",
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
+    "signInSubmit": "Prihlásiť sa",
+    "signUpSubmit": "Vytvoriť účet",
+    "submitting": "Čakaj…",
+    "authFailed": "Prihlásenie zlyhalo",
+    "signedIn": "Si prihlásený",
+    "registered": "Účet bol vytvorený"
   },
   "Landing": {
     "skip": "Preskočiť na obsah",

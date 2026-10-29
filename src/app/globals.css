@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@clerk/ui/themes/shadcn.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -126,7 +125,6 @@
   --sidebar: #e6e9ee;
   --sidebar-border: #cdd2da;
 
-  /* Clerk @clerk/ui shadcn theme reads these unprefixed tokens */
   --background: var(--ground);
   --foreground: var(--text);
   --card: var(--surface);
