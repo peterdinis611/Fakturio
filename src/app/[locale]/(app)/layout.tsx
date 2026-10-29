@@ -1,15 +1,15 @@
 import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
-import { getCompanyStatus, getCompanySummary } from "@/actions/company";
-import { getCurrentUser } from "@/actions/auth";
-import { AppSidebar } from "@/components/layout/app-sidebar";
-import { CompanyBanner } from "@/components/layout/company-banner";
+import { getCompanyStatus, getCompanySummary } from "@/features/company/api/company";
+import { getCurrentUser } from "@/features/auth/api/auth";
+import { AppSidebar } from "@/widgets/app-shell/app-sidebar";
+import { CompanyBanner } from "@/widgets/app-shell/company-banner";
 import {
   ScrollRestoration,
   ScrollToTopButton,
-} from "@/components/layout/scroll-to-top";
-import { PageMotion } from "@/components/motion/page-motion";
-import { isOnboardingSkipped } from "@/lib/onboarding";
+} from "@/widgets/app-shell/scroll-to-top";
+import { PageMotion } from "@/shared/ui/motion/page-motion";
+import { isOnboardingSkipped } from "@/shared/lib/onboarding";
 import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";

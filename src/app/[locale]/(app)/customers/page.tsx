@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { listCustomers } from "@/actions/customers";
-import { CreateCustomerDialog } from "@/components/customers/create-customer-dialog";
-import { PageHeader } from "@/components/layout/page-header";
-import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
-import { EmptyState } from "@/components/shared/empty-state";
-import { Button } from "@/components/ui/button";
+import { listCustomers } from "@/features/customers/api/customers";
+import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { DebouncedSearchField } from "@/shared/ui/debounced-search-field";
+import { EmptyState } from "@/shared/ui/empty-state";
+import { Button } from "@/shared/ui/button";
 import {
   Table,
   TableBody,
@@ -12,8 +12,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { emptyDash } from "@/lib/format";
+} from "@/shared/ui/table";
+import { emptyDash } from "@/shared/lib/format";
 
 export const metadata = { title: "Zákazníci" };
 

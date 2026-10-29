@@ -1,11 +1,11 @@
 import { InfoIcon } from "lucide-react";
-import { getCompany } from "@/actions/company";
-import { CompanyForm } from "@/components/company/company-form";
-import { SkipOnboardingButton } from "@/components/company/skip-onboarding-button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { getCompany } from "@/features/company/api/company";
+import { CompanyForm } from "@/features/company/ui/company-form";
+import { SkipOnboardingButton } from "@/features/company/ui/skip-onboarding-button";
+import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { Separator } from "@/shared/ui/separator";
 import { Link } from "@/i18n/navigation";
 import "./onboarding.css";
 

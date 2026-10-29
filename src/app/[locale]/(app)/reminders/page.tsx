@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { AlertCircle, Clock3, Mail } from "lucide-react";
-import { getReminders } from "@/actions/invoices";
-import { PageHeader } from "@/components/layout/page-header";
-import { FadeIn } from "@/components/motion/page-motion";
+import { getReminders } from "@/features/invoices/api/invoices";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { FadeIn } from "@/shared/ui/motion/page-motion";
 import {
   MarkReminderSentButton,
   SyncOverdueButton,
-} from "@/components/reminders/reminder-actions";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { Button } from "@/components/ui/button";
-import type { InvoiceReminder } from "@/lib/api/types";
-import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
-import { cn } from "@/lib/utils";
+} from "@/features/reminders/ui/reminder-actions";
+import { StatusBadge } from "@/shared/ui/status-badge";
+import { Button } from "@/shared/ui/button";
+import type { InvoiceReminder } from "@/shared/api/types";
+import { formatDate, formatDateTime, formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 
 export const metadata = { title: "Upomienky" };
 

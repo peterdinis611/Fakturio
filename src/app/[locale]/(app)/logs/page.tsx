@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { ScrollText } from "lucide-react";
-import { listAuditLogs } from "@/actions/logs";
-import { PageHeader } from "@/components/layout/page-header";
-import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
-import { EmptyState } from "@/components/shared/empty-state";
-import type { AuditAction } from "@/lib/api/types";
-import { auditActionLabel, formatDateTime } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { listAuditLogs } from "@/features/logs/api/logs";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { DebouncedSearchField } from "@/shared/ui/debounced-search-field";
+import { EmptyState } from "@/shared/ui/empty-state";
+import type { AuditAction } from "@/shared/api/types";
+import { auditActionLabel, formatDateTime } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 
 export const metadata = { title: "Logy" };
 

@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
-import { AUTH_COOKIE } from "@/lib/auth/constants";
+import { AUTH_COOKIE } from "@/shared/auth/constants";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);

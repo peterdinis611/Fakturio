@@ -1,10 +1,10 @@
 import { Building2, CalendarDays, Mail, ShieldCheck } from "lucide-react";
 import { getLocale } from "next-intl/server";
-import { getCurrentUser } from "@/actions/auth";
-import { PageHeader } from "@/components/layout/page-header";
-import { ProfileSignOut } from "@/components/profile/profile-sign-out";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/features/auth/api/auth";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { ProfileSignOut } from "@/features/profile/ui/profile-sign-out";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import {
   Card,
   CardContent,
@@ -12,9 +12,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { emptyDash, formatDateTime } from "@/lib/format";
+} from "@/shared/ui/card";
+import { Separator } from "@/shared/ui/separator";
+import { emptyDash, formatDateTime } from "@/shared/lib/format";
 import { Link, redirect } from "@/i18n/navigation";
 
 export const metadata = { title: "Profil" };

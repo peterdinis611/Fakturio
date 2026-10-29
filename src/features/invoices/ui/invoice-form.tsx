@@ -1,0 +1,752 @@
+"use client";
+
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/shared/toast";
+import { PlusIcon, Trash2Icon } from "lucide-react";
+import {
+  createInvoiceAction,
+  updateInvoiceAction,
+} from "@/features/invoices/api/invoices";
+import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
+import { CatalogPicker } from "@/features/invoices/ui/catalog-picker";
+import { LineTemplatesMenu } from "@/features/invoices/ui/line-templates";
+import type {
+  Invoice,
+  InvoiceDocumentType,
+  ServiceCatalogItem,
+} from "@/shared/api/types";
+import { documentTypeLabel } from "@/shared/lib/format";
+import type { z } from "zod";
+import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
+import {
+  invoiceSchema,
+  type InvoiceFormValues,
+} from "@/entities/invoice/model/schema";
+import { formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/ui/button";
+import { DatePicker } from "@/shared/ui/date-picker";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Textarea } from "@/shared/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select";
+
+type InvoiceFormInput = z.input<typeof invoiceSchema>;
+
+type CompanyDefaults = {
+  defaultVatRate: number;
+  defaultCurrency: string;
+  defaultPaymentMethod: string | null;
+  bankIban: string | null;
+  bankBic: string | null;
+  defaultDueDays: number;
+  isVatPayer: boolean;
+};
+
+type InvoiceFormProps = {
+  customers: { id: string; name: string }[];
+  initial?: Invoice | null;
+  companyDefaults?: CompanyDefaults;
+  defaultCustomerId?: string;
+  defaultDocumentType?: InvoiceDocumentType;
+  catalogItems?: ServiceCatalogItem[];
+};
+
+function dateInputValue(value: string | null | undefined) {
+  if (!value) return "";
+  return value.slice(0, 10);
+}
+
+function addDaysIso(from: string, days: number) {
+  const d = new Date(`${from}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function toFormValues(
+  initial: Invoice | null | undefined,
+  companyDefaults?: CompanyDefaults,
+  defaultCustomerId?: string,
+): InvoiceFormInput {
+  const today = new Date().toISOString().slice(0, 10);
+  const dueDays = companyDefaults?.defaultDueDays ?? 14;
+
+  if (initial?.id) {
+    return {
+      customerId: initial.customerId,
+      issueDate: dateInputValue(initial.issueDate),
+      dueDate: dateInputValue(initial.dueDate),
+      deliveryDate: dateInputValue(initial.deliveryDate),
+      currency: initial.currency,
+      variableSymbol: initial.variableSymbol ?? "",
+      constantSymbol: initial.constantSymbol ?? "",
+      specificSymbol: initial.specificSymbol ?? "",
+      paymentMethod: initial.paymentMethod ?? "",
+      bankIban: initial.bankIban ?? "",
+      bankBic: initial.bankBic ?? "",
+      notes: initial.notes ?? "",
+      items: initial.items.map((item) => ({
+        description: item.description,
+        unit: item.unit,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        vatRate: companyDefaults?.isVatPayer === false ? 0 : item.vatRate,
+      })),
+    };
+  }
+
+  const vatDefault =
+    companyDefaults?.isVatPayer === false
+      ? 0
+      : (companyDefaults?.defaultVatRate ?? 23);
+
+  return {
+    customerId: defaultCustomerId ?? "",
+    issueDate: today,
+    dueDate: addDaysIso(today, dueDays),
+    deliveryDate: "",
+    currency: companyDefaults?.defaultCurrency ?? "EUR",
+    variableSymbol: "",
+    constantSymbol: "",
+    specificSymbol: "",
+    paymentMethod: companyDefaults?.defaultPaymentMethod ?? "",
+    bankIban: companyDefaults?.bankIban ?? "",
+    bankBic: companyDefaults?.bankBic ?? "",
+    notes: "",
+    items: [
+      {
+        description: "",
+        unit: "ks",
+        quantity: 1,
+        unitPrice: 0,
+        vatRate: vatDefault,
+      },
+    ],
+  };
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-xs text-destructive">{message}</p>;
+}
+
+function lineTotal(quantity: number, unitPrice: number, vatRate: number | null | undefined) {
+  const sub = quantity * unitPrice;
+  const rate = vatRate ?? 0;
+  return sub + sub * (rate / 100);
+}
+
+export function InvoiceForm({
+  customers,
+  initial,
+  companyDefaults,
+  defaultCustomerId,
+  defaultDocumentType = "Invoice",
+  catalogItems = [],
+}: InvoiceFormProps) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [customerOptions, setCustomerOptions] = useState(customers);
+  const [documentType, setDocumentType] = useState<InvoiceDocumentType>(
+    initial?.documentType === "Proforma" || defaultDocumentType === "Proforma"
+      ? "Proforma"
+      : "Invoice",
+  );
+  const isEdit = Boolean(initial?.id);
+  const readOnly = isEdit && initial!.status !== "Draft";
+  const isVatPayer = companyDefaults?.isVatPayer !== false;
+
+  const form = useForm<InvoiceFormInput, unknown, InvoiceFormValues>({
+    resolver: zodResolver(invoiceSchema),
+    defaultValues: toFormValues(initial, companyDefaults, defaultCustomerId),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setError,
+    setValue,
+    formState: { errors },
+  } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  const watchedItems = watch("items");
+  const currency = watch("currency") || "EUR";
+
+  const grandTotal = useMemo(() => {
+    return (watchedItems ?? []).reduce(
+      (sum, item) =>
+        sum +
+        lineTotal(
+          Number(item.quantity) || 0,
+          Number(item.unitPrice) || 0,
+          item.vatRate != null ? Number(item.vatRate) : 0,
+        ),
+      0,
+    );
+  }, [watchedItems]);
+
+  const defaultVat = isVatPayer
+    ? (companyDefaults?.defaultVatRate ?? 23)
+    : 0;
+
+  function addEmptyLine() {
+    append({
+      description: "",
+      unit: "ks",
+      quantity: 1,
+      unitPrice: 0,
+      vatRate: defaultVat,
+    });
+  }
+
+  function addFromCatalog(item: ServiceCatalogItem) {
+    append({
+      description: item.description,
+      unit: item.unit,
+      quantity: 1,
+      unitPrice: item.unitPrice,
+      vatRate: isVatPayer ? item.vatRate : 0,
+    });
+  }
+
+  useEffect(() => {
+    if (readOnly) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+
+      if (e.key === "Enter" && e.shiftKey) {
+        e.preventDefault();
+        addEmptyLine();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        void handleSubmit((values) => submit(values))();
+        return;
+      }
+
+      if (e.key === "Backspace" && e.shiftKey) {
+        const items = watchedItems ?? [];
+        if (items.length <= 1) return;
+        const last = items[items.length - 1];
+        if (last && !String(last.description ?? "").trim()) {
+          e.preventDefault();
+          remove(items.length - 1);
+        }
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable shortcuts for editor session
+  }, [readOnly, watchedItems, fields.length]);
+
+  function applyFieldErrors(fieldErrors?: Record<string, string>) {
+    if (!fieldErrors) return;
+    for (const [key, message] of Object.entries(fieldErrors)) {
+      setError(key as keyof InvoiceFormValues, { message });
+    }
+  }
+
+  function submit(values: InvoiceFormValues, status?: "Draft" | "Issued") {
+    const payload = {
+      ...values,
+      items: values.items.map((item) => ({
+        ...item,
+        vatRate: isVatPayer ? item.vatRate : 0,
+      })),
+    };
+
+    startTransition(async () => {
+      const result = isEdit
+        ? await updateInvoiceAction({ ...payload, id: initial!.id })
+        : await createInvoiceAction({
+            ...payload,
+            status: status ?? "Draft",
+            documentType:
+              documentType === "Proforma" ? "Proforma" : "Invoice",
+          });
+
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        applyFieldErrors(toFieldErrors(result?.validationErrors));
+        return;
+      }
+
+      if (isEdit) {
+        toast.success("Doklad bol uložený");
+        router.refresh();
+        return;
+      }
+
+      const label = documentTypeLabel(documentType);
+      toast.success(
+        status === "Issued"
+          ? `${label} bola vystavená`
+          : `Koncept (${label.toLowerCase()}) bol vytvorený`,
+      );
+      router.push(`/invoices/${result.data.id}`);
+    });
+  }
+
+  const fieldClass = "flex flex-col gap-1.5";
+
+  return (
+    <form className="flex flex-col gap-6" noValidate>
+      {readOnly ? (
+        <p className="panel border-signal/30 bg-signal/5 px-4 py-3 text-sm text-muted-foreground">
+          Túto faktúru nie je možné upravovať: stav{" "}
+          <span className="font-medium text-signal">{initial!.status}</span>.
+        </p>
+      ) : null}
+
+      <section className="panel flex flex-col gap-4 p-4">
+        <h2 className="font-heading text-sm font-medium">Základné údaje</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {!isEdit ? (
+            <div className={fieldClass}>
+              <Label>Typ dokladu</Label>
+              <Select
+                value={documentType}
+                onValueChange={(v) =>
+                  setDocumentType(v as "Invoice" | "Proforma")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Invoice">Faktúra</SelectItem>
+                  <SelectItem value="Proforma">Zálohová / proforma</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[12px] text-muted-foreground">
+                Zálohové majú sériu ZF…; daňový doklad FA / bez prefixu.
+              </p>
+            </div>
+          ) : (
+            <div className={fieldClass}>
+              <Label>Typ dokladu</Label>
+              <p className="text-[14px] font-medium text-ink">
+                {documentTypeLabel(initial?.documentType)}
+              </p>
+            </div>
+          )}
+          <div className={cn(fieldClass, "sm:col-span-2")}>
+            <div className="flex items-center justify-between gap-2">
+              <Label>Zákazník</Label>
+              {!readOnly ? (
+                <CreateCustomerDialog
+                  trigger={
+                    <Button type="button" variant="ghost" size="xs">
+                      <PlusIcon className="size-3.5" aria-hidden />
+                      Nový
+                    </Button>
+                  }
+                  onCreated={(customer) => {
+                    setCustomerOptions((prev) => {
+                      if (prev.some((c) => c.id === customer.id)) return prev;
+                      return [...prev, { id: customer.id, name: customer.name }].sort(
+                        (a, b) => a.name.localeCompare(b.name, "sk"),
+                      );
+                    });
+                    setValue("customerId", customer.id, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }}
+                />
+              ) : null}
+            </div>
+            <Controller
+              control={control}
+              name="customerId"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={readOnly || pending}
+                >
+                  <SelectTrigger className="w-full" aria-invalid={!!errors.customerId}>
+                    <SelectValue placeholder="Vyber zákazníka" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customerOptions.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            <FieldError message={errors.customerId?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="issueDate">Dátum vystavenia</Label>
+            <Controller
+              control={control}
+              name="issueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="issueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Vystavenie"
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <FieldError message={errors.issueDate?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="dueDate">Dátum splatnosti</Label>
+            <Controller
+              control={control}
+              name="dueDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="dueDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Splatnosť"
+                  fromDate={watch("issueDate") || undefined}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <FieldError message={errors.dueDate?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="deliveryDate">Dátum dodania</Label>
+            <Controller
+              control={control}
+              name="deliveryDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="deliveryDate"
+                  value={field.value}
+                  disabled={readOnly || pending}
+                  placeholder="Dodanie"
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <FieldError message={errors.deliveryDate?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="currency">Mena</Label>
+            <Input
+              id="currency"
+              maxLength={3}
+              disabled={readOnly || pending}
+              className="data-num uppercase"
+              {...register("currency")}
+            />
+            <FieldError message={errors.currency?.message} />
+          </div>
+        </div>
+      </section>
+
+      <section className="panel flex flex-col gap-4 p-4">
+        <h2 className="font-heading text-sm font-medium">Platba</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className={fieldClass}>
+            <Label htmlFor="variableSymbol">Variabilný symbol</Label>
+            <Input
+              id="variableSymbol"
+              className="data-num"
+              disabled={readOnly || pending}
+              {...register("variableSymbol")}
+            />
+            <FieldError message={errors.variableSymbol?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="constantSymbol">Konštantný symbol</Label>
+            <Input
+              id="constantSymbol"
+              className="data-num"
+              disabled={readOnly || pending}
+              {...register("constantSymbol")}
+            />
+            <FieldError message={errors.constantSymbol?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="specificSymbol">Špecifický symbol</Label>
+            <Input
+              id="specificSymbol"
+              className="data-num"
+              disabled={readOnly || pending}
+              {...register("specificSymbol")}
+            />
+            <FieldError message={errors.specificSymbol?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="paymentMethod">Spôsob platby</Label>
+            <Input
+              id="paymentMethod"
+              disabled={readOnly || pending}
+              {...register("paymentMethod")}
+            />
+            <FieldError message={errors.paymentMethod?.message} />
+          </div>
+          <div className={cn(fieldClass, "sm:col-span-2")}>
+            <Label htmlFor="bankIban">IBAN</Label>
+            <Input
+              id="bankIban"
+              className="data-num text-sm"
+              disabled={readOnly || pending}
+              {...register("bankIban")}
+            />
+            <FieldError message={errors.bankIban?.message} />
+          </div>
+          <div className={fieldClass}>
+            <Label htmlFor="bankBic">BIC</Label>
+            <Input
+              id="bankBic"
+              className="data-num text-sm"
+              disabled={readOnly || pending}
+              {...register("bankBic")}
+            />
+            <FieldError message={errors.bankBic?.message} />
+          </div>
+        </div>
+      </section>
+
+      <section className="panel flex flex-col gap-4 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="font-heading text-sm font-medium">Položky</h2>
+            {!readOnly ? (
+              <p className="mt-0.5 text-[11px] text-faint">
+                ⌘/Ctrl+Enter uložiť · ⌘/Ctrl+Shift+Enter nový riadok ·
+                ⌘/Ctrl+Shift+⌫ zmazať prázdny
+              </p>
+            ) : null}
+          </div>
+          {!readOnly ? (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {catalogItems.length > 0 ? (
+                <CatalogPicker
+                  disabled={pending}
+                  currency={currency}
+                  isVatPayer={isVatPayer}
+                  items={catalogItems}
+                  onPick={addFromCatalog}
+                />
+              ) : null}
+              <LineTemplatesMenu
+                disabled={pending}
+                currency={currency}
+                onApply={(t) =>
+                  append({
+                    description: t.description,
+                    unit: t.unit,
+                    quantity: 1,
+                    unitPrice: t.unitPrice,
+                    vatRate: isVatPayer ? t.vatRate : 0,
+                  })
+                }
+                onSaveFromLine={() => {
+                  const items = watchedItems ?? [];
+                  const last = items[items.length - 1];
+                  if (!last) return null;
+                  return {
+                    description: String(last.description ?? ""),
+                    unit: String(last.unit ?? "ks"),
+                    unitPrice: Number(last.unitPrice) || 0,
+                    vatRate:
+                      last.vatRate != null ? Number(last.vatRate) : defaultVat,
+                  };
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={pending}
+                onClick={addEmptyLine}
+              >
+                <PlusIcon />
+                Pridať položku
+              </Button>
+            </div>
+          ) : null}
+        </div>
+
+        <FieldError message={errors.items?.message ?? errors.items?.root?.message} />
+
+        <div className="flex flex-col gap-3">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="grid gap-3 border border-border bg-background/50 p-3 sm:grid-cols-12"
+            >
+              <div className={cn(fieldClass, "sm:col-span-5")}>
+                <Label htmlFor={`items.${index}.description`}>Popis</Label>
+                <Input
+                  id={`items.${index}.description`}
+                  disabled={readOnly || pending}
+                  {...register(`items.${index}.description`)}
+                />
+                <FieldError message={errors.items?.[index]?.description?.message} />
+              </div>
+              <div className={cn(fieldClass, "sm:col-span-1")}>
+                <Label htmlFor={`items.${index}.unit`}>Mj.</Label>
+                <Input
+                  id={`items.${index}.unit`}
+                  disabled={readOnly || pending}
+                  {...register(`items.${index}.unit`)}
+                />
+              </div>
+              <div className={cn(fieldClass, "sm:col-span-2")}>
+                <Label htmlFor={`items.${index}.quantity`}>Množstvo</Label>
+                <Input
+                  id={`items.${index}.quantity`}
+                  type="number"
+                  min={0}
+                  step="any"
+                  className="data-num"
+                  disabled={readOnly || pending}
+                  {...register(`items.${index}.quantity`)}
+                />
+                <FieldError message={errors.items?.[index]?.quantity?.message} />
+              </div>
+              <div className={cn(fieldClass, "sm:col-span-2")}>
+                <Label htmlFor={`items.${index}.unitPrice`}>Cena / mj.</Label>
+                <Input
+                  id={`items.${index}.unitPrice`}
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  className="data-num"
+                  disabled={readOnly || pending}
+                  {...register(`items.${index}.unitPrice`)}
+                />
+                <FieldError message={errors.items?.[index]?.unitPrice?.message} />
+              </div>
+              {isVatPayer ? (
+                <div className={cn(fieldClass, "sm:col-span-1")}>
+                  <Label htmlFor={`items.${index}.vatRate`}>DPH</Label>
+                  <Input
+                    id={`items.${index}.vatRate`}
+                    type="number"
+                    min={0}
+                    max={100}
+                    className="data-num"
+                    disabled={readOnly || pending}
+                    {...register(`items.${index}.vatRate`)}
+                  />
+                </div>
+              ) : null}
+              <div
+                className={cn(
+                  "flex items-end justify-between gap-2 sm:flex-col sm:items-stretch",
+                  isVatPayer ? "sm:col-span-1" : "sm:col-span-2",
+                )}
+              >
+                <p className="data-num text-right text-sm font-medium text-signal sm:text-left">
+                  {formatMoney(
+                    lineTotal(
+                      Number(watchedItems?.[index]?.quantity) || 0,
+                      Number(watchedItems?.[index]?.unitPrice) || 0,
+                      watchedItems?.[index]?.vatRate != null
+                        ? Number(watchedItems[index].vatRate)
+                        : 0,
+                    ),
+                    currency,
+                  )}
+                </p>
+                {!readOnly && fields.length > 1 ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    disabled={pending}
+                    aria-label="Odstrániť položku"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2Icon className="text-destructive" />
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="ledger-strip justify-end border-b-0 pb-0">
+          <span>{isVatPayer ? "Celkom s DPH" : "Celkom"}</span>
+          <span className="data-num text-base font-semibold text-signal">
+            {formatMoney(grandTotal, currency)}
+          </span>
+        </div>
+        {!isVatPayer ? (
+          <p className="text-[12px] text-muted-foreground">
+            Režim neplatcu DPH — sadzby sú 0 % a na PDF sa DPH nezobrazí.
+          </p>
+        ) : null}
+      </section>
+
+      <section className="panel flex flex-col gap-4 p-4">
+        <h2 className="font-heading text-sm font-medium">Poznámka</h2>
+        <Textarea
+          rows={4}
+          disabled={readOnly || pending}
+          {...register("notes")}
+        />
+        <FieldError message={errors.notes?.message} />
+      </section>
+
+      {!readOnly ? (
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border pt-4">
+          {isEdit ? (
+            <Button
+              type="button"
+              disabled={pending}
+              onClick={handleSubmit((values) => submit(values))}
+            >
+              Uložiť koncept
+            </Button>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={pending}
+                onClick={handleSubmit((values) => submit(values, "Draft"))}
+              >
+                Uložiť koncept
+              </Button>
+              <Button
+                type="button"
+                disabled={pending}
+                onClick={handleSubmit((values) => submit(values, "Issued"))}
+              >
+                Vytvoriť a vystaviť
+              </Button>
+            </>
+          )}
+        </div>
+      ) : null}
+    </form>
+  );
+}

@@ -1,6 +1,6 @@
 import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
-import { getCurrentUser } from "@/actions/auth";
+import { getCurrentUser } from "@/features/auth/api/auth";
 import { redirect } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";

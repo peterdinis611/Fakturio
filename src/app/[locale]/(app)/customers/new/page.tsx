@@ -1,5 +1,5 @@
-import { PageHeader } from "@/components/layout/page-header";
-import { CustomerForm } from "@/components/customers/customer-form";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { CustomerForm } from "@/features/customers/ui/customer-form";
 
 export const metadata = { title: "Nový zákazník" };
 

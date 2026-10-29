@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
-import { listInvoices } from "@/actions/invoices";
+import { listInvoices } from "@/features/invoices/api/invoices";
 import {
   InvoiceFilters,
   InvoiceLifecycleHint,
-} from "@/components/invoices/invoice-filters";
-import { PageHeader } from "@/components/layout/page-header";
-import { CsvPreview } from "@/components/preview/csv-preview";
-import { DebouncedSearchField } from "@/components/shared/debounced-search-field";
-import { EmptyState } from "@/components/shared/empty-state";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { Button } from "@/components/ui/button";
+} from "@/features/invoices/ui/invoice-filters";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { CsvPreview } from "@/widgets/preview/csv-preview";
+import { DebouncedSearchField } from "@/shared/ui/debounced-search-field";
+import { EmptyState } from "@/shared/ui/empty-state";
+import { StatusBadge } from "@/shared/ui/status-badge";
+import { Button } from "@/shared/ui/button";
 import {
   Table,
   TableBody,
@@ -18,15 +18,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { InvoiceDocumentType, InvoiceStatus } from "@/lib/api/types";
-import { invoicesExportHref } from "@/lib/exports";
+} from "@/shared/ui/table";
+import type { InvoiceDocumentType, InvoiceStatus } from "@/shared/api/types";
+import { invoicesExportHref } from "@/shared/lib/exports";
 import {
   documentTypeLabel,
   formatDate,
   formatMoney,
-} from "@/lib/format";
-import { cn } from "@/lib/utils";
+} from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 
 export const metadata = { title: "Faktúry" };
 

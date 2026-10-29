@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { PageHeader } from "@/components/layout/page-header";
-import { FadeIn } from "@/components/motion/page-motion";
-import { SearchBox } from "@/components/search/search-box";
-import { SearchIdle } from "@/components/search/search-empty";
-import { SearchResults } from "@/components/search/search-results";
-import { SectionLoader } from "@/components/ui/spinner";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { FadeIn } from "@/shared/ui/motion/page-motion";
+import { SearchBox } from "@/features/search/ui/search-box";
+import { SearchIdle } from "@/features/search/ui/search-empty";
+import { SearchResults } from "@/features/search/ui/search-results";
+import { SectionLoader } from "@/shared/ui/spinner";
 
 export const metadata = { title: "Hľadanie" };
 

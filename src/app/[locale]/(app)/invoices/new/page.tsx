@@ -1,9 +1,9 @@
-import { listCustomers } from "@/actions/customers";
-import { getCompany } from "@/actions/company";
-import { listServices } from "@/actions/services";
-import { InvoiceForm } from "@/components/invoices/invoice-form";
-import { NewInvoiceNeedsCustomer } from "@/components/invoices/new-invoice-gate";
-import { PageHeader } from "@/components/layout/page-header";
+import { listCustomers } from "@/features/customers/api/customers";
+import { getCompany } from "@/features/company/api/company";
+import { listServices } from "@/features/services/api/services";
+import { InvoiceForm } from "@/features/invoices/ui/invoice-form";
+import { NewInvoiceNeedsCustomer } from "@/features/invoices/ui/new-invoice-gate";
+import { PageHeader } from "@/widgets/app-shell/page-header";
 
 export const metadata = { title: "Nová faktúra" };
 

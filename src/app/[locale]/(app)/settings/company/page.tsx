@@ -1,8 +1,8 @@
-import { getCompany } from "@/actions/company";
-import { CompanyForm } from "@/components/company/company-form";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { getCompany } from "@/features/company/api/company";
+import { CompanyForm } from "@/features/company/ui/company-form";
+import { Badge } from "@/shared/ui/badge";
+import { Progress } from "@/shared/ui/progress";
+import { cn } from "@/shared/lib/utils";
 
 export const metadata = { title: "Firma" };
 

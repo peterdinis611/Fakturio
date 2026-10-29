@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ErrorScreen } from "@/components/shared/error-screen";
-import { Button } from "@/components/ui/button";
+import { ErrorScreen } from "@/shared/ui/error-screen";
+import { Button } from "@/shared/ui/button";
 
 export default function AppNotFoundPage() {
   return (

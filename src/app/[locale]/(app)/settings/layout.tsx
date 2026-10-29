@@ -1,5 +1,5 @@
-import { SettingsNav } from "@/components/settings/settings-nav";
-import { PageHeader } from "@/components/layout/page-header";
+import { SettingsNav } from "@/features/settings/ui/settings-nav";
+import { PageHeader } from "@/widgets/app-shell/page-header";
 
 export default function SettingsLayout({
   children,

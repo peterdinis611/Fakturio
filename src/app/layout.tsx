@@ -4,8 +4,8 @@ import {
   IBM_Plex_Mono,
   IBM_Plex_Sans,
 } from "next/font/google";
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Toaster } from "@/components/toast/toaster";
+import { ThemeProvider } from "@/shared/theme/theme-provider";
+import { Toaster } from "@/shared/toast/toaster";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({

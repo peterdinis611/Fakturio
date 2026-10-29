@@ -1,19 +1,19 @@
 import Link from "next/link";
-import { getReminders, listInvoices } from "@/actions/invoices";
-import { getMonthlyRevenue, getReportOverview } from "@/actions/reports";
-import { CashflowTrend } from "@/components/dashboard/cashflow-trend";
-import { DashboardEmpty } from "@/components/dashboard/dashboard-empty";
-import { dueDaysLabel } from "@/components/dashboard/due-days";
+import { getReminders, listInvoices } from "@/features/invoices/api/invoices";
+import { getMonthlyRevenue, getReportOverview } from "@/features/reports/api/reports";
+import { CashflowTrend } from "@/widgets/dashboard/cashflow-trend";
+import { DashboardEmpty } from "@/widgets/dashboard/dashboard-empty";
+import { dueDaysLabel } from "@/widgets/dashboard/due-days";
 import {
   buildTodayActions,
   TodayActions,
-} from "@/components/dashboard/today-actions";
-import { PageHeader } from "@/components/layout/page-header";
-import { MotionItem } from "@/components/motion/page-motion";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { Button } from "@/components/ui/button";
-import { formatDate, formatMoney } from "@/lib/format";
-import { cn } from "@/lib/utils";
+} from "@/widgets/dashboard/today-actions";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { MotionItem } from "@/shared/ui/motion/page-motion";
+import { StatusBadge } from "@/shared/ui/status-badge";
+import { Button } from "@/shared/ui/button";
+import { formatDate, formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 
 export const metadata = { title: "Prehľad" };
 

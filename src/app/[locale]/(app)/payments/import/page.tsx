@@ -1,5 +1,5 @@
-import { PageHeader } from "@/components/layout/page-header";
-import { PaymentImportPanel } from "@/components/payments/payment-import";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { PaymentImportPanel } from "@/features/payments/ui/payment-import";
 
 export const metadata = { title: "Import platieb" };
 

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCustomer } from "@/actions/customers";
-import { listInvoices } from "@/actions/invoices";
-import { PageHeader } from "@/components/layout/page-header";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { Button } from "@/components/ui/button";
+import { getCustomer } from "@/features/customers/api/customers";
+import { listInvoices } from "@/features/invoices/api/invoices";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { StatusBadge } from "@/shared/ui/status-badge";
+import { Button } from "@/shared/ui/button";
 import {
   Table,
   TableBody,
@@ -12,9 +12,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { emptyDash, formatDate, formatMoney } from "@/lib/format";
-import { isApiError } from "@/lib/api/errors";
+} from "@/shared/ui/table";
+import { emptyDash, formatDate, formatMoney } from "@/shared/lib/format";
+import { isApiError } from "@/shared/api/errors";
 
 export async function generateMetadata({
   params,

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { ErrorScreen } from "@/components/shared/error-screen";
-import { Button } from "@/components/ui/button";
+import { ErrorScreen } from "@/shared/ui/error-screen";
+import { Button } from "@/shared/ui/button";
 
 export default function AppErrorPage({
   error,

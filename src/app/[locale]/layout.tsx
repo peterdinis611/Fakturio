@@ -1,7 +1,7 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { LocaleHtmlLang } from "@/components/i18n/locale-html-lang";
+import { LocaleHtmlLang } from "@/shared/i18n/ui/locale-html-lang";
 import { routing } from "@/i18n/routing";
 
 type Props = {

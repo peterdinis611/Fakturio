@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthShell } from "@/features/auth/ui/auth-shell";
 import "@/app/[locale]/(marketing)/landing.css";
 
 type Props = { params: Promise<{ locale: string }> };

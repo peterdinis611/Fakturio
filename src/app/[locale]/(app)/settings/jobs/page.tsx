@@ -1,12 +1,12 @@
-import { getJobSettings } from "@/actions/jobs";
-import { JobsForm } from "@/components/settings/jobs-form";
+import { getJobSettings } from "@/features/settings/api/jobs";
+import { JobsForm } from "@/features/settings/ui/jobs-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/ui/card";
 
 export const metadata = { title: "Joby" };
 

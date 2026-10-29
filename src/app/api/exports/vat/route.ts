@@ -1,4 +1,4 @@
-import { apiFetchBlob } from "@/lib/api/client";
+import { apiFetchBlob } from "@/shared/api/client";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

@@ -1,11 +1,11 @@
-import { AppearanceForm } from "@/components/settings/appearance-form";
+import { AppearanceForm } from "@/features/settings/ui/appearance-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/ui/card";
 
 export const metadata = { title: "Vzhľad" };
 

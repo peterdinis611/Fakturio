@@ -1,11 +1,11 @@
 import { notFound, redirect } from "next/navigation";
-import { getCompany } from "@/actions/company";
-import { listCustomers } from "@/actions/customers";
-import { getInvoice } from "@/actions/invoices";
-import { listServices } from "@/actions/services";
-import { InvoiceForm } from "@/components/invoices/invoice-form";
-import { PageHeader } from "@/components/layout/page-header";
-import { isApiError } from "@/lib/api/errors";
+import { getCompany } from "@/features/company/api/company";
+import { listCustomers } from "@/features/customers/api/customers";
+import { getInvoice } from "@/features/invoices/api/invoices";
+import { listServices } from "@/features/services/api/services";
+import { InvoiceForm } from "@/features/invoices/ui/invoice-form";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { isApiError } from "@/shared/api/errors";
 
 export const metadata = { title: "Upraviť faktúru" };
 

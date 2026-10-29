@@ -1,7 +1,7 @@
-import { getResumeProfile, listResumeEntries } from "@/actions/resume";
-import { PageHeader } from "@/components/layout/page-header";
-import { ResumeEntriesTable } from "@/components/resume/resume-entries-table";
-import { ResumeProfileForm } from "@/components/resume/resume-profile-form";
+import { getResumeProfile, listResumeEntries } from "@/features/resume/api/resume";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { ResumeEntriesTable } from "@/features/resume/ui/resume-entries-table";
+import { ResumeProfileForm } from "@/features/resume/ui/resume-profile-form";
 
 export const metadata = { title: "Životopis" };
 

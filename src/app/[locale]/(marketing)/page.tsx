@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { LandingShell } from "@/components/landing/landing-shell";
-import { SignedInRedirect } from "@/components/landing/signed-in-redirect";
+import { LandingShell } from "@/widgets/landing/landing-shell";
+import { SignedInRedirect } from "@/widgets/landing/signed-in-redirect";
 import { routing } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };

@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { PageHeader } from "@/components/layout/page-header";
-import { ReportExportLinks } from "@/components/reports/export-links";
-import { ReportsDashboard } from "@/components/reports/reports-dashboard";
-import { ReportsFilters } from "@/components/reports/reports-filters";
-import { SectionLoader } from "@/components/ui/spinner";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { ReportExportLinks } from "@/features/reports/ui/export-links";
+import { ReportsDashboard } from "@/widgets/reports/reports-dashboard";
+import { ReportsFilters } from "@/features/reports/ui/reports-filters";
+import { SectionLoader } from "@/shared/ui/spinner";
 
 export const metadata = { title: "Reporty" };
 

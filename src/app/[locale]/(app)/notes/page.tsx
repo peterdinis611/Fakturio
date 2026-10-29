@@ -1,6 +1,6 @@
-import { listNotes } from "@/actions/notes";
-import { PageHeader } from "@/components/layout/page-header";
-import { NotesBoard } from "@/components/notes/notes-board";
+import { listNotes } from "@/features/notes/api/notes";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { NotesBoard } from "@/widgets/notes/notes-board";
 
 export const metadata = { title: "Poznámky" };
 

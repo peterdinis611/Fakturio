@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { getCustomer } from "@/actions/customers";
-import { CustomerForm } from "@/components/customers/customer-form";
-import { PageHeader } from "@/components/layout/page-header";
-import { isApiError } from "@/lib/api/errors";
+import { getCustomer } from "@/features/customers/api/customers";
+import { CustomerForm } from "@/features/customers/ui/customer-form";
+import { PageHeader } from "@/widgets/app-shell/page-header";
+import { isApiError } from "@/shared/api/errors";
 
 export const metadata = { title: "Upraviť zákazníka" };
 
