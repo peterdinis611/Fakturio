@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 /**
  * Clerk user lifecycle webhook.
  * Configure endpoint URL .../api/webhooks/clerk and set CLERK_WEBHOOK_SIGNING_SECRET.
- * Primary sync still happens via ensureCurrentUser() on app entry.
+ * Primary sync: ensureCurrentUser() → POST /api/users/sync (no JWT on API).
  */
 export async function POST(req: NextRequest) {
   try {

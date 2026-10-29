@@ -8,11 +8,12 @@ export function getApiBaseUrl() {
   return process.env.API_BASE_URL?.replace(/\/$/, "") || DEFAULT_BASE;
 }
 
-async function getAuthHeader(): Promise<Record<string, string>> {
+/** Optional actor id for audit trail — not a JWT. Auth stays in Clerk/Next.js. */
+async function getActorHeaders(): Promise<Record<string, string>> {
   try {
     const session = await auth();
-    const token = await session.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    const userId = session.userId;
+    return userId ? { "X-Clerk-User-Id": userId } : {};
   } catch {
     return {};
   }
@@ -64,13 +65,13 @@ export async function apiFetch<T>(
   options: RequestOptions = {},
 ): Promise<T> {
   const { method = "GET", body, searchParams, headers, cache, next } = options;
-  const authHeader = await getAuthHeader();
+  const actorHeaders = await getActorHeaders();
   const res = await fetch(buildUrl(path, searchParams), {
     method,
     headers: {
       Accept: "application/json",
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...authHeader,
+      ...actorHeaders,
       ...headers,
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -98,9 +99,9 @@ export async function apiFetchBlob(
   searchParams?: RequestOptions["searchParams"],
   accept = "application/pdf, text/csv, */*",
 ): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
-  const authHeader = await getAuthHeader();
+  const actorHeaders = await getActorHeaders();
   const res = await fetch(buildUrl(path, searchParams), {
-    headers: { Accept: accept, ...authHeader },
+    headers: { Accept: accept, ...actorHeaders },
     cache: "no-store",
   });
 
