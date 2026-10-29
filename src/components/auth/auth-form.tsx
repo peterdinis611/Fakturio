@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Eye, EyeOff } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { loginAction, registerAction } from "@/actions/auth";
@@ -21,6 +22,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -96,16 +98,35 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="password">{t("password")}</Label>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-          required
-          minLength={mode === "sign-up" ? 8 : 1}
-          disabled={pending}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={
+              mode === "sign-in" ? "current-password" : "new-password"
+            }
+            required
+            minLength={mode === "sign-up" ? 8 : 1}
+            disabled={pending}
+            className="pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            disabled={pending}
+            aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+            aria-pressed={showPassword}
+            className="absolute inset-y-0 right-0 inline-flex w-10 items-center justify-center text-muted-foreground transition-colors hover:text-ink disabled:opacity-50"
+          >
+            {showPassword ? (
+              <EyeOff className="size-4" aria-hidden />
+            ) : (
+              <Eye className="size-4" aria-hidden />
+            )}
+          </button>
+        </div>
       </div>
 
       {error ? <p className="text-xs text-destructive">{error}</p> : null}

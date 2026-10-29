@@ -63,6 +63,8 @@
     "signInLink": "Sign in",
     "email": "Email",
     "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "firstName": "First name",
     "lastName": "Last name",
     "signInSubmit": "Sign in",

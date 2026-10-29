@@ -63,6 +63,8 @@
     "signInLink": "Prihlásenie",
     "email": "E-mail",
     "password": "Heslo",
+    "showPassword": "Zobraziť heslo",
+    "hidePassword": "Skryť heslo",
     "firstName": "Meno",
     "lastName": "Priezvisko",
     "signInSubmit": "Prihlásiť sa",
