@@ -1,6 +1,6 @@
 "use client";
 
-import { countriesForSelect } from "@/shared/lib/countries";
+import { countriesForSelect, countryFlag } from "@/shared/lib/countries";
 import { cn } from "@/shared/lib/utils";
 import {
   Select,
@@ -46,6 +46,9 @@ export function CountrySelect({
         {OPTIONS.map((opt) => (
           <SelectItem key={opt.code} value={opt.code}>
             <span className="inline-flex items-center gap-2">
+              <span className="text-[15px] leading-none" aria-hidden>
+                {countryFlag(opt.code)}
+              </span>
               <span className="data-num w-7 text-[11px] text-muted-foreground">
                 {opt.code}
               </span>

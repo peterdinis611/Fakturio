@@ -241,6 +241,15 @@ export function countryDial(code: string | null | undefined) {
   return getCountry(code)?.dial ?? "+421";
 }
 
+/** Regional-indicator emoji flag from ISO 3166-1 alpha-2 (e.g. SK → 🇸🇰). */
+export function countryFlag(code: string | null | undefined) {
+  const c = code?.trim().toUpperCase();
+  if (!c || c.length !== 2 || !/^[A-Z]{2}$/.test(c)) return "🏳️";
+  return String.fromCodePoint(
+    ...[...c].map((ch) => 0x1f1e6 - 65 + ch.charCodeAt(0)),
+  );
+}
+
 export function countriesForSelect() {
   const priority = new Set<string>(["SK", "CZ", "AT", "HU", "PL", "DE"]);
   const head = ["SK", "CZ", "AT", "HU", "PL", "DE"]

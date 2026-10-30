@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/shared/toast";
 import { updateResumeProfileAction } from "@/features/resume/api/resume";
@@ -15,6 +15,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PhoneInput } from "@/shared/ui/phone-input";
 import { Textarea } from "@/shared/ui/textarea";
 
 type Props = {
@@ -26,6 +27,7 @@ export function ResumeProfileForm({ initial }: Props) {
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors },
@@ -105,7 +107,18 @@ export function ResumeProfileForm({ initial }: Props) {
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="phone">Telefón</Label>
-          <Input id="phone" disabled={pending} {...register("phone")} />
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneInput
+                id="phone"
+                disabled={pending}
+                value={field.value ?? ""}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="location">Lokalita</Label>
