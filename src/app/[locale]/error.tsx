@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { ErrorScreen } from "@/shared/ui/error-screen";
 import { Button } from "@/shared/ui/button";
 
@@ -11,6 +12,8 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("Errors");
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -18,11 +21,11 @@ export default function ErrorPage({
   return (
     <ErrorScreen
       code="500"
-      title="Niečo sa pokazilo"
-      description="Nepodarilo sa načítať túto stránku. Skús to znova — ak problém pretrváva, reštartuj aplikáciu."
+      title={t("crashTitle")}
+      description={t("crashBody")}
       secondary={
         <Button type="button" variant="outline" onClick={reset}>
-          Skúsiť znova
+          {t("tryAgain")}
         </Button>
       }
     />

@@ -1,18 +1,23 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ErrorScreen } from "@/shared/ui/error-screen";
 import { Button } from "@/shared/ui/button";
 
-export const metadata = { title: "404" };
+export async function generateMetadata() {
+  return { title: "404" };
+}
 
-export default function NotFoundPage() {
+export default async function NotFoundPage() {
+  const t = await getTranslations("Errors");
+
   return (
     <ErrorScreen
       code="404"
-      title="Stránka neexistuje"
-      description="Táto adresa vo Fakturio nie je. Skontroluj URL alebo sa vráť na prehľad."
+      title={t("pageMissingTitle")}
+      description={t("pageMissingBody")}
       secondary={
         <Button asChild variant="outline">
-          <Link href="/invoices">Faktúry</Link>
+          <Link href="/invoices">{t("invoices")}</Link>
         </Button>
       }
     />

@@ -242,7 +242,7 @@ export default async function InvoiceDetailPage({
             <h2 className="text-[16px] font-medium text-ink">{t("documents")}</h2>
             <XmlPreview
               title={`XML · ${invoice.number}`}
-              description="Štruktúrovaný náhľad faktúry pred stiahnutím."
+              description={t("xmlPreview")}
               xml={buildInvoiceXml(invoice)}
               fileName={`${invoice.number}.xml`}
               triggerVariant="outline"
