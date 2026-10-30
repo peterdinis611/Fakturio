@@ -6,10 +6,15 @@ import {
   ReceiptText,
   ScrollText,
 } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/shared/ui/badge";
 import type { InvoiceDocumentType, InvoiceStatus } from "@/shared/api/types";
-import { documentTypeLabel, statusLabel } from "@/shared/lib/format";
+import {
+  documentTypeLabel,
+  statusLabelFor,
+} from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
 const statuses: (InvoiceStatus | "all")[] = [
   "all",
@@ -53,16 +58,25 @@ function buildHref({
   return qs ? `/invoices?${qs}` : "/invoices";
 }
 
-export function InvoiceLifecycleHint({ overdueOnly }: { overdueOnly: boolean }) {
+export async function InvoiceLifecycleHint({
+  overdueOnly,
+}: {
+  overdueOnly: boolean;
+}) {
+  const t = await getTranslations("Invoices");
+  const locale = (await getLocale()) as AppLocale;
+
   if (overdueOnly) {
     return (
-      <p className="text-[14px] text-muted-foreground">
-        Len po splatnosti: označiť úhradu alebo poslať upomienku.
-      </p>
+      <p className="text-[14px] text-muted-foreground">{t("overdueOnlyHint")}</p>
     );
   }
 
-  const steps = ["Koncept", "Vystavená", "Zaplatená"] as const;
+  const steps = [
+    statusLabelFor("Draft", locale),
+    statusLabelFor("Issued", locale),
+    statusLabelFor("Paid", locale),
+  ] as const;
 
   return (
     <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
@@ -82,21 +96,25 @@ export function InvoiceLifecycleHint({ overdueOnly }: { overdueOnly: boolean }) 
         </span>
       ))}
       <span className="text-faint">·</span>
-      <span>Číslo a VS sú v detaile.</span>
+      <span>{t("lifecycleHint")}</span>
     </div>
   );
 }
 
-export function InvoiceFilters({
+export async function InvoiceFilters({
   status,
   documentType,
   overdueOnly,
 }: InvoiceFiltersProps) {
+  const t = await getTranslations("Common");
+  const ti = await getTranslations("Invoices");
+  const locale = (await getLocale()) as AppLocale;
+
   return (
     <div className="mb-4 space-y-3">
       <div
         role="tablist"
-        aria-label="Typ dokladu"
+        aria-label={ti("colType")}
         className="grid grid-cols-2 gap-1 rounded-[6px] border border-border bg-raised/35 p-1 sm:grid-cols-4"
       >
         {documentTypes.map(({ key, icon: Icon }) => {
@@ -120,7 +138,7 @@ export function InvoiceFilters({
               )}
             >
               <Icon className="size-3.5 opacity-70" aria-hidden />
-              {key === "all" ? "Všetky" : documentTypeLabel(key)}
+              {key === "all" ? t("all") : documentTypeLabel(key, locale)}
             </Link>
           );
         })}
@@ -129,7 +147,7 @@ export function InvoiceFilters({
       <div className="flex flex-wrap items-center gap-2">
         <div
           role="tablist"
-          aria-label="Stav"
+          aria-label={ti("colStatus")}
           className="flex min-w-0 flex-1 flex-wrap gap-1"
         >
           {statuses.map((s) => {
@@ -151,7 +169,7 @@ export function InvoiceFilters({
                     : "border-border bg-surface text-muted-foreground hover:border-control hover:text-ink",
                 )}
               >
-                {s === "all" ? "Všetky stavy" : statusLabel[s]}
+                {s === "all" ? t("allStatuses") : statusLabelFor(s, locale)}
               </Link>
             );
           })}
@@ -171,7 +189,7 @@ export function InvoiceFilters({
           )}
         >
           <AlertTriangle className="size-3.5" aria-hidden />
-          Po splatnosti
+          {statusLabelFor("Overdue", locale)}
         </Link>
       </div>
     </div>

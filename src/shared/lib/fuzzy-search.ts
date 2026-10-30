@@ -1,9 +1,9 @@
-import Fuse, { type IFuseOptions, type FuseResult } from "fuse.js";
+import Fuse, { type IFuseOptions, type FuseOptionKey, type FuseResult } from "fuse.js";
 
 export const DEFAULT_FUSE_THRESHOLD = 0.38;
 
 export type FuzzySearchOptions<T> = {
-  keys: IFuseOptions<T>["keys"];
+  keys: ReadonlyArray<FuseOptionKey<T>>;
   threshold?: number;
   limit?: number;
   /** When true, empty/whitespace query returns all items. Default true. */
@@ -23,7 +23,7 @@ export function createFuzzyIndex<T>(
   } = options;
 
   return new Fuse([...items], {
-    keys,
+    keys: [...keys],
     threshold,
     ignoreLocation: true,
     includeScore: true,

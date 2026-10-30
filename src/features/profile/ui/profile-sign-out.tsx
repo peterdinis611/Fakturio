@@ -17,7 +17,7 @@ export function ProfileSignOut() {
   function onSignOut() {
     startTransition(async () => {
       await logoutAction();
-      toast.message("Odhlásený");
+      toast.message(t("signedOut"));
       router.replace("/sign-in");
       router.refresh();
     });

@@ -71,7 +71,7 @@ export function PhoneInput({
   const international = value.trim().startsWith("+");
 
   const filtered = useFuzzySearch(OPTIONS, query, {
-    keys: [...fuzzyKeys.country],
+    keys: fuzzyKeys.country,
     threshold: 0.32,
   });
 

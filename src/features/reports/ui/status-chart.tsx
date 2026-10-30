@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { Cell, Pie, PieChart } from "recharts";
 import {
   ChartContainer,
@@ -10,7 +11,8 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import type { InvoiceStatus } from "@/shared/api/types";
-import { formatMoney, statusLabel } from "@/shared/lib/format";
+import { formatMoney, statusLabelFor } from "@/shared/lib/format";
+import type { AppLocale } from "@/i18n/routing";
 
 const statusColor: Record<InvoiceStatus, string> = {
   Draft: "var(--faint)",
@@ -27,11 +29,12 @@ export function StatusChart({
   currency: string;
   rows: { status: InvoiceStatus; count: number; amount: number }[];
 }) {
+  const locale = useLocale() as AppLocale;
   const config = Object.fromEntries(
     rows.map((r) => [
       r.status,
       {
-        label: statusLabel[r.status],
+        label: statusLabelFor(r.status, locale),
         color: statusColor[r.status],
       },
     ]),
@@ -64,13 +67,16 @@ export function StatusChart({
               formatter={(value, _name, item) => (
                 <div className="flex w-full flex-col gap-0.5">
                   <span className="font-medium text-ink">
-                    {statusLabel[item?.payload?.status as InvoiceStatus]}
+                    {statusLabelFor(
+                      item?.payload?.status as InvoiceStatus,
+                      locale,
+                    )}
                   </span>
                   <span className="money text-ink">
-                    {formatMoney(Number(value), currency)}
+                    {formatMoney(Number(value), currency, locale)}
                   </span>
                   <span className="text-muted-foreground">
-                    {item?.payload?.count ?? 0} faktúr
+                    {item?.payload?.count ?? 0}
                   </span>
                 </div>
               )}

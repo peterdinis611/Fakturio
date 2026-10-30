@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { Button } from "@/shared/ui/button";
@@ -26,10 +27,11 @@ export function DebouncedSearchField({
   param = "q",
   initialQuery = "",
   extraParams,
-  placeholder = "Hľadať…",
+  placeholder,
   className,
   waitMs = 300,
 }: Props) {
+  const t = useTranslations("Common");
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
   const [pending, startTransition] = useTransition();
@@ -63,7 +65,7 @@ export function DebouncedSearchField({
           setValue(next);
           debouncer.maybeExecute(next);
         }}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("searchPlaceholder")}
         autoComplete="off"
         spellCheck={false}
         className="h-9 flex-1 rounded-[6px] border border-control bg-surface px-3 text-[14px] outline-none focus:ring-2 focus:ring-ink/15"
@@ -74,7 +76,7 @@ export function DebouncedSearchField({
         disabled={pending}
         onClick={() => debouncer.flush()}
       >
-        Hľadať
+        {t("search")}
       </Button>
     </div>
   );

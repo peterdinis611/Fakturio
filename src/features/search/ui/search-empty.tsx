@@ -3,32 +3,9 @@
 import Link from "next/link";
 import { ArrowUpRight, FileSearch, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
-
-const SUGGESTIONS: {
-  q: string;
-  mark: string;
-  label: string;
-  sample: string;
-  mono?: boolean;
-}[] = [
-  { q: "Acme", mark: "Z", label: "Meno firmy", sample: "Acme" },
-  {
-    q: "12345678",
-    mark: "IČ",
-    label: "IČO",
-    sample: "12345678",
-    mono: true,
-  },
-  {
-    q: "2026-001",
-    mark: "F",
-    label: "Číslo faktúry",
-    sample: "2026-001",
-    mono: true,
-  },
-];
 
 function SuggestionRow({
   mark,
@@ -80,7 +57,26 @@ function SuggestionRow({
 
 /** Idle state — before the user types. */
 export function SearchIdle() {
+  const t = useTranslations("Search");
   const router = useRouter();
+
+  const suggestions = [
+    { q: "Acme", mark: "Z", label: t("suggestCompany"), sample: "Acme" },
+    {
+      q: "12345678",
+      mark: "IČ",
+      label: t("suggestIco"),
+      sample: "12345678",
+      mono: true,
+    },
+    {
+      q: "2026-001",
+      mark: "F",
+      label: t("suggestInvoice"),
+      sample: "2026-001",
+      mono: true,
+    },
+  ] as const;
 
   return (
     <div className="relative overflow-hidden border-t border-rule pt-10">
@@ -94,25 +90,24 @@ export function SearchIdle() {
       <div className="relative grid gap-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:gap-14">
         <div className="max-w-md">
           <p className="text-[11px] font-medium tracking-[0.16em] text-faint uppercase">
-            Index
+            {t("idleEyebrow")}
           </p>
           <h2 className="mt-3 text-[28px] leading-[1.15] font-semibold tracking-tight text-ink">
-            Začni písať
+            {t("idleTitle")}
           </h2>
           <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
-            Výsledky sa dopĺňajú priebežne. Hľadá v menách, IČO, emailoch aj
-            číslach faktúr — stačia dva znaky.
+            {t("idleBody")}
           </p>
           <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[12px] text-faint">
             <span className="inline-flex items-center gap-1.5">
               <span className="stamp size-4 border-control text-[8px]">Z</span>
-              Zákazníci
+              {t("customers")}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="stamp size-4 border-ink text-[8px] text-ink">
                 F
               </span>
-              Faktúry
+              {t("invoices")}
             </span>
           </div>
         </div>
@@ -120,7 +115,7 @@ export function SearchIdle() {
         <div>
           <div className="mb-1 flex items-baseline justify-between gap-3 border-b border-rule pb-2">
             <p className="text-[11px] font-medium tracking-[0.14em] text-faint uppercase">
-              Skús napríklad
+              {t("tryEyebrow")}
             </p>
             <Search
               aria-hidden
@@ -129,13 +124,13 @@ export function SearchIdle() {
             />
           </div>
           <ul className="divide-y divide-rule">
-            {SUGGESTIONS.map((s) => (
+            {suggestions.map((s) => (
               <SuggestionRow
                 key={s.q}
                 mark={s.mark}
                 label={s.label}
                 sample={s.sample}
-                mono={s.mono}
+                mono={"mono" in s ? s.mono : false}
                 onPick={() =>
                   router.replace(`/search?q=${encodeURIComponent(s.q)}`)
                 }
@@ -150,6 +145,8 @@ export function SearchIdle() {
 
 /** Query too short (&lt; 2 chars). */
 export function SearchTooShort() {
+  const t = useTranslations("Search");
+
   return (
     <div className="relative border-t border-rule pt-10">
       <div className="flex items-start gap-4">
@@ -161,12 +158,10 @@ export function SearchTooShort() {
         </span>
         <div>
           <h2 className="text-[20px] font-semibold tracking-tight text-ink">
-            Ešte o znak
+            {t("tooShortTitle")}
           </h2>
           <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-muted-foreground">
-            Zadaj aspoň{" "}
-            <span className="font-mono text-ink tabular-nums">2</span> znaky —
-            potom sa index spustí sám.
+            {t("tooShortBody", { count: 2 })}
           </p>
         </div>
       </div>
@@ -176,6 +171,8 @@ export function SearchTooShort() {
 
 /** Zero hits for an active query. */
 export function SearchNoResults({ query }: { query: string }) {
+  const t = useTranslations("Search");
+
   return (
     <div className="relative overflow-hidden border-t border-rule pt-10">
       <div
@@ -194,22 +191,19 @@ export function SearchNoResults({ query }: { query: string }) {
             <FileSearch className="size-[18px]" strokeWidth={1.5} />
           </span>
           <h2 className="text-[22px] font-semibold tracking-tight text-ink">
-            Nič sa nenašlo
+            {t("noResultsTitle")}
           </h2>
           <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-            Pre{" "}
-            <span className="font-medium text-ink">„{query}“</span> nie sú zhody
-            medzi zákazníkmi ani faktúrami. Skús kratší výraz alebo skontroluj
-            preklep.
+            {t("noResultsBody", { query })}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline">
-            <Link href="/customers">Zákazníci</Link>
+            <Link href="/customers">{t("customers")}</Link>
           </Button>
           <Button asChild variant="ghost">
-            <Link href="/invoices">Faktúry</Link>
+            <Link href="/invoices">{t("invoices")}</Link>
           </Button>
         </div>
       </div>

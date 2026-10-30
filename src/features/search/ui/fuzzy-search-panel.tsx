@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   useEffect,
   useEffectEvent,
@@ -23,6 +24,7 @@ import { cn } from "@/shared/lib/utils";
 import { StatusBadge } from "@/shared/ui/status-badge";
 import { FadeIn } from "@/shared/ui/motion/page-motion";
 import type { Customer, InvoiceListItem } from "@/shared/api/types";
+import type { AppLocale } from "@/i18n/routing";
 
 const DEBOUNCE_MS = 280;
 const MIN_QUERY = 2;
@@ -44,6 +46,8 @@ export function FuzzySearchPanel({
   initialQuery,
   truncated = false,
 }: Props) {
+  const t = useTranslations("Search");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
   const [pending, startTransition] = useTransition();
@@ -111,7 +115,7 @@ export function FuzzySearchPanel({
         )}
       >
         <label className="relative flex min-w-0 flex-1 items-center">
-          <span className="sr-only">Hľadať zákazníkov a faktúry</span>
+          <span className="sr-only">{t("srLabel")}</span>
           <Search
             aria-hidden
             className={cn(
@@ -133,7 +137,7 @@ export function FuzzySearchPanel({
                 urlDebouncer.flush();
               }
             }}
-            placeholder="Meno, IČO, číslo faktúry… (fuzzy)"
+            placeholder={t("placeholder")}
             autoFocus
             autoComplete="off"
             spellCheck={false}
@@ -164,26 +168,40 @@ export function FuzzySearchPanel({
         <FadeIn delay={0.08} className="space-y-8">
           <div className="ledger-strip">
             <span>
-              Dotaz <span className="text-ink">„{query}“</span>
+              {t("queryLabel")}{" "}
+              <span className="text-ink">„{query}“</span>
             </span>
-            <span className="data-num">{filtered.length} zásahov</span>
             <span className="data-num">
-              {customersHits.length} zákazníkov · {invoicesHits.length} faktúr
+              {t("hits", { count: filtered.length })}
+            </span>
+            <span className="data-num">
+              {t("hitBreakdown", {
+                customers: customersHits.length,
+                invoices: invoicesHits.length,
+              })}
             </span>
             {truncated ? (
-              <span className="text-faint">fuzzy v načítanom katalógu</span>
+              <span className="text-faint">{t("catalogNote")}</span>
             ) : null}
           </div>
 
-          <ResultGroup label="Zákazníci" count={customersHits.length}>
+          <ResultGroup label={t("customers")} count={customersHits.length}>
             {customersHits.map(({ item }) => (
-              <CustomerHit key={item.id} customer={item} />
+              <CustomerHit
+                key={item.id}
+                customer={item}
+                badge={t("customer")}
+              />
             ))}
           </ResultGroup>
 
-          <ResultGroup label="Faktúry" count={invoicesHits.length}>
+          <ResultGroup label={t("invoices")} count={invoicesHits.length}>
             {invoicesHits.map(({ item }) => (
-              <InvoiceHit key={item.id} invoice={item} />
+              <InvoiceHit
+                key={item.id}
+                invoice={item}
+                locale={locale}
+              />
             ))}
           </ResultGroup>
         </FadeIn>
@@ -215,7 +233,13 @@ function ResultGroup({
   );
 }
 
-function CustomerHit({ customer }: { customer: Customer }) {
+function CustomerHit({
+  customer,
+  badge,
+}: {
+  customer: Customer;
+  badge: string;
+}) {
   const meta = [customer.ico && `IČO ${customer.ico}`, customer.city, customer.email]
     .filter(Boolean)
     .join(" · ");
@@ -242,13 +266,19 @@ function CustomerHit({ customer }: { customer: Customer }) {
             </p>
           ) : null}
         </div>
-        <p className="shrink-0 text-[12px] text-faint">Zákazník</p>
+        <p className="shrink-0 text-[12px] text-faint">{badge}</p>
       </Link>
     </li>
   );
 }
 
-function InvoiceHit({ invoice }: { invoice: InvoiceListItem }) {
+function InvoiceHit({
+  invoice,
+  locale,
+}: {
+  invoice: InvoiceListItem;
+  locale: AppLocale;
+}) {
   return (
     <li>
       <Link
@@ -271,10 +301,10 @@ function InvoiceHit({ invoice }: { invoice: InvoiceListItem }) {
         </div>
         <div className="shrink-0 pt-0.5 text-right">
           <p className="money text-[14px] text-ink">
-            {formatMoney(invoice.total, invoice.currency)}
+            {formatMoney(invoice.total, invoice.currency, locale)}
           </p>
           <p className="mt-0.5 text-[12px] text-muted-foreground">
-            {formatDate(invoice.issueDate)}
+            {formatDate(invoice.issueDate, locale)}
           </p>
         </div>
       </Link>

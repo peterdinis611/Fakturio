@@ -16,6 +16,7 @@ import { useEffect, useState, useTransition } from "react";
 import { logoutAction } from "@/features/auth/api/auth";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,12 +86,9 @@ export function SidebarAccount({ email }: { email?: string | null }) {
               "data-[state=open]:bg-raised/80",
             )}
           >
-            <span
-              aria-hidden
-              className="flex size-8 shrink-0 items-center justify-center border border-border bg-ground text-[11px] font-semibold tracking-wide text-ink"
-            >
-              {initialsFromEmail(email)}
-            </span>
+            <Avatar aria-hidden size="default">
+              <AvatarFallback>{initialsFromEmail(email)}</AvatarFallback>
+            </Avatar>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-medium leading-tight text-ink">
                 {displayName}

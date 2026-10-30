@@ -1,10 +1,14 @@
+import { getTranslations } from "next-intl/server";
 import { listCustomers } from "@/features/customers/api/customers";
 import { listInvoices } from "@/features/invoices/api/invoices";
 import { FuzzySearchPanel } from "@/features/search/ui/fuzzy-search-panel";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { FadeIn } from "@/shared/ui/motion/page-motion";
 
-export const metadata = { title: "Hľadanie" };
+export async function generateMetadata() {
+  const t = await getTranslations("Search");
+  return { title: t("title") };
+}
 
 const CATALOG_SIZE = 500;
 
@@ -13,6 +17,7 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const t = await getTranslations("Search");
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
@@ -27,10 +32,7 @@ export default async function SearchPage({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <PageHeader
-        title="Hľadanie"
-        description="Fuzzy hľadanie (fuse.js) v zákazníkoch a faktúrach — aspoň 2 znaky."
-      />
+      <PageHeader title={t("title")} description={t("description")} />
 
       <FadeIn delay={0.05}>
         <FuzzySearchPanel

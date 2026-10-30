@@ -130,6 +130,24 @@ const auditActionLabelSk: Record<AuditAction, string> = {
   ProformaFinalized: "Záloha → faktúra",
 };
 
-export function auditActionLabel(action: AuditAction) {
-  return auditActionLabelSk[action] ?? action;
+const auditActionLabelEn: Record<AuditAction, string> = {
+  Created: "Created",
+  Updated: "Updated",
+  Issued: "Issued",
+  Paid: "Paid",
+  Cancelled: "Cancelled",
+  ReminderSent: "Reminder",
+  Deleted: "Deleted",
+  Duplicated: "Duplicated",
+  OverdueMarked: "Marked overdue",
+  CreditNoteCreated: "Credit note",
+  ProformaFinalized: "Proforma → invoice",
+};
+
+export function auditActionLabel(
+  action: AuditAction,
+  locale: FormatLocale = "sk",
+) {
+  const map = locale === "en" ? auditActionLabelEn : auditActionLabelSk;
+  return map[action] ?? action;
 }

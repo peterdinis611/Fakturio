@@ -9,35 +9,20 @@ import {
 
 /**
  * Memoized Fuse.js search over an in-memory list.
- * Rebuilds the index when `items` or option keys change.
+ * Pass stable `keys` (e.g. `fuzzyKeys.customer`) so the index is not rebuilt every render.
  */
 export function useFuzzySearch<T>(
   items: readonly T[],
   query: string,
   options: FuzzySearchOptions<T>,
 ): T[] {
-  const {
-    keys,
-    threshold,
-    limit,
-    matchAllOnEmpty,
-    ignoreLocation,
-    includeScore,
-    ...rest
-  } = options;
+  const { keys, threshold, limit, matchAllOnEmpty } = options;
 
   const fuse = useMemo(
-    () =>
-      createFuzzyIndex(items, {
-        keys,
-        threshold,
-        ignoreLocation,
-        includeScore,
-        ...rest,
-      }),
-    // Fuse options are stable in practice; keys identity matters most.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- options spread is intentional
-    [items, keys, threshold, ignoreLocation, includeScore],
+    () => createFuzzyIndex(items, options),
+    // options.keys should be a module-level constant (fuzzyKeys.*)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberate: rebuild on items/keys/threshold only
+    [items, keys, threshold],
   );
 
   return useMemo(() => {

@@ -1,107 +1,39 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { listCustomers } from "@/features/customers/api/customers";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
+import { CustomersFuzzyTable } from "@/features/customers/ui/customers-fuzzy-table";
 import { PageHeader } from "@/widgets/app-shell/page-header";
-import { DebouncedSearchField } from "@/shared/ui/debounced-search-field";
-import { EmptyState } from "@/shared/ui/empty-state";
-import { Button } from "@/shared/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/ui/table";
-import { emptyDash } from "@/shared/lib/format";
 
-export const metadata = { title: "Zákazníci" };
+export async function generateMetadata() {
+  const t = await getTranslations("Customers");
+  return { title: t("title") };
+}
+
+const CATALOG_SIZE = 500;
 
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string }>;
 }) {
+  const t = await getTranslations("Customers");
   const sp = await searchParams;
-  const page = Number(sp.page) || 1;
-  const search = sp.q?.trim() || undefined;
-  const data = await listCustomers({ page, pageSize: 20, search });
+  const search = sp.q?.trim() || "";
+  const data = await listCustomers({ page: 1, pageSize: CATALOG_SIZE });
 
   return (
     <div>
       <PageHeader
-        title="Zákazníci"
-        description={`${data.totalCount} odberateľov: IČO a adresa idú do faktúry.`}
+        title={t("title")}
+        description={t("description", { count: data.totalCount })}
         actions={<CreateCustomerDialog />}
       />
 
-      <DebouncedSearchField
-        path="/customers"
-        initialQuery={search ?? ""}
-        placeholder="Meno, IČO, email…"
+      <CustomersFuzzyTable
+        items={data.items}
+        initialQuery={search}
+        truncated={data.totalCount > data.items.length}
       />
-
-      {data.items.length === 0 ? (
-        <div className="space-y-4">
-          <EmptyState
-            title="Žiadni zákazníci"
-            description="Pridaj odberateľa pred vystavením faktúry."
-          />
-          <CreateCustomerDialog
-            trigger={
-              <Button type="button">Pridať zákazníka</Button>
-            }
-          />
-        </div>
-      ) : (
-        <div className="panel overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[12px] text-muted-foreground">
-                  Názov
-                </TableHead>
-                <TableHead className="text-[12px] text-muted-foreground">
-                  IČO
-                </TableHead>
-                <TableHead className="text-[12px] text-muted-foreground">
-                  Mesto
-                </TableHead>
-                <TableHead className="text-[12px] text-muted-foreground">
-                  Email
-                </TableHead>
-                <TableHead className="text-right text-[12px] text-muted-foreground">
-                  Faktúry
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.items.map((c) => (
-                <TableRow key={c.id} className="h-11">
-                  <TableCell>
-                    <Link
-                      href={`/customers/${c.id}`}
-                      className="font-medium hover:underline"
-                    >
-                      {c.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="data-num text-[13px]">
-                    {emptyDash(c.ico)}
-                  </TableCell>
-                  <TableCell>{emptyDash(c.city)}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {emptyDash(c.email)}
-                  </TableCell>
-                  <TableCell className="data-num text-right">
-                    {c.invoiceCount}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { useTransition } from "react";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
@@ -28,10 +29,11 @@ export function FuzzySearchField({
   path,
   param = "q",
   extraParams,
-  placeholder = "Hľadať…",
+  placeholder,
   className,
   waitMs = 280,
 }: Props) {
+  const t = useTranslations("Common");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -65,7 +67,7 @@ export function FuzzySearchField({
           onValueChange(next);
           if (path) urlDebouncer.maybeExecute(next);
         }}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("searchPlaceholder")}
         autoComplete="off"
         spellCheck={false}
         className="h-9 flex-1 rounded-[6px] border border-control bg-surface px-3 text-[14px] outline-none focus:ring-2 focus:ring-ink/15"
@@ -77,7 +79,7 @@ export function FuzzySearchField({
           disabled={pending}
           onClick={() => urlDebouncer.flush()}
         >
-          Hľadať
+          {t("search")}
         </Button>
       ) : null}
     </div>

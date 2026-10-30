@@ -1,8 +1,9 @@
 import { Building2, CalendarDays, Mail, ShieldCheck } from "lucide-react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/features/auth/api/auth";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ProfileSignOut } from "@/features/profile/ui/profile-sign-out";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {
@@ -16,8 +17,12 @@ import {
 import { Separator } from "@/shared/ui/separator";
 import { emptyDash, formatDateTime } from "@/shared/lib/format";
 import { Link, redirect } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 
-export const metadata = { title: "Profil" };
+export async function generateMetadata() {
+  const t = await getTranslations("Profile");
+  return { title: t("title") };
+}
 
 function initials(firstName: string | null, lastName: string | null, email: string) {
   const a = firstName?.trim()?.[0];
@@ -55,7 +60,8 @@ function Field({
 }
 
 export default async function ProfilePage() {
-  const locale = await getLocale();
+  const t = await getTranslations("Profile");
+  const locale = (await getLocale()) as AppLocale;
   const user = await getCurrentUser();
   if (!user) {
     redirect({ href: "/sign-in", locale });
@@ -69,20 +75,17 @@ export default async function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <PageHeader
-        title="Profil"
-        description="Údaje prihláseného účtu a rýchle akcie."
+        title={t("title")}
+        description={t("description")}
         actions={<ProfileSignOut />}
       />
 
       <Card size="sm" className="overflow-hidden rounded-[6px] bg-surface ring-border">
         <CardHeader className="border-b border-rule bg-raised/30">
           <div className="flex flex-wrap items-center gap-4">
-            <div
-              className="grid size-14 shrink-0 place-items-center rounded-[6px] border border-border bg-ground font-mono text-[15px] font-bold tracking-wide text-ink"
-              aria-hidden
-            >
-              {mark}
-            </div>
+            <Avatar aria-hidden size="xl">
+              <AvatarFallback>{mark}</AvatarFallback>
+            </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <CardTitle className="truncate text-[17px]">{displayName}</CardTitle>
@@ -90,7 +93,7 @@ export default async function ProfilePage() {
                   variant="outline"
                   className="rounded-[4px] border-ring/35 text-[10px] tracking-[0.08em] text-ring uppercase"
                 >
-                  Aktívny
+                  {t("active")}
                 </Badge>
               </div>
               <CardDescription className="mt-1 flex items-center gap-1.5 truncate">
@@ -103,8 +106,8 @@ export default async function ProfilePage() {
 
         <CardContent className="space-y-5 pt-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Meno" value={emptyDash(user.firstName)} />
-            <Field label="Priezvisko" value={emptyDash(user.lastName)} />
+            <Field label={t("firstName")} value={emptyDash(user.firstName)} />
+            <Field label={t("lastName")} value={emptyDash(user.lastName)} />
           </div>
 
           <Separator />
@@ -116,8 +119,8 @@ export default async function ProfilePage() {
                 aria-hidden
               />
               <Field
-                label="Účet vytvorený"
-                value={formatDateTime(user.createdAt)}
+                label={t("created")}
+                value={formatDateTime(user.createdAt, locale)}
                 mono
               />
             </div>
@@ -127,10 +130,10 @@ export default async function ProfilePage() {
                 aria-hidden
               />
               <Field
-                label="Posledná aktivita"
+                label={t("lastSeen")}
                 value={
                   user.lastSeenAt
-                    ? formatDateTime(user.lastSeenAt)
+                    ? formatDateTime(user.lastSeenAt, locale)
                     : emptyDash(null)
                 }
                 mono
@@ -140,13 +143,11 @@ export default async function ProfilePage() {
         </CardContent>
 
         <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-rule bg-raised/20">
-          <p className="text-[12px] text-muted-foreground">
-            Firemné údaje na faktúrach upravíš vo Firma.
-          </p>
+          <p className="text-[12px] text-muted-foreground">{t("companyHint")}</p>
           <Button asChild variant="secondary" size="sm">
             <Link href="/settings/company">
               <Building2 className="size-3.5" aria-hidden />
-              Nastaviť firmu
+              {t("setCompany")}
             </Link>
           </Button>
         </CardFooter>
