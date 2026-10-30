@@ -30,28 +30,25 @@ export default async function DashboardPage() {
         ? `${reminders.length} splatností v najbližších 14 dňoch`
         : `K ${formatDate(overview.asOf)} · ${overview.totalInvoices} faktúr`;
 
-  if (isEmpty) {
-    return (
-      <>
-        <PageHeader title="Prehľad" description={finding} />
-        <MotionItem>
-          <DashboardEmpty />
-        </MotionItem>
-      </>
-    );
-  }
-
   return (
     <>
       <PageHeader
         title="Prehľad"
         description={finding}
         actions={
-          <Button asChild>
-            <Link href="/invoices/new">Nová faktúra</Link>
-          </Button>
+          isEmpty ? undefined : (
+            <Button asChild>
+              <Link href="/invoices/new">Nová faktúra</Link>
+            </Button>
+          )
         }
       />
+
+      {isEmpty ? (
+        <MotionItem>
+          <DashboardEmpty />
+        </MotionItem>
+      ) : null}
 
       <DashboardSections
         overview={overview}
@@ -59,6 +56,7 @@ export default async function DashboardPage() {
         drafts={draftsPage.items}
         recent={recent.items}
         monthly={monthly}
+        showSectionLabel={isEmpty}
       />
     </>
   );

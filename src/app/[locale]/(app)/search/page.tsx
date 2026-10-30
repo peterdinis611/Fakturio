@@ -1,12 +1,12 @@
-import { Suspense } from "react";
+import { listCustomers } from "@/features/customers/api/customers";
+import { listInvoices } from "@/features/invoices/api/invoices";
+import { FuzzySearchPanel } from "@/features/search/ui/fuzzy-search-panel";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { FadeIn } from "@/shared/ui/motion/page-motion";
-import { SearchBox } from "@/features/search/ui/search-box";
-import { SearchIdle } from "@/features/search/ui/search-empty";
-import { SearchResults } from "@/features/search/ui/search-results";
-import { SectionLoader } from "@/shared/ui/spinner";
 
 export const metadata = { title: "Hľadanie" };
+
+const CATALOG_SIZE = 500;
 
 export default async function SearchPage({
   searchParams,
@@ -16,30 +16,30 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
+  const [customers, invoices] = await Promise.all([
+    listCustomers({ page: 1, pageSize: CATALOG_SIZE }),
+    listInvoices({ page: 1, pageSize: CATALOG_SIZE }),
+  ]);
+
+  const truncated =
+    customers.totalCount > customers.items.length ||
+    invoices.totalCount > invoices.items.length;
+
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
         title="Hľadanie"
-        description="Zákazníci a faktúry naraz — aspoň 2 znaky."
+        description="Fuzzy hľadanie (fuse.js) v zákazníkoch a faktúrach — aspoň 2 znaky."
       />
 
       <FadeIn delay={0.05}>
-        <SearchBox initialQuery={query} />
+        <FuzzySearchPanel
+          customers={customers.items}
+          invoices={invoices.items}
+          initialQuery={query}
+          truncated={truncated}
+        />
       </FadeIn>
-
-      {!query ? (
-        <FadeIn delay={0.1}>
-          <SearchIdle />
-        </FadeIn>
-      ) : (
-        <Suspense
-          fallback={
-            <SectionLoader label="Hľadám…" rows={5} className="mt-2" />
-          }
-        >
-          <SearchResults query={query} />
-        </Suspense>
-      )}
     </div>
   );
 }

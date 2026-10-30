@@ -28,9 +28,11 @@ import {
 import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PaymentMethodSelect } from "@/shared/ui/payment-method-select";
 import { Textarea } from "@/shared/ui/textarea";
 import {
   Select,
@@ -455,12 +457,17 @@ export function InvoiceForm({
           </div>
           <div className={fieldClass}>
             <Label htmlFor="currency">Mena</Label>
-            <Input
-              id="currency"
-              maxLength={3}
-              disabled={readOnly || pending}
-              className="data-num uppercase"
-              {...register("currency")}
+            <Controller
+              control={control}
+              name="currency"
+              render={({ field }) => (
+                <CurrencySelect
+                  id="currency"
+                  disabled={readOnly || pending}
+                  value={field.value || "EUR"}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.currency?.message} />
           </div>
@@ -502,10 +509,17 @@ export function InvoiceForm({
           </div>
           <div className={fieldClass}>
             <Label htmlFor="paymentMethod">Spôsob platby</Label>
-            <Input
-              id="paymentMethod"
-              disabled={readOnly || pending}
-              {...register("paymentMethod")}
+            <Controller
+              control={control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <PaymentMethodSelect
+                  id="paymentMethod"
+                  disabled={readOnly || pending}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
             <FieldError message={errors.paymentMethod?.message} />
           </div>

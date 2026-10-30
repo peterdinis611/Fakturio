@@ -8,6 +8,8 @@ import {
   countryFlag,
   getCountry,
 } from "@/shared/lib/countries";
+import { useFuzzySearch } from "@/shared/hooks/use-fuzzy-search";
+import { fuzzyKeys } from "@/shared/lib/fuzzy-search";
 import { cn } from "@/shared/lib/utils";
 import { Input } from "@/shared/ui/input";
 import {
@@ -68,17 +70,10 @@ export function PhoneInput({
   const flag = countryFlag(code);
   const international = value.trim().startsWith("+");
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return OPTIONS;
-    return OPTIONS.filter(
-      (opt) =>
-        opt.name.toLowerCase().includes(q) ||
-        opt.code.toLowerCase().includes(q) ||
-        opt.dial.includes(q) ||
-        opt.dial.replace("+", "").includes(q),
-    );
-  }, [query]);
+  const filtered = useFuzzySearch(OPTIONS, query, {
+    keys: [...fuzzyKeys.country],
+    threshold: 0.32,
+  });
 
   function selectCountry(next: string) {
     const nextCode = next.toUpperCase();

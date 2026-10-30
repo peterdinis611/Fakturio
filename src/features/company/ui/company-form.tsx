@@ -1,13 +1,16 @@
 "use client";
 
-import { useTransition } from "react";
+import { useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/shared/toast";
 import { updateCompanyAction } from "@/features/company/api/company";
+import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
+import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
+import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
-import type { CompanySettings } from "@/shared/api/types";
+import type { CompanySettings, RegistryCompany } from "@/shared/api/types";
 import type { z } from "zod";
 import {
   companySchema,
@@ -24,8 +27,10 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { CountrySelect } from "@/shared/ui/country-select";
+import { CurrencySelect } from "@/shared/ui/currency-select";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
+import { PaymentMethodSelect } from "@/shared/ui/payment-method-select";
 import { PhoneInput } from "@/shared/ui/phone-input";
 import { Separator } from "@/shared/ui/separator";
 import {
@@ -54,19 +59,6 @@ const LEGAL_FORMS = [
   { value: "v.o.s.", label: "v.o.s." },
   { value: "k.s.", label: "k.s." },
   { value: "iné", label: "Iné" },
-] as const;
-
-const PAYMENT_METHODS = [
-  { value: "bank_transfer", label: "Bankový prevod" },
-  { value: "cash", label: "Hotovosť" },
-  { value: "card", label: "Karta" },
-  { value: "other", label: "Iné" },
-] as const;
-
-const CURRENCIES = [
-  { value: "EUR", label: "EUR" },
-  { value: "CZK", label: "CZK" },
-  { value: "USD", label: "USD" },
 ] as const;
 
 function toFormValues(initial: CompanySettings): CompanyFormInput {
@@ -190,6 +182,32 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
 
   const isVatPayer = watch("isVatPayer");
   const country = watch("country");
+  const ico = watch("ico");
+
+  const applyRegistry = useCallback(
+    (data: RegistryCompany) => {
+      const fields = toRegistryAutofill(data, { includeCompanyExtras: true });
+      const opts = { shouldDirty: true, shouldValidate: true } as const;
+      setValue("name", fields.name, opts);
+      setValue("ico", fields.ico, opts);
+      setValue("country", fields.country, opts);
+      if (fields.street) setValue("street", fields.street, opts);
+      if (fields.city) setValue("city", fields.city, opts);
+      if (fields.postalCode) setValue("postalCode", fields.postalCode, opts);
+      if (fields.dic) setValue("dic", fields.dic, opts);
+      if (fields.legalForm) setValue("legalForm", fields.legalForm, opts);
+      if (fields.commercialRegister) {
+        setValue("commercialRegister", fields.commercialRegister, opts);
+      }
+    },
+    [setValue],
+  );
+
+  const { canLookup, lookingUp, registrySupported, lookup } = useRegistryLookup({
+    ico,
+    country,
+    onFound: applyRegistry,
+  });
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -269,8 +287,22 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="ico">IČO</Label>
-          <Input id="ico" className="data-num" {...register("ico")} />
+          <IcoLookupField
+            id="ico"
+            register={register("ico")}
+            lookingUp={lookingUp}
+            registrySupported={registrySupported}
+            canLookup={canLookup}
+            onLookup={lookup}
+            aria-invalid={!!errors.ico}
+          />
           <FieldError message={errors.ico?.message} />
+          {registrySupported ? (
+            <p className="text-[11px] text-muted-foreground">
+              Po zadaní IČO doplníme firmu z{" "}
+              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO"}.
+            </p>
+          ) : null}
         </Field>
         <Field>
           <Label htmlFor="dic">DIČ</Label>
@@ -427,24 +459,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             control={control}
             name="defaultCurrency"
             render={({ field }) => (
-              <Select
+              <CurrencySelect
+                id="defaultCurrency"
                 value={field.value || "EUR"}
-                onValueChange={field.onChange}
-              >
-                <SelectTrigger
-                  id="defaultCurrency"
-                  className="h-9 w-full rounded-[4px] border-border bg-ground"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCIES.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={field.onChange}
+              />
             )}
           />
         </Field>
@@ -458,24 +477,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             control={control}
             name="defaultPaymentMethod"
             render={({ field }) => (
-              <Select
-                value={field.value || undefined}
-                onValueChange={field.onChange}
-              >
-                <SelectTrigger
-                  id="defaultPaymentMethod"
-                  className="h-9 w-full rounded-[4px] border-border bg-ground"
-                >
-                  <SelectValue placeholder="Vyber…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_METHODS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <PaymentMethodSelect
+                id="defaultPaymentMethod"
+                value={field.value}
+                onChange={field.onChange}
+              />
             )}
           />
         </Field>

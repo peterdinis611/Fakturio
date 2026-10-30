@@ -86,8 +86,14 @@ export function buildTodayActions(params: {
       id: "clear",
       priority: 9,
       tone: "muted",
-      title: "Dnes nič naliehavé",
-      detail: "Ledger je v poriadku — môžeš vystaviť ďalšiu faktúru.",
+      title:
+        overview.totalInvoices === 0
+          ? "Začni prvou faktúrou"
+          : "Dnes nič naliehavé",
+      detail:
+        overview.totalInvoices === 0
+          ? "Widgety nižšie sa naplnia, keď vystavíš prvý doklad."
+          : "Ledger je v poriadku — môžeš vystaviť ďalšiu faktúru.",
       href: "/invoices/new",
       cta: "Nová faktúra",
     });

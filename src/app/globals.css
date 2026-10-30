@@ -312,6 +312,16 @@
   margin-bottom: 0;
 }
 
+.note-editor-content h1,
+.note-body h1 {
+  margin: 0 0 0.45em;
+  font-size: 1.35em;
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
 .note-editor-content h2,
 .note-body h2 {
   margin: 0 0 0.4em;
@@ -328,6 +338,61 @@
   font-weight: 600;
   line-height: 1.35;
   color: var(--text);
+}
+
+.note-editor-content sub,
+.note-body sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+}
+
+.note-editor-content sup,
+.note-body sup {
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+.note-editor-content img.note-image,
+.note-body img.note-image,
+.note-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.55em 0;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.note-editor-content table,
+.note-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 0.65em;
+  font-size: 0.92em;
+  table-layout: fixed;
+}
+
+.note-editor-content th,
+.note-editor-content td,
+.note-body th,
+.note-body td {
+  border: 1px solid var(--border);
+  padding: 0.35em 0.5em;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.note-editor-content th,
+.note-body th {
+  background: var(--raised);
+  font-weight: 600;
+  text-align: left;
+}
+
+.note-editor-content .selectedCell,
+.note-editor-content td.selectedCell,
+.note-editor-content th.selectedCell {
+  background: color-mix(in oklab, var(--chart-3, #c4a35a) 18%, transparent);
 }
 
 .note-editor-content ul,

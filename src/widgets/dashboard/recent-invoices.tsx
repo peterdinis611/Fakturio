@@ -15,33 +15,42 @@ export function RecentInvoices({ items }: { items: InvoiceListItem[] }) {
           Všetky
         </Link>
       </div>
-      <ul className="divide-y divide-rule border-t border-rule">
-        {items.map((inv) => (
-          <li
-            key={inv.id}
-            className="grid grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 sm:grid-cols-[7rem_minmax(0,1fr)_auto_6.5rem_auto]"
-          >
-            <Link
-              href={`/invoices/${inv.id}`}
-              className="data-num text-[14px] font-medium hover:underline"
+      {items.length === 0 ? (
+        <div className="border-t border-rule py-5">
+          <p className="text-[14px] text-ink">Zatiaľ žiadne faktúry</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Po vystavení sa tu zobrazia posledné doklady.
+          </p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-rule border-t border-rule">
+          {items.map((inv) => (
+            <li
+              key={inv.id}
+              className="grid grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 sm:grid-cols-[7rem_minmax(0,1fr)_auto_6.5rem_auto]"
             >
-              {inv.number}
-            </Link>
-            <span className="truncate text-[14px] text-ink">
-              {inv.customerName}
-            </span>
-            <span className="hidden sm:inline">
-              <StatusBadge status={inv.status} />
-            </span>
-            <span className="hidden text-right text-[12px] text-muted-foreground sm:block">
-              {formatDate(inv.dueDate)}
-            </span>
-            <span className="money text-right text-[14px]">
-              {formatMoney(inv.total, inv.currency)}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <Link
+                href={`/invoices/${inv.id}`}
+                className="data-num text-[14px] font-medium hover:underline"
+              >
+                {inv.number}
+              </Link>
+              <span className="truncate text-[14px] text-ink">
+                {inv.customerName}
+              </span>
+              <span className="hidden sm:inline">
+                <StatusBadge status={inv.status} />
+              </span>
+              <span className="hidden text-right text-[12px] text-muted-foreground sm:block">
+                {formatDate(inv.dueDate)}
+              </span>
+              <span className="money text-right text-[14px]">
+                {formatMoney(inv.total, inv.currency)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

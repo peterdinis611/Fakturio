@@ -438,6 +438,22 @@ export type ApiProblem = {
   instance?: string;
 };
 
+/** Normalized company from ARES (CZ) or RPO (SK). */
+export type RegistryCompany = {
+  country: string;
+  source: string;
+  ico: string;
+  name: string;
+  legalForm: string | null;
+  dic: string | null;
+  street: string | null;
+  city: string | null;
+  postalCode: string | null;
+  countryCode: string;
+  isVatPayer: boolean | null;
+  commercialRegister: string | null;
+};
+
 export type OverdueJobSettings = {
   enabled: boolean;
   runAtHourUtc: number;

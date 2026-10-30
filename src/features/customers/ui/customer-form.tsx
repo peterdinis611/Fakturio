@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,10 @@ import {
   createCustomerAction,
   updateCustomerAction,
 } from "@/features/customers/api/customers";
-import type { Customer } from "@/shared/api/types";
+import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
+import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
+import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
+import type { Customer, RegistryCompany } from "@/shared/api/types";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
 import {
   customerSchema,
@@ -75,10 +78,33 @@ export function CustomerForm({
     control,
     watch,
     setError,
+    setValue,
     formState: { errors },
   } = form;
 
   const country = watch("country");
+  const ico = watch("ico");
+
+  const applyRegistry = useCallback(
+    (data: RegistryCompany) => {
+      const fields = toRegistryAutofill(data);
+      const opts = { shouldDirty: true, shouldValidate: true } as const;
+      setValue("name", fields.name, opts);
+      setValue("ico", fields.ico, opts);
+      setValue("country", fields.country, opts);
+      if (fields.street) setValue("street", fields.street, opts);
+      if (fields.city) setValue("city", fields.city, opts);
+      if (fields.postalCode) setValue("postalCode", fields.postalCode, opts);
+      if (fields.dic) setValue("dic", fields.dic, opts);
+    },
+    [setValue],
+  );
+
+  const { canLookup, lookingUp, registrySupported, lookup } = useRegistryLookup({
+    ico,
+    country,
+    onFound: applyRegistry,
+  });
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -136,8 +162,22 @@ export function CustomerForm({
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-ico">IČO</Label>
-          <Input id="customer-ico" className="data-num" {...register("ico")} />
+          <IcoLookupField
+            id="customer-ico"
+            register={register("ico")}
+            lookingUp={lookingUp}
+            registrySupported={registrySupported}
+            canLookup={canLookup}
+            onLookup={lookup}
+            aria-invalid={!!errors.ico}
+          />
           <FieldError message={errors.ico?.message} />
+          {registrySupported ? (
+            <p className="text-[11px] text-muted-foreground">
+              Po zadaní IČO doplníme firmu z{" "}
+              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO"}.
+            </p>
+          ) : null}
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-dic">DIČ</Label>
