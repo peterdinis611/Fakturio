@@ -1,6 +1,7 @@
 "use client";
 
 import { FileSpreadsheet, Upload, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useId, useRef, useState } from "react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -25,6 +26,7 @@ export function CsvUploader({
   onFile,
   onClear,
 }: CsvUploaderProps) {
+  const t = useTranslations("Payments");
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -92,9 +94,7 @@ export function CsvUploader({
           <Upload className="size-4" strokeWidth={1.75} />
         </span>
         <div className="space-y-0.5">
-          <p className="text-[13px] font-medium text-ink">
-            Presuň CSV sem alebo klikni na výber
-          </p>
+          <p className="text-[13px] font-medium text-ink">{t("dropHint")}</p>
           <p className="text-[12px] text-muted-foreground">
             .csv · Tatra, SLSP, VÚB a pod.
           </p>
@@ -145,7 +145,7 @@ export function CsvUploader({
               size="icon-sm"
               variant="ghost"
               disabled={disabled}
-              aria-label="Odstrániť súbor"
+              aria-label={t("removeFile")}
               onClick={(e) => {
                 e.stopPropagation();
                 setMeta(null);

@@ -1,8 +1,21 @@
 import type { ReportOverview } from "@/shared/api/types";
 import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
-export function LedgerLead({ overview }: { overview: ReportOverview }) {
+type Props = {
+  overview: ReportOverview;
+  locale: AppLocale;
+  labels: {
+    unpaidTotal: string;
+    cashflowCollected: string;
+    issued: string;
+    paid: string;
+    unpaid: string;
+  };
+};
+
+export function LedgerLead({ overview, locale, labels }: Props) {
   const unpaidOpen = Math.max(
     0,
     overview.outstandingAmount - overview.overdueAmount,
@@ -19,26 +32,28 @@ export function LedgerLead({ overview }: { overview: ReportOverview }) {
     <div className="mb-8">
       <div className="grid gap-6 sm:grid-cols-[1.4fr_auto_auto] sm:items-end">
         <div>
-          <p className="text-[13px] text-muted-foreground">Neuhradené celkom</p>
+          <p className="text-[13px] text-muted-foreground">{labels.unpaidTotal}</p>
           <p
             className={cn(
               "money mt-1 text-[32px] leading-none tracking-tight",
               overview.outstandingAmount > 0 ? "text-ink" : "text-faint",
             )}
           >
-            {formatMoney(overview.outstandingAmount, overview.currency)}
+            {formatMoney(overview.outstandingAmount, overview.currency, locale)}
           </p>
         </div>
         <div>
-          <p className="text-[13px] text-muted-foreground">Inkaso</p>
+          <p className="text-[13px] text-muted-foreground">
+            {labels.cashflowCollected}
+          </p>
           <p className="money mt-1 text-[24px] leading-none text-chart">
             {overview.collectionRatePercent.toFixed(0)}%
           </p>
         </div>
         <div>
-          <p className="text-[13px] text-muted-foreground">Vystavené</p>
+          <p className="text-[13px] text-muted-foreground">{labels.issued}</p>
           <p className="money mt-1 text-[24px] leading-none text-ink">
-            {formatMoney(overview.issuedAmount, overview.currency)}
+            {formatMoney(overview.issuedAmount, overview.currency, locale)}
           </p>
         </div>
       </div>
@@ -68,16 +83,16 @@ export function LedgerLead({ overview }: { overview: ReportOverview }) {
           <div className="ledger-strip mt-2 mb-0 border-0 pb-0 text-[12px]">
             <span>
               <span className="mr-1.5 inline-block size-1.5 bg-positive/70" />
-              Zaplatené{" "}
+              {labels.paid}{" "}
               <span className="money text-ink">
-                {formatMoney(overview.paidAmount, overview.currency)}
+                {formatMoney(overview.paidAmount, overview.currency, locale)}
               </span>
             </span>
             <span>
               <span className="mr-1.5 inline-block size-1.5 bg-chart" />
-              Otvorené{" "}
+              {labels.unpaid}{" "}
               <span className="money text-ink">
-                {formatMoney(unpaidOpen, overview.currency)}
+                {formatMoney(unpaidOpen, overview.currency, locale)}
               </span>
             </span>
             {overview.overdueAmount > 0 ? (
@@ -85,7 +100,7 @@ export function LedgerLead({ overview }: { overview: ReportOverview }) {
                 <span className="mr-1.5 inline-block size-1.5 bg-negative" />
                 Po splatnosti{" "}
                 <span className="money text-negative">
-                  {formatMoney(overview.overdueAmount, overview.currency)}
+                  {formatMoney(overview.overdueAmount, overview.currency, locale)}
                 </span>
               </span>
             ) : null}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getInvoice } from "@/features/invoices/api/invoices";
 import { InvoiceActions } from "@/features/invoices/ui/invoice-actions";
 import { XmlPreview } from "@/widgets/preview/xml-preview";
@@ -21,6 +22,7 @@ import {
   formatMoney,
 } from "@/shared/lib/format";
 import { buildInvoiceXml } from "@/shared/lib/preview/invoice-xml";
+import type { AppLocale } from "@/i18n/routing";
 
 export async function generateMetadata({
   params,
@@ -28,11 +30,12 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("Search");
   try {
     const inv = await getInvoice(id);
     return { title: inv.number };
   } catch {
-    return { title: "Faktúra" };
+    return { title: t("invoice") };
   }
 }
 
@@ -42,6 +45,9 @@ export default async function InvoiceDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("InvoiceDetail");
+  const te = await getTranslations("CustomerDetail");
+  const locale = (await getLocale()) as AppLocale;
   let invoice;
   try {
     invoice = await getInvoice(id);
@@ -58,12 +64,12 @@ export default async function InvoiceDetailPage({
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">
-              {documentTypeLabel(invoice.documentType)}
+              {documentTypeLabel(invoice.documentType, locale)}
             </span>
             <StatusBadge status={invoice.status} />
             {invoice.isOverdue ? (
               <span className="text-[12px] font-medium text-negative">
-                Po splatnosti
+                {t("overdue")}
               </span>
             ) : null}
           </div>
@@ -71,9 +77,9 @@ export default async function InvoiceDetailPage({
             {invoice.number}
           </h1>
           <p className="mt-1 text-[14px] text-muted-foreground">
-            {invoice.customer.name} · splatnosť{" "}
+            {invoice.customer.name} ·{" "}
             <span className={invoice.isOverdue ? "text-negative" : undefined}>
-              {formatDate(invoice.dueDate)}
+              {formatDate(invoice.dueDate, locale)}
             </span>
           </p>
           {invoice.relatedInvoiceId && invoice.relatedInvoiceNumber ? (
@@ -92,14 +98,14 @@ export default async function InvoiceDetailPage({
             <span>VS {emptyDash(invoice.variableSymbol)}</span>
             <span>IBAN {emptyDash(invoice.bankIban)}</span>
             <span className="money text-ink">
-              {formatMoney(invoice.total, invoice.currency)}
+              {formatMoney(invoice.total, invoice.currency, locale)}
             </span>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {invoice.status === "Draft" ? (
             <Button asChild variant="outline">
-              <Link href={`/invoices/${id}/edit`}>Upraviť</Link>
+              <Link href={`/invoices/${id}/edit`}>{te("edit")}</Link>
             </Button>
           ) : null}
           <InvoiceActions invoice={invoice} />
@@ -108,7 +114,7 @@ export default async function InvoiceDetailPage({
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
         <div className="panel space-y-1 px-5 py-4 text-[14px]">
-          <h2 className="mb-2 text-[14px] font-medium text-ink">Odberateľ</h2>
+          <h2 className="mb-2 text-[14px] font-medium text-ink">{t("buyer")}</h2>
           <p className="font-medium">{invoice.customer.name}</p>
           <p className="data-num text-[12px] text-muted-foreground">
             IČO {emptyDash(invoice.customer.ico)}
@@ -122,7 +128,7 @@ export default async function InvoiceDetailPage({
           </p>
         </div>
         <div className="panel space-y-1 px-5 py-4 text-[14px]">
-          <h2 className="mb-2 text-[14px] font-medium text-ink">Platba</h2>
+          <h2 className="mb-2 text-[14px] font-medium text-ink">{t("payment")}</h2>
           <p>Metóda: {emptyDash(invoice.paymentMethod)}</p>
           <p className="data-num text-[12px]">
             IBAN {emptyDash(invoice.bankIban)}
@@ -131,10 +137,12 @@ export default async function InvoiceDetailPage({
             BIC {emptyDash(invoice.bankBic)}
           </p>
           <p className="text-muted-foreground">
-            Vystavené {formatDate(invoice.issueDate)}
+            Vystavené {formatDate(invoice.issueDate, locale)}
           </p>
           {invoice.paidAt ? (
-            <p className="text-positive">Zaplatené {formatDate(invoice.paidAt)}</p>
+            <p className="text-positive">
+              Zaplatené {formatDate(invoice.paidAt, locale)}
+            </p>
           ) : null}
           {invoice.cancelReason ? (
             <p className="text-negative">Zrušené: {invoice.cancelReason}</p>
@@ -177,7 +185,7 @@ export default async function InvoiceDetailPage({
                 </TableCell>
                 <TableCell>{item.unit}</TableCell>
                 <TableCell className="money text-right">
-                  {formatMoney(item.unitPrice, invoice.currency)}
+                  {formatMoney(item.unitPrice, invoice.currency, locale)}
                 </TableCell>
                 {showVat ? (
                   <TableCell className="data-num text-right">
@@ -185,7 +193,7 @@ export default async function InvoiceDetailPage({
                   </TableCell>
                 ) : null}
                 <TableCell className="money text-right">
-                  {formatMoney(item.total, invoice.currency)}
+                  {formatMoney(item.total, invoice.currency, locale)}
                 </TableCell>
               </TableRow>
             ))}
@@ -199,25 +207,25 @@ export default async function InvoiceDetailPage({
             <div className="flex justify-between">
               <span className="text-muted-foreground">Základ</span>
               <span className="money">
-                {formatMoney(invoice.subtotal, invoice.currency)}
+                {formatMoney(invoice.subtotal, invoice.currency, locale)}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">DPH</span>
               <span className="money">
-                {formatMoney(invoice.vatTotal, invoice.currency)}
+                {formatMoney(invoice.vatTotal, invoice.currency, locale)}
               </span>
             </div>
           </>
         ) : (
           <p className="mb-2 text-[12px] text-muted-foreground">
-            Nie som platca DPH
+            {t("notVatPayer")}
           </p>
         )}
         <div className="flex justify-between border-t border-border pt-2 text-[16px]">
           <span className="font-medium">Celkom</span>
           <span className="money font-bold">
-            {formatMoney(invoice.total, invoice.currency)}
+            {formatMoney(invoice.total, invoice.currency, locale)}
           </span>
         </div>
       </div>
@@ -231,7 +239,7 @@ export default async function InvoiceDetailPage({
       {invoice.status !== "Draft" ? (
         <div className="mt-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[16px] font-medium text-ink">Dokumenty</h2>
+            <h2 className="text-[16px] font-medium text-ink">{t("documents")}</h2>
             <XmlPreview
               title={`XML · ${invoice.number}`}
               description="Štruktúrovaný náhľad faktúry pred stiahnutím."

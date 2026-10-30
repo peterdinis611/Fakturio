@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
   createResumeEntryAction,
@@ -12,7 +13,6 @@ import type { ResumeEntry } from "@/shared/api/types";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
 import {
   resumeEntrySchema,
-  resumeEntryTypeLabels,
   resumeEntryTypes,
   type ResumeEntryFormInput,
   type ResumeEntryFormValues,
@@ -36,7 +36,25 @@ type Props = {
   onDone?: () => void;
 };
 
+function entryTypeLabel(
+  type: (typeof resumeEntryTypes)[number],
+  t: ReturnType<typeof useTranslations<"Resume">>,
+) {
+  switch (type) {
+    case "experience":
+      return t("experience");
+    case "education":
+      return t("education");
+    case "certification":
+      return t("certificate");
+    default:
+      return type;
+  }
+}
+
 export function ResumeEntryForm({ initial, onDone }: Props) {
+  const t = useTranslations("Resume");
+  const tc = useTranslations("Common");
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(initial?.id);
 
@@ -82,7 +100,7 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
         return;
       }
 
-      toast.success(isEdit ? "Položka upravená" : "Položka pridaná");
+      toast.success(isEdit ? t("entryUpdated") : t("entryAdded"));
       onDone?.();
     });
   }
@@ -110,7 +128,7 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
               <SelectContent>
                 {resumeEntryTypes.map((type) => (
                   <SelectItem key={type} value={type}>
-                    {resumeEntryTypeLabels[type]}
+                    {entryTypeLabel(type, t)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -120,7 +138,7 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="title">Názov / pozícia</Label>
+        <Label htmlFor="title">{t("position")}</Label>
         <Input id="title" disabled={pending} {...register("title")} />
         {errors.title ? (
           <p className="text-xs text-destructive">{errors.title.message}</p>
@@ -192,7 +210,7 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
           }}
         />
         <Label htmlFor="isCurrent" className="font-normal">
-          Prebieha / aktuálne
+          {t("current")}
         </Label>
       </div>
 
@@ -208,7 +226,7 @@ export function ResumeEntryForm({ initial, onDone }: Props) {
 
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={pending}>
-          {isEdit ? "Uložiť" : "Pridať"}
+          {isEdit ? tc("save") : "Pridať"}
         </Button>
       </div>
     </form>

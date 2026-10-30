@@ -2,6 +2,7 @@
 
 import { useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/shared/toast";
@@ -63,6 +64,7 @@ export function CustomerForm({
   embedded = false,
   onSuccess,
 }: CustomerFormProps) {
+  const t = useTranslations("CustomerDetail");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(customerId);
@@ -104,6 +106,11 @@ export function CustomerForm({
     ico,
     country,
     onFound: applyRegistry,
+    messages: {
+      needIco: t("lookupNeedIco"),
+      filledRpo: t("lookupFilledRpo"),
+      filledAres: t("lookupFilledAres"),
+    },
   });
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
@@ -125,9 +132,7 @@ export function CustomerForm({
         return;
       }
 
-      toast.success(
-        isEdit ? "Zákazník bol aktualizovaný" : "Zákazník bol vytvorený",
-      );
+      toast.success(isEdit ? t("updated") : t("created"));
 
       if (onSuccess) {
         onSuccess(result.data);
@@ -152,7 +157,7 @@ export function CustomerForm({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={cn(fieldClass, "sm:col-span-2")}>
-          <Label htmlFor="customer-name">Názov / meno</Label>
+          <Label htmlFor="customer-name">{t("name")}</Label>
           <Input
             id="customer-name"
             {...register("name")}
@@ -173,10 +178,7 @@ export function CustomerForm({
           />
           <FieldError message={errors.ico?.message} />
           {registrySupported ? (
-            <p className="text-[11px] text-muted-foreground">
-              Po zadaní IČO doplníme firmu z{" "}
-              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO"}.
-            </p>
+            <p className="text-[11px] text-muted-foreground">{t("icoHint")}</p>
           ) : null}
         </div>
         <div className={fieldClass}>
@@ -253,7 +255,7 @@ export function CustomerForm({
         )}
       >
         <Button type="submit" disabled={pending}>
-          {isEdit ? "Uložiť zákazníka" : "Vytvoriť zákazníka"}
+          {t("save")}
         </Button>
       </div>
     </form>

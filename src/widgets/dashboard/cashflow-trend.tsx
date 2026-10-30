@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
@@ -8,32 +9,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
-
-const config = {
-  paid: {
-    label: "Inkaso",
-    color: "var(--chart-3)",
-  },
-  issued: {
-    label: "Vystavené",
-    color: "var(--text)",
-  },
-} satisfies ChartConfig;
-
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Máj",
-  "Jún",
-  "Júl",
-  "Aug",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Dec",
-];
+import type { AppLocale } from "@/i18n/routing";
 
 export function CashflowTrend({
   currency,
@@ -50,8 +26,25 @@ export function CashflowTrend({
     issuedAmount: number;
   }[];
 }) {
+  const t = useTranslations("Dashboard");
+  const locale = useLocale() as AppLocale;
+  const intlLocale = locale === "en" ? "en-US" : "sk-SK";
+
+  const config = {
+    paid: {
+      label: t("cashflowCollected"),
+      color: "var(--chart-3)",
+    },
+    issued: {
+      label: t("cashflowIssued"),
+      color: "var(--text)",
+    },
+  } satisfies ChartConfig;
+
   const data = months.map((m) => ({
-    month: monthNames[m.month - 1] ?? String(m.month),
+    month: new Intl.DateTimeFormat(intlLocale, { month: "short" }).format(
+      new Date(2020, m.month - 1, 1),
+    ),
     paid: m.paidAmount,
     issued: m.issuedAmount,
   }));
@@ -59,18 +52,18 @@ export function CashflowTrend({
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-[15px] font-medium text-ink">Cashflow trend</h2>
+        <h2 className="text-[15px] font-medium text-ink">Cashflow</h2>
         <div className="flex flex-wrap gap-4 text-[12px] text-muted-foreground">
           <span>
-            Inkaso{" "}
+            {t("cashflowCollected")}{" "}
             <span className="money text-chart">
-              {formatMoney(yearPaidTotal, currency)}
+              {formatMoney(yearPaidTotal, currency, locale)}
             </span>
           </span>
           <span>
-            Vystavené{" "}
+            {t("cashflowIssued")}{" "}
             <span className="money text-ink">
-              {formatMoney(yearIssuedTotal, currency)}
+              {formatMoney(yearIssuedTotal, currency, locale)}
             </span>
           </span>
         </div>
@@ -92,7 +85,7 @@ export function CashflowTrend({
               width={48}
               tick={{ fill: "var(--muted)", fontSize: 10 }}
               tickFormatter={(v) =>
-                new Intl.NumberFormat("sk-SK", {
+                new Intl.NumberFormat(intlLocale, {
                   notation: "compact",
                   maximumFractionDigits: 1,
                 }).format(Number(v))
@@ -103,9 +96,11 @@ export function CashflowTrend({
                 <ChartTooltipContent
                   formatter={(value, name) => (
                     <span className="money">
-                      {formatMoney(Number(value), currency)}
+                      {formatMoney(Number(value), currency, locale)}
                       <span className="ml-1 text-muted-foreground">
-                        {name === "paid" ? "inkaso" : "vystavené"}
+                        {name === "paid"
+                          ? t("cashflowCollected")
+                          : t("cashflowIssued")}
                       </span>
                     </span>
                   )}

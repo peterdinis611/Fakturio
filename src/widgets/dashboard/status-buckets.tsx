@@ -2,8 +2,20 @@ import Link from "next/link";
 import type { ReportOverview } from "@/shared/api/types";
 import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
-export function StatusBuckets({ overview }: { overview: ReportOverview }) {
+type Props = {
+  overview: ReportOverview;
+  locale: AppLocale;
+  labels: {
+    paid: string;
+    unpaid: string;
+    drafts: string;
+    all: string;
+  };
+};
+
+export function StatusBuckets({ overview, locale, labels }: Props) {
   const unpaidOpen = Math.max(
     0,
     overview.outstandingAmount - overview.overdueAmount,
@@ -12,7 +24,7 @@ export function StatusBuckets({ overview }: { overview: ReportOverview }) {
   const buckets = [
     {
       key: "paid",
-      label: "Zaplatené",
+      label: labels.paid,
       count: overview.paidCount,
       amount: overview.paidAmount,
       href: "/invoices?status=Paid",
@@ -20,7 +32,7 @@ export function StatusBuckets({ overview }: { overview: ReportOverview }) {
     },
     {
       key: "outstanding",
-      label: "Neuhradené",
+      label: labels.unpaid,
       count: overview.issuedCount,
       amount: unpaidOpen,
       href: "/invoices?status=Issued",
@@ -36,7 +48,7 @@ export function StatusBuckets({ overview }: { overview: ReportOverview }) {
     },
     {
       key: "draft",
-      label: "Koncepty",
+      label: labels.drafts,
       count: overview.draftCount,
       amount: null as number | null,
       href: "/invoices?status=Draft",
@@ -52,7 +64,7 @@ export function StatusBuckets({ overview }: { overview: ReportOverview }) {
           href="/invoices"
           className="text-[13px] font-medium text-ink underline-offset-2 hover:underline"
         >
-          Všetky
+          {labels.all}
         </Link>
       </div>
       <ul className="divide-y divide-rule border-t border-rule">
@@ -82,7 +94,7 @@ export function StatusBuckets({ overview }: { overview: ReportOverview }) {
               >
                 {b.amount === null
                   ? "—"
-                  : formatMoney(b.amount, overview.currency)}
+                  : formatMoney(b.amount, overview.currency, locale)}
               </span>
             </Link>
           </li>

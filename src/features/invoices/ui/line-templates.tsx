@@ -2,6 +2,7 @@
 
 import { BookmarkPlus, LayoutTemplate } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import {
 } from "@/shared/lib/line-templates";
 import { formatMoney } from "@/shared/lib/format";
 import { toast } from "@/shared/toast";
+import type { AppLocale } from "@/i18n/routing";
 
 export function LineTemplatesMenu({
   disabled,
@@ -33,6 +35,8 @@ export function LineTemplatesMenu({
     | { description: string; unit: string; unitPrice: number; vatRate: number }
     | null;
 }) {
+  const t = useTranslations("InvoiceDetail");
+  const locale = useLocale() as AppLocale;
   const [templates, setTemplates] = useState<LineTemplate[]>([]);
 
   useEffect(() => {
@@ -52,7 +56,7 @@ export function LineTemplatesMenu({
     }
     const next = upsertLineTemplate(templates, line);
     persist(next);
-    toast.success("Šablóna riadku uložená");
+    toast.success(t("templateSaved"));
   }
 
   return (
@@ -66,24 +70,25 @@ export function LineTemplatesMenu({
             disabled={disabled}
           >
             <LayoutTemplate className="size-3.5" aria-hidden />
-            Šablóny
+            {t("templates")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-56">
-          <DropdownMenuLabel>Rýchle položky</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("templates")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {templates.length === 0 ? (
-            <DropdownMenuItem disabled>Žiadne šablóny</DropdownMenuItem>
+            <DropdownMenuItem disabled>{t("noTemplates")}</DropdownMenuItem>
           ) : (
-            templates.map((t) => (
+            templates.map((tmpl) => (
               <DropdownMenuItem
-                key={t.id}
-                onSelect={() => onApply(t)}
+                key={tmpl.id}
+                onSelect={() => onApply(tmpl)}
                 className="flex flex-col items-start gap-0.5"
               >
-                <span className="text-[13px] font-medium">{t.description}</span>
+                <span className="text-[13px] font-medium">{tmpl.description}</span>
                 <span className="font-mono text-[11px] text-muted-foreground">
-                  {t.unit} · {formatMoney(t.unitPrice, currency)} · {t.vatRate}%
+                  {tmpl.unit} · {formatMoney(tmpl.unitPrice, currency, locale)} ·{" "}
+                  {tmpl.vatRate}%
                 </span>
               </DropdownMenuItem>
             ))

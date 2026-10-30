@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Cell, Pie, PieChart } from "recharts";
 import {
   ChartContainer,
@@ -29,6 +29,7 @@ export function StatusChart({
   currency: string;
   rows: { status: InvoiceStatus; count: number; amount: number }[];
 }) {
+  const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
   const config = Object.fromEntries(
     rows.map((r) => [
@@ -52,7 +53,7 @@ export function StatusChart({
   if (data.length === 0) {
     return (
       <div className="flex h-[220px] items-center justify-center text-[14px] text-muted-foreground">
-        Žiadne faktúry v období
+        {t("noInvoicesPeriod")}
       </div>
     );
   }

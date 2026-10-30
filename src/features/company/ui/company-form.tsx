@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { updateCompanyAction } from "@/features/company/api/company";
+import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -162,6 +163,8 @@ function Section({
 }
 
 export function CompanyForm({ initial, mode }: CompanyFormProps) {
+  const t = useTranslations("Company");
+  const tOnboarding = useTranslations("Onboarding");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -220,15 +223,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     startTransition(async () => {
       const result = await updateCompanyAction(values);
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
         applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
-      toast.success(
-        mode === "onboarding"
-          ? "Firma bola uložená"
-          : "Nastavenia firmy boli aktualizované",
-      );
+      toast.success(t("saved"));
       if (mode === "onboarding") {
         router.push("/");
       } else {
@@ -249,12 +248,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     >
       <Section
         index="01"
-        title="Identita"
+        title={t("identity")}
         hint="Čo ide do hlavičky faktúry."
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
-          <Label htmlFor="name">Názov firmy</Label>
+          <Label htmlFor="name">{t("name")}</Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
           <FieldError message={errors.name?.message} />
         </Field>
@@ -320,7 +319,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
               </Label>
               {!isVatPayer ? (
                 <p className="mt-0.5 text-[12px] text-muted-foreground">
-                  Na faktúrach bude DPH 0 % a text „Nie som platca DPH“.
+                  {t("notVatPayer")}
                 </p>
               ) : (
                 <p className="mt-0.5 text-[12px] text-muted-foreground">
@@ -374,7 +373,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
       </Section>
 
-      <Section index="02" title="Adresa" quiet={mode === "settings"}>
+      <Section index="02" title={t("address")} quiet={mode === "settings"}>
         <Field className="sm:col-span-2">
           <Label htmlFor="street">Ulica</Label>
           <Input id="street" {...register("street")} />
@@ -405,12 +404,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
 
       <Section
         index="03"
-        title="Banka"
+        title={t("bank")}
         hint="Predvolený účet na faktúrach."
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
-          <Label htmlFor="bankIban">IBAN</Label>
+          <Label htmlFor="bankIban">{t("iban")}</Label>
           <Input id="bankIban" className="data-num" {...register("bankIban")} />
         </Field>
         <Field>
@@ -531,10 +530,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </div>
         <Button type="submit" disabled={pending}>
           {pending
-            ? "Ukladám…"
+            ? `${t("save")}…`
             : mode === "onboarding"
-              ? "Dokončiť"
-              : "Uložiť firmu"}
+              ? tOnboarding("done")
+              : t("save")}
         </Button>
       </div>
     </form>

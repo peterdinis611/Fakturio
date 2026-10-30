@@ -514,7 +514,12 @@
     "errorTitle": "Failed to load",
     "errorBody": "This part of the app couldn't be shown. Try again or go to the overview.",
     "tryAgain": "Try again",
-    "search": "Search"
+    "search": "Search",
+    "pageMissingTitle": "Page not found",
+    "pageMissingBody": "This address isn't in Fakturio. Check the URL or go back to the overview.",
+    "crashTitle": "Something went wrong",
+    "crashBody": "This page couldn't be loaded. Try again — if it keeps happening, restart the app.",
+    "invoices": "Invoices"
   },
   "Loading": {
     "default": "Loading…",
@@ -557,7 +562,8 @@
     "noTemplates": "No templates",
     "templateSaved": "Line template saved",
     "catalog": "Service catalog",
-    "catalogEmpty": "Catalog is empty"
+    "catalogEmpty": "Catalog is empty",
+    "xmlPreview": "Structured invoice preview before download."
   },
   "CustomerDetail": {
     "edit": "Edit",

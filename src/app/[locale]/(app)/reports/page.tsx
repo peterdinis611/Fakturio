@@ -1,11 +1,15 @@
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ReportExportLinks } from "@/features/reports/ui/export-links";
 import { ReportsDashboard } from "@/widgets/reports/reports-dashboard";
 import { ReportsFilters } from "@/features/reports/ui/reports-filters";
 import { SectionLoader } from "@/shared/ui/spinner";
 
-export const metadata = { title: "Reporty" };
+export async function generateMetadata() {
+  const t = await getTranslations("Reports");
+  return { title: t("title") };
+}
 
 function parseYear(raw: string | undefined, fallback: number) {
   const n = Number(raw);
@@ -32,6 +36,8 @@ export default async function ReportsPage({
     top?: string;
   }>;
 }) {
+  const t = await getTranslations("Reports");
+  const tc = await getTranslations("Common");
   const sp = await searchParams;
   const currentYear = new Date().getFullYear();
   const year = parseYear(sp.year, currentYear);
@@ -42,8 +48,8 @@ export default async function ReportsPage({
   return (
     <div>
       <PageHeader
-        title="Reporty"
-        description="Obrat, aging, DPH a top zákazníci."
+        title={t("title")}
+        description={t("description")}
         actions={<ReportExportLinks from={from} to={to} />}
       />
 
@@ -51,7 +57,7 @@ export default async function ReportsPage({
 
       <Suspense
         fallback={
-          <SectionLoader label="Načítavam reporty…" rows={8} className="mt-2" />
+          <SectionLoader label={tc("loading")} rows={8} className="mt-2" />
         }
       >
         <ReportsDashboard year={year} from={from} to={to} top={top} />

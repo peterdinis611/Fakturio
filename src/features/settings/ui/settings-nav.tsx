@@ -1,22 +1,23 @@
 "use client";
 
 import { Building2, CalendarClock, Palette } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/utils";
 
 const tabs = [
-  { href: "/settings/company", label: "Firma", icon: Building2 },
-  { href: "/settings/appearance", label: "Vzhľad", icon: Palette },
-  { href: "/settings/jobs", label: "Automatizácia", icon: CalendarClock },
+  { href: "/settings/company", labelKey: "navCompany", icon: Building2 },
+  { href: "/settings/appearance", labelKey: "navAppearance", icon: Palette },
+  { href: "/settings/jobs", labelKey: "navAutomation", icon: CalendarClock },
 ] as const;
 
 export function SettingsNav() {
   const pathname = usePathname();
+  const t = useTranslations("Settings");
 
   return (
     <nav
-      aria-label="Sekcie nastavení"
+      aria-label={t("navAria")}
       className="mb-6 grid grid-cols-3 gap-1 rounded-[6px] border border-border bg-raised/35 p-1"
     >
       {tabs.map((tab) => {
@@ -36,7 +37,7 @@ export function SettingsNav() {
             )}
           >
             <Icon className="size-3.5 opacity-70" aria-hidden />
-            {tab.label}
+            {t(tab.labelKey)}
           </Link>
         );
       })}

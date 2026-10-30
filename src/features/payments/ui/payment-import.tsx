@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
   confirmPaymentImportAction,
@@ -29,16 +30,12 @@ import type {
 } from "@/shared/api/types";
 import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
-
-const statusLabel: Record<PaymentImportRowResult["matchStatus"], string> = {
-  matched: "Zhoda",
-  ambiguous: "Nejednoznačné",
-  unmatched: "Bez faktúry",
-  already_paid: "Už zaplatené",
-  skipped: "Preskočené",
-};
+import type { AppLocale } from "@/i18n/routing";
 
 export function PaymentImportPanel() {
+  const t = useTranslations("Payments");
+  const tc = useTranslations("Common");
+  const locale = useLocale() as AppLocale;
   const [pending, startTransition] = useTransition();
   const [csvText, setCsvText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -46,6 +43,14 @@ export function PaymentImportPanel() {
     null,
   );
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const statusLabel: Record<PaymentImportRowResult["matchStatus"], string> = {
+    matched: t("matched"),
+    ambiguous: t("ambiguous"),
+    unmatched: t("noInvoice"),
+    already_paid: "Už zaplatené",
+    skipped: "Preskočené",
+  };
 
   const matchedRows = useMemo(
     () =>
@@ -69,9 +74,7 @@ export function PaymentImportPanel() {
           .map((r) => r.invoiceId!),
       );
       setSelected(ids);
-      toast.success(
-        `Nájdených ${result.data.matched} zhôd z ${result.data.totalRows} riadkov`,
-      );
+      toast.success(t("preview"));
     });
   }
 
@@ -93,7 +96,7 @@ export function PaymentImportPanel() {
       }));
 
     if (rows.length === 0) {
-      toast.error("Vyber aspoň jednu zhodu");
+      toast.error(t("selectMatch"));
       return;
     }
 
@@ -103,10 +106,7 @@ export function PaymentImportPanel() {
         toast.error(actionErrorMessage(result ?? {}) ?? "Import zlyhal");
         return;
       }
-      toast.success(
-        `Označených ako zaplatené: ${result.data.markedPaid}` +
-          (result.data.failed ? ` · zlyhalo ${result.data.failed}` : ""),
-      );
+      toast.success(t("importDone"));
       setPreview(null);
       setSelected(new Set());
       setCsvText("");
@@ -130,10 +130,9 @@ export function PaymentImportPanel() {
         <CardHeader className="border-b border-rule pb-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <CardTitle className="text-[15px]">Bankový CSV</CardTitle>
+              <CardTitle className="text-[15px]">{t("bankCsv")}</CardTitle>
               <CardDescription className="mt-1 max-w-xl">
-                Export z banky (Tatra, SLSP, VÚB…). Hľadáme stĺpec VS /
-                variabilný symbol a párme ho na vystavené faktúry.
+                {t("description")}
               </CardDescription>
             </div>
             <Badge variant="outline" className="rounded-[4px] text-[10px]">
@@ -191,7 +190,7 @@ export function PaymentImportPanel() {
             disabled={pending || !csvText.trim()}
             onClick={runPreview}
           >
-            Párovanie VS
+            {t("preview")}
           </Button>
         </CardFooter>
       </Card>
@@ -203,13 +202,13 @@ export function PaymentImportPanel() {
               Riadky {preview.totalRows}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
-              Zhody {preview.matched}
+              {t("matched")} {preview.matched}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
-              Nejednoznačné {preview.ambiguous}
+              {t("ambiguous")} {preview.ambiguous}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
-              Bez faktúry {preview.unmatched}
+              {t("noInvoice")} {preview.unmatched}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
               Už zaplatené {preview.alreadyPaid}
@@ -261,6 +260,7 @@ export function PaymentImportPanel() {
                         ? formatMoney(
                             row.amount,
                             row.invoiceCurrency ?? "EUR",
+                            locale,
                           )
                         : "—"}
                     </span>
@@ -299,14 +299,14 @@ export function PaymentImportPanel() {
                 setSelected(new Set());
               }}
             >
-              Zrušiť
+              {tc("cancel")}
             </Button>
             <Button
               type="button"
               disabled={pending || selected.size === 0}
               onClick={confirm}
             >
-              Označiť {selected.size} ako zaplatené
+              {t("markPaid", { count: selected.size })}
             </Button>
           </div>
         </section>

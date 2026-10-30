@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { CustomerForm } from "@/features/customers/ui/customer-form";
 import { Button } from "@/shared/ui/button";
 import {
@@ -24,21 +25,19 @@ export function CreateCustomerDialog({
   trigger,
   onCreated,
 }: CreateCustomerDialogProps) {
+  const t = useTranslations("CustomerDetail");
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger ?? <Button type="button">Pridať zákazníka</Button>}
+        {trigger ?? <Button type="button">{t("add")}</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Nový zákazník</DialogTitle>
-          <DialogDescription>
-            Údaje odberateľa pre faktúry a PDF. IČO a adresa sa skopírujú pri
-            vystavení.
-          </DialogDescription>
+          <DialogTitle>{t("dialogTitle")}</DialogTitle>
+          <DialogDescription>{t("dialogDescription")}</DialogDescription>
         </DialogHeader>
         <CustomerForm
           embedded

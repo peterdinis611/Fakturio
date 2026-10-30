@@ -1,21 +1,23 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { skipOnboardingAction } from "@/features/company/api/company";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 
 export function SkipOnboardingButton() {
+  const t = useTranslations("Onboarding");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   function onSkip() {
     startTransition(async () => {
       await skipOnboardingAction();
-      toast.message("Onboarding preskočený", {
-        description: "Firmu doplníš neskôr v Nastaveniach → Firma.",
+      toast.message(t("skipped"), {
+        description: t("skipToast"),
       });
       router.replace("/dashboard");
       router.refresh();
@@ -33,11 +35,11 @@ export function SkipOnboardingButton() {
     >
       {pending ? (
         <span className="inline-flex items-center gap-2">
-          <Spinner size="sm" label="Preskakujem" />
-          Preskakujem…
+          <Spinner size="sm" label={t("skip")} />
+          {t("skip")}…
         </span>
       ) : (
-        "Preskočiť a nastaviť neskôr"
+        t("skip")
       )}
     </Button>
   );

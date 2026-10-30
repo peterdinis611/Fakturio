@@ -2,8 +2,16 @@ import Link from "next/link";
 import type { ReportOverview } from "@/shared/api/types";
 import { Button } from "@/shared/ui/button";
 import { formatMoney } from "@/shared/lib/format";
+import type { AppLocale } from "@/i18n/routing";
 
-export function OverdueAlert({ overview }: { overview: ReportOverview }) {
+type Props = {
+  overview: ReportOverview;
+  locale: AppLocale;
+  message: string;
+  cta: string;
+};
+
+export function OverdueAlert({ overview, locale, message, cta }: Props) {
   if (overview.overdueCount <= 0) return null;
 
   return (
@@ -12,15 +20,14 @@ export function OverdueAlert({ overview }: { overview: ReportOverview }) {
         <span className="stamp mr-2 inline-flex border-negative text-negative">
           !
         </span>
-        {overview.overdueCount}{" "}
-        {overview.overdueCount === 1 ? "faktúra je" : "faktúr je"} po splatnosti
-        —{" "}
+        {message}
+        {" — "}
         <span className="money text-negative">
-          {formatMoney(overview.overdueAmount, overview.currency)}
+          {formatMoney(overview.overdueAmount, overview.currency, locale)}
         </span>
       </p>
       <Button asChild variant="outline" size="sm">
-        <Link href="/reminders?overdue=1">Riešiť upomienky</Link>
+        <Link href="/reminders?overdue=1">{cta}</Link>
       </Button>
     </div>
   );

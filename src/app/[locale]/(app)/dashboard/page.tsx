@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getReminders, listInvoices } from "@/features/invoices/api/invoices";
 import { getMonthlyRevenue, getReportOverview } from "@/features/reports/api/reports";
 import { DashboardEmpty } from "@/widgets/dashboard/dashboard-empty";
@@ -7,10 +7,17 @@ import { PageHeader } from "@/widgets/app-shell/page-header";
 import { MotionItem } from "@/shared/ui/motion/page-motion";
 import { Button } from "@/shared/ui/button";
 import { formatDate, formatMoney } from "@/shared/lib/format";
+import type { AppLocale } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 
-export const metadata = { title: "Prehľad" };
+export async function generateMetadata() {
+  const t = await getTranslations("Dashboard");
+  return { title: t("title") };
+}
 
 export default async function DashboardPage() {
+  const t = await getTranslations("Dashboard");
+  const locale = (await getLocale()) as AppLocale;
   const year = new Date().getFullYear();
   const [overview, recent, reminders, monthly, draftsPage] = await Promise.all([
     getReportOverview(),
@@ -23,22 +30,32 @@ export default async function DashboardPage() {
   const isEmpty = overview.totalInvoices === 0;
 
   const finding = isEmpty
-    ? "Zatiaľ prázdny ledger — vystav prvú faktúru."
+    ? t("emptyFinding")
     : overview.overdueCount > 0
-      ? `${overview.overdueCount} po splatnosti · ${formatMoney(overview.overdueAmount, overview.currency)}`
+      ? t("overdueFinding", {
+          count: overview.overdueCount,
+          amount: formatMoney(
+            overview.overdueAmount,
+            overview.currency,
+            locale,
+          ),
+        })
       : reminders.length > 0
-        ? `${reminders.length} splatností v najbližších 14 dňoch`
-        : `K ${formatDate(overview.asOf)} · ${overview.totalInvoices} faktúr`;
+        ? t("remindersFinding", { count: reminders.length })
+        : t("defaultFinding", {
+            date: formatDate(overview.asOf, locale),
+            count: overview.totalInvoices,
+          });
 
   return (
     <>
       <PageHeader
-        title="Prehľad"
+        title={t("title")}
         description={finding}
         actions={
           isEmpty ? undefined : (
             <Button asChild>
-              <Link href="/invoices/new">Nová faktúra</Link>
+              <Link href="/invoices/new">{t("newInvoice")}</Link>
             </Button>
           )
         }

@@ -1,6 +1,7 @@
 "use client";
 
 import type { UseFormRegisterReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Spinner } from "@/shared/ui/spinner";
@@ -27,6 +28,7 @@ export function IcoLookupField({
   "aria-invalid": ariaInvalid,
   className,
 }: IcoLookupFieldProps) {
+  const t = useTranslations("CustomerDetail");
   const { onBlur, ...rest } = register;
 
   return (
@@ -58,9 +60,13 @@ export function IcoLookupField({
           className="h-9 shrink-0 px-2.5"
           disabled={lookingUp || !canLookup}
           onClick={() => onLookup("manual")}
-          aria-label="Doplniť údaje z registra podľa IČO"
+          aria-label={t("lookupFill")}
         >
-          {lookingUp ? <Spinner size="sm" label="Hľadám" /> : "Doplniť"}
+          {lookingUp ? (
+            <Spinner size="sm" label={t("lookupSearching")} />
+          ) : (
+            t("lookupFill")
+          )}
         </Button>
       ) : null}
     </div>

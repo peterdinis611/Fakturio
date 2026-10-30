@@ -1,11 +1,16 @@
+import { getTranslations } from "next-intl/server";
 import { getCompany } from "@/features/company/api/company";
 import { listServices } from "@/features/services/api/services";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ServiceCatalogTable } from "@/features/services/ui/service-catalog-table";
 
-export const metadata = { title: "Katalóg služieb" };
+export async function generateMetadata() {
+  const t = await getTranslations("Services");
+  return { title: t("title") };
+}
 
 export default async function ServicesPage() {
+  const t = await getTranslations("Services");
   const [data, company] = await Promise.all([
     listServices({ pageSize: 100 }),
     getCompany(),
@@ -14,16 +19,14 @@ export default async function ServicesPage() {
   return (
     <div>
       <PageHeader
-        title="Katalóg služieb"
-        description="Opakované položky na faktúry — popis, cena a DPH na jedno miesto."
+        title={t("title")}
+        description={t("description")}
         ledger={
           <>
-            <span>{data.totalCount} položiek</span>
-            <span>
-              {company.isVatPayer
-                ? `Platca DPH · predvolené ${company.defaultVatRate}%`
-                : "Neplatca DPH"}
-            </span>
+            <span>{data.totalCount}</span>
+            {company.isVatPayer ? (
+              <span>{company.defaultVatRate}%</span>
+            ) : null}
           </>
         }
       />

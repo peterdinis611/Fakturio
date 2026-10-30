@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/shared/toast";
@@ -18,15 +19,15 @@ import type {
   InvoiceDocumentType,
   ServiceCatalogItem,
 } from "@/shared/api/types";
-import { documentTypeLabel } from "@/shared/lib/format";
+import { documentTypeLabel, formatMoney } from "@/shared/lib/format";
 import type { z } from "zod";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
 import {
   invoiceSchema,
   type InvoiceFormValues,
 } from "@/entities/invoice/model/schema";
-import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 import { Button } from "@/shared/ui/button";
 import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
@@ -155,6 +156,9 @@ export function InvoiceForm({
   defaultDocumentType = "Invoice",
   catalogItems = [],
 }: InvoiceFormProps) {
+  const t = useTranslations("InvoiceDetail");
+  const ti = useTranslations("Invoices");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [customerOptions, setCustomerOptions] = useState(customers);
@@ -295,12 +299,12 @@ export function InvoiceForm({
       }
 
       if (isEdit) {
-        toast.success("Doklad bol uložený");
+        toast.success(t("saved"));
         router.refresh();
         return;
       }
 
-      const label = documentTypeLabel(documentType);
+      const label = documentTypeLabel(documentType, locale);
       toast.success(
         status === "Issued"
           ? `${label} bola vystavená`
@@ -322,7 +326,7 @@ export function InvoiceForm({
       ) : null}
 
       <section className="panel flex flex-col gap-4 p-4">
-        <h2 className="font-heading text-sm font-medium">Základné údaje</h2>
+        <h2 className="font-heading text-sm font-medium">{t("basics")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {!isEdit ? (
             <div className={fieldClass}>
@@ -337,8 +341,12 @@ export function InvoiceForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Invoice">Faktúra</SelectItem>
-                  <SelectItem value="Proforma">Zálohová / proforma</SelectItem>
+                  <SelectItem value="Invoice">
+                    {documentTypeLabel("Invoice", locale)}
+                  </SelectItem>
+                  <SelectItem value="Proforma">
+                    {documentTypeLabel("Proforma", locale)}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-[12px] text-muted-foreground">
@@ -349,13 +357,13 @@ export function InvoiceForm({
             <div className={fieldClass}>
               <Label>Typ dokladu</Label>
               <p className="text-[14px] font-medium text-ink">
-                {documentTypeLabel(initial?.documentType)}
+                {documentTypeLabel(initial?.documentType, locale)}
               </p>
             </div>
           )}
           <div className={cn(fieldClass, "sm:col-span-2")}>
             <div className="flex items-center justify-between gap-2">
-              <Label>Zákazník</Label>
+              <Label>{ti("colCustomer")}</Label>
               {!readOnly ? (
                 <CreateCustomerDialog
                   trigger={
@@ -368,7 +376,7 @@ export function InvoiceForm({
                     setCustomerOptions((prev) => {
                       if (prev.some((c) => c.id === customer.id)) return prev;
                       return [...prev, { id: customer.id, name: customer.name }].sort(
-                        (a, b) => a.name.localeCompare(b.name, "sk"),
+                        (a, b) => a.name.localeCompare(b.name, locale),
                       );
                     });
                     setValue("customerId", customer.id, {
@@ -389,7 +397,7 @@ export function InvoiceForm({
                   disabled={readOnly || pending}
                 >
                   <SelectTrigger className="w-full" aria-invalid={!!errors.customerId}>
-                    <SelectValue placeholder="Vyber zákazníka" />
+                    <SelectValue placeholder={t("pickCustomer")} />
                   </SelectTrigger>
                   <SelectContent>
                     {customerOptions.map((c) => (
@@ -421,7 +429,7 @@ export function InvoiceForm({
             <FieldError message={errors.issueDate?.message} />
           </div>
           <div className={fieldClass}>
-            <Label htmlFor="dueDate">Dátum splatnosti</Label>
+            <Label htmlFor="dueDate">{t("dueDate")}</Label>
             <Controller
               control={control}
               name="dueDate"
@@ -430,7 +438,7 @@ export function InvoiceForm({
                   id="dueDate"
                   value={field.value}
                   disabled={readOnly || pending}
-                  placeholder="Splatnosť"
+                  placeholder={t("dueDate")}
                   fromDate={watch("issueDate") || undefined}
                   onChange={field.onChange}
                 />
@@ -475,7 +483,7 @@ export function InvoiceForm({
       </section>
 
       <section className="panel flex flex-col gap-4 p-4">
-        <h2 className="font-heading text-sm font-medium">Platba</h2>
+        <h2 className="font-heading text-sm font-medium">{t("payment")}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className={fieldClass}>
             <Label htmlFor="variableSymbol">Variabilný symbol</Label>
@@ -688,6 +696,7 @@ export function InvoiceForm({
                         : 0,
                     ),
                     currency,
+                    locale,
                   )}
                 </p>
                 {!readOnly && fields.length > 1 ? (
@@ -710,13 +719,11 @@ export function InvoiceForm({
         <div className="ledger-strip justify-end border-b-0 pb-0">
           <span>{isVatPayer ? "Celkom s DPH" : "Celkom"}</span>
           <span className="data-num text-base font-semibold text-signal">
-            {formatMoney(grandTotal, currency)}
+            {formatMoney(grandTotal, currency, locale)}
           </span>
         </div>
         {!isVatPayer ? (
-          <p className="text-[12px] text-muted-foreground">
-            Režim neplatcu DPH — sadzby sú 0 % a na PDF sa DPH nezobrazí.
-          </p>
+          <p className="text-[12px] text-muted-foreground">{t("notVatPayer")}</p>
         ) : null}
       </section>
 
@@ -755,7 +762,7 @@ export function InvoiceForm({
                 disabled={pending}
                 onClick={handleSubmit((values) => submit(values, "Issued"))}
               >
-                Vytvoriť a vystaviť
+                {t("createAndIssue")}
               </Button>
             </>
           )}

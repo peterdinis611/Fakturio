@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
@@ -15,13 +16,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
-
-const config = {
-  amount: {
-    label: "Suma",
-    color: "var(--chart-3)",
-  },
-} satisfies ChartConfig;
+import type { AppLocale } from "@/i18n/routing";
 
 const bucketFill: Record<string, string> = {
   current: "var(--text)",
@@ -38,6 +33,17 @@ export function AgingChart({
   currency: string;
   buckets: { key: string; label: string; amount: number; count: number }[];
 }) {
+  const t = useTranslations("Reports");
+  const locale = useLocale() as AppLocale;
+  const intl = locale === "en" ? "en-US" : "sk-SK";
+
+  const config = {
+    amount: {
+      label: t("unpaid"),
+      color: "var(--chart-3)",
+    },
+  } satisfies ChartConfig;
+
   const data = buckets.map((b) => ({
     key: b.key,
     label: b.label,
@@ -69,7 +75,7 @@ export function AgingChart({
           axisLine={false}
           tick={{ fill: "var(--muted)", fontSize: 11 }}
           tickFormatter={(v) =>
-            new Intl.NumberFormat("sk-SK", {
+            new Intl.NumberFormat(intl, {
               notation: "compact",
               maximumFractionDigits: 1,
             }).format(Number(v))
@@ -83,10 +89,10 @@ export function AgingChart({
               formatter={(value, _name, item) => (
                 <div className="flex w-full flex-col gap-0.5">
                   <span className="money font-medium text-ink">
-                    {formatMoney(Number(value), currency)}
+                    {formatMoney(Number(value), currency, locale)}
                   </span>
                   <span className="text-muted-foreground">
-                    {item?.payload?.count ?? 0} faktúr
+                    {item?.payload?.count ?? 0} {t("invoices").toLowerCase()}
                   </span>
                 </div>
               )}

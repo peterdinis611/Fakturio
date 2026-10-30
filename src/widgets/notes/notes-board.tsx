@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Pin, Pencil, Plus, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { deleteNoteAction } from "@/features/notes/api/notes";
 import { NoteForm } from "@/features/notes/ui/note-form";
@@ -32,12 +32,16 @@ import type { Note } from "@/shared/api/types";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { formatDateTime } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import { useRouter } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 
 type Props = {
   items: Note[];
 };
 
 export function NotesBoard({ items }: Props) {
+  const t = useTranslations("Notes");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
@@ -51,10 +55,10 @@ export function NotesBoard({ items }: Props) {
     startTransition(async () => {
       const result = await deleteNoteAction({ id });
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Mazanie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("delete"));
         return;
       }
-      toast.success("Poznámka odstránená");
+      toast.success(t("deleted"));
       refresh();
     });
   }
@@ -66,12 +70,12 @@ export function NotesBoard({ items }: Props) {
           <DialogTrigger asChild>
             <Button type="button">
               <Plus className="size-4" aria-hidden />
-              Nová poznámka
+              {t("new")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Nová poznámka</DialogTitle>
+              <DialogTitle>{t("new")}</DialogTitle>
             </DialogHeader>
             <NoteForm
               onDone={() => {
@@ -84,10 +88,7 @@ export function NotesBoard({ items }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <EmptyState
-          title="Zatiaľ žiadne poznámky"
-          description="Zapíš si quick poznámky k zákazníkom, DPH alebo todočekám."
-        />
+        <EmptyState title={t("empty")} description={t("emptyBody")} />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((note) => (
@@ -110,12 +111,12 @@ export function NotesBoard({ items }: Props) {
                       className="shrink-0 rounded-[4px] gap-1 text-[10px]"
                     >
                       <Pin className="size-3" aria-hidden />
-                      Pin
+                      {t("pin")}
                     </Badge>
                   ) : null}
                 </div>
                 <CardDescription className="data-num text-[11px]">
-                  {formatDateTime(note.updatedAt)}
+                  {formatDateTime(note.updatedAt, locale)}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-3">
@@ -150,7 +151,7 @@ export function NotesBoard({ items }: Props) {
                   size="icon-sm"
                   variant="ghost"
                   disabled={pending}
-                  aria-label="Zmazať"
+                  aria-label={t("delete")}
                   onClick={() => remove(note.id)}
                 >
                   <Trash2 className="size-3.5" />
@@ -169,7 +170,7 @@ export function NotesBoard({ items }: Props) {
       >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Upraviť poznámku</DialogTitle>
+            <DialogTitle>{editItem?.title ?? t("title")}</DialogTitle>
           </DialogHeader>
           {editItem ? (
             <NoteForm

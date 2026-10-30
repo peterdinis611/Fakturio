@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   getAgingReport,
   getMonthlyRevenue,
@@ -23,6 +24,7 @@ import {
 } from "@/shared/ui/table";
 import { vatExportHref } from "@/shared/lib/exports";
 import { formatDate, formatMoney, formatPercent } from "@/shared/lib/format";
+import type { AppLocale } from "@/i18n/routing";
 
 export type ReportsDashboardData = Awaited<
   ReturnType<typeof loadReportsDashboard>
@@ -51,6 +53,8 @@ export async function ReportsDashboard(props: {
   to?: string;
   top: number;
 }) {
+  const t = await getTranslations("Reports");
+  const locale = (await getLocale()) as AppLocale;
   const { overview, monthly, aging, topCustomers, vat, from, to, top } =
     await loadReportsDashboard(props);
 
@@ -58,14 +62,15 @@ export async function ReportsDashboard(props: {
     <div>
       <div className="ledger-strip mb-5">
         <span>
-          Stav k <span className="text-ink">{formatDate(overview.asOf)}</span>
+          Stav k{" "}
+          <span className="text-ink">{formatDate(overview.asOf, locale)}</span>
         </span>
         <span className="data-num">
-          Inkaso {formatPercent(overview.collectionRatePercent)}
+          Inkaso {formatPercent(overview.collectionRatePercent, locale)}
         </span>
         {overview.averageDaysToPay != null ? (
           <span className="data-num">
-            Ø {overview.averageDaysToPay.toFixed(0)} dní do úhrady
+            Ø {overview.averageDaysToPay.toFixed(0)} {t("daysToPay")}
           </span>
         ) : null}
         <span className="data-num text-faint">{overview.currency}</span>
@@ -76,28 +81,41 @@ export async function ReportsDashboard(props: {
           <div className="panel grid divide-y divide-rule sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
             {[
               {
-                label: "Vystavené",
-                value: formatMoney(overview.issuedAmount, overview.currency),
-                hint: `${overview.totalInvoices} faktúr`,
+                label: t("issued"),
+                value: formatMoney(
+                  overview.issuedAmount,
+                  overview.currency,
+                  locale,
+                ),
+                hint: `${overview.totalInvoices} ${t("invoices").toLowerCase()}`,
               },
               {
-                label: "Zaplatené",
-                value: formatMoney(overview.paidAmount, overview.currency),
+                label: t("paid"),
+                value: formatMoney(
+                  overview.paidAmount,
+                  overview.currency,
+                  locale,
+                ),
                 hint: `${overview.paidCount} úhrad`,
                 accent: true,
               },
               {
-                label: "Neuhradené",
+                label: t("unpaid"),
                 value: formatMoney(
                   overview.outstandingAmount,
                   overview.currency,
+                  locale,
                 ),
-                hint: `${overview.issuedCount} vystavených`,
+                hint: `${overview.issuedCount} ${t("issued").toLowerCase()}`,
               },
               {
                 label: "Po splatnosti",
-                value: formatMoney(overview.overdueAmount, overview.currency),
-                hint: `${overview.overdueCount} faktúr`,
+                value: formatMoney(
+                  overview.overdueAmount,
+                  overview.currency,
+                  locale,
+                ),
+                hint: `${overview.overdueCount} ${t("invoices").toLowerCase()}`,
                 bad: overview.overdueAmount > 0,
               },
             ].map((k) => (
@@ -125,19 +143,23 @@ export async function ReportsDashboard(props: {
         <section className="mb-8">
           <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-[16px] font-medium text-ink">
-              Mesačný pohyb {monthly.year}
+              {t("monthly")} {monthly.year}
             </h2>
             <div className="flex flex-wrap gap-4 text-[12px] text-muted-foreground">
               <span>
-                Vystavené{" "}
+                {t("issued")}{" "}
                 <span className="money text-ink">
-                  {formatMoney(monthly.yearIssuedTotal, monthly.currency)}
+                  {formatMoney(
+                    monthly.yearIssuedTotal,
+                    monthly.currency,
+                    locale,
+                  )}
                 </span>
               </span>
               <span>
-                Zaplatené{" "}
+                {t("paid")}{" "}
                 <span className="money text-chart">
-                  {formatMoney(monthly.yearPaidTotal, monthly.currency)}
+                  {formatMoney(monthly.yearPaidTotal, monthly.currency, locale)}
                 </span>
               </span>
             </div>
@@ -155,11 +177,11 @@ export async function ReportsDashboard(props: {
         <section className="mb-8 grid gap-6 lg:grid-cols-2">
           <div>
             <header className="mb-3 flex items-baseline justify-between gap-2">
-              <h2 className="text-[16px] font-medium text-ink">Aging</h2>
+              <h2 className="text-[16px] font-medium text-ink">{t("aging")}</h2>
               <p className="text-[12px] text-muted-foreground">
-                Outstanding{" "}
+                {t("unpaid")}{" "}
                 <span className="money text-negative">
-                  {formatMoney(aging.totalOutstanding, aging.currency)}
+                  {formatMoney(aging.totalOutstanding, aging.currency, locale)}
                 </span>
               </p>
             </header>
@@ -171,7 +193,7 @@ export async function ReportsDashboard(props: {
           <div>
             <header className="mb-3 flex items-baseline justify-between gap-2">
               <h2 className="text-[16px] font-medium text-ink">
-                Najväčšie neuhradené
+                {t("largestUnpaid")}
               </h2>
               <span className="text-[12px] text-faint">Top {top}</span>
             </header>
@@ -180,7 +202,7 @@ export async function ReportsDashboard(props: {
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-[12px] text-muted-foreground">
-                      Faktúra
+                      {t("invoices")}
                     </TableHead>
                     <TableHead className="text-right text-[12px] text-muted-foreground">
                       Suma
@@ -194,7 +216,7 @@ export async function ReportsDashboard(props: {
                         colSpan={2}
                         className="py-8 text-center text-muted-foreground"
                       >
-                        Žiadne neuhradené
+                        {t("unpaid")}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -213,10 +235,11 @@ export async function ReportsDashboard(props: {
                         </TableCell>
                         <TableCell className="text-right">
                           <p className="money">
-                            {formatMoney(row.total, row.currency)}
+                            {formatMoney(row.total, row.currency, locale)}
                           </p>
                           <p className="text-[12px] text-negative">
-                            {row.daysOverdue} d · {formatDate(row.dueDate)}
+                            {row.daysOverdue} d ·{" "}
+                            {formatDate(row.dueDate, locale)}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -234,9 +257,9 @@ export async function ReportsDashboard(props: {
           <div>
             <header className="mb-3 flex items-baseline justify-between gap-2">
               <h2 className="text-[16px] font-medium text-ink">
-                Top zákazníci
+                {t("topCustomers")}
               </h2>
-              <span className="text-[12px] text-faint">Obrat · top {top}</span>
+              <span className="text-[12px] text-faint">Top {top}</span>
             </header>
             <div className="panel px-3 pt-4 pb-2 sm:px-4">
               <TopCustomersChart
@@ -253,7 +276,7 @@ export async function ReportsDashboard(props: {
                         Zákazník
                       </TableHead>
                       <TableHead className="text-right text-[12px] text-muted-foreground">
-                        Faktúry
+                        {t("invoices")}
                       </TableHead>
                       <TableHead className="text-right text-[12px] text-muted-foreground">
                         Obrat
@@ -278,7 +301,11 @@ export async function ReportsDashboard(props: {
                           {c.invoiceCount}
                         </TableCell>
                         <TableCell className="money text-right">
-                          {formatMoney(c.totalAmount, topCustomers.currency)}
+                          {formatMoney(
+                            c.totalAmount,
+                            topCustomers.currency,
+                            locale,
+                          )}
                         </TableCell>
                         <TableCell className="data-num text-right text-muted-foreground">
                           {c.shareOfRevenuePercent.toFixed(1)} %
@@ -294,10 +321,12 @@ export async function ReportsDashboard(props: {
           <div className="space-y-6">
             <div>
               <header className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-                <h2 className="text-[16px] font-medium text-ink">DPH podľa sadzby</h2>
+                <h2 className="text-[16px] font-medium text-ink">
+                  {t("vatByRate")}
+                </h2>
                 <div className="flex items-center gap-3">
                   <span className="money text-[12px] text-chart">
-                    {formatMoney(vat.vatTotal, vat.currency)}
+                    {formatMoney(vat.vatTotal, vat.currency, locale)}
                   </span>
                   <a
                     href={vatExportHref({ from, to })}
@@ -315,19 +344,19 @@ export async function ReportsDashboard(props: {
                 <div className="px-4 py-3">
                   <p className="text-[12px] text-muted-foreground">Základ</p>
                   <p className="money mt-0.5 text-[16px] font-bold">
-                    {formatMoney(vat.taxBaseTotal, vat.currency)}
+                    {formatMoney(vat.taxBaseTotal, vat.currency, locale)}
                   </p>
                 </div>
                 <div className="px-4 py-3">
                   <p className="text-[12px] text-muted-foreground">DPH</p>
                   <p className="money mt-0.5 text-[16px] font-bold text-chart">
-                    {formatMoney(vat.vatTotal, vat.currency)}
+                    {formatMoney(vat.vatTotal, vat.currency, locale)}
                   </p>
                 </div>
                 <div className="px-4 py-3">
                   <p className="text-[12px] text-muted-foreground">Spolu</p>
                   <p className="money mt-0.5 text-[16px] font-bold">
-                    {formatMoney(vat.grossTotal, vat.currency)}
+                    {formatMoney(vat.grossTotal, vat.currency, locale)}
                   </p>
                 </div>
               </div>
@@ -368,7 +397,11 @@ export async function ReportsDashboard(props: {
                           {row.count}
                         </TableCell>
                         <TableCell className="money text-right">
-                          {formatMoney(row.amount, overview.currency)}
+                          {formatMoney(
+                            row.amount,
+                            overview.currency,
+                            locale,
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -382,4 +415,3 @@ export async function ReportsDashboard(props: {
     </div>
   );
 }
-

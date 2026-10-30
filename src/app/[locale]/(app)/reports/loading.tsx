@@ -1,5 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import { PageLoader } from "@/shared/ui/spinner";
 
-export default function ReportsLoading() {
-  return <PageLoader label="Načítavam reporty…" />;
+export default async function ReportsLoading() {
+  const t = await getTranslations("Loading");
+  return <PageLoader label={t("reports")} />;
 }

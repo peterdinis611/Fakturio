@@ -514,7 +514,12 @@
     "errorTitle": "Chyba pri načítaní",
     "errorBody": "Túto časť aplikácie sa nepodarilo zobraziť. Skús znova alebo prejdi na prehľad.",
     "tryAgain": "Skúsiť znova",
-    "search": "Hľadať"
+    "search": "Hľadať",
+    "pageMissingTitle": "Stránka neexistuje",
+    "pageMissingBody": "Táto adresa vo Fakturio nie je. Skontroluj URL alebo sa vráť na prehľad.",
+    "crashTitle": "Niečo sa pokazilo",
+    "crashBody": "Nepodarilo sa načítať túto stránku. Skús to znova — ak problém pretrváva, reštartuj aplikáciu.",
+    "invoices": "Faktúry"
   },
   "Loading": {
     "default": "Načítavam…",
@@ -557,7 +562,8 @@
     "noTemplates": "Žiadne šablóny",
     "templateSaved": "Šablóna riadku uložená",
     "catalog": "Katalóg služieb",
-    "catalogEmpty": "Katalóg je prázdny"
+    "catalogEmpty": "Katalóg je prázdny",
+    "xmlPreview": "Štruktúrovaný náhľad faktúry pred stiahnutím."
   },
   "CustomerDetail": {
     "edit": "Upraviť",

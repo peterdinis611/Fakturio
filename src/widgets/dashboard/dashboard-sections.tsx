@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import type {
   InvoiceListItem,
   InvoiceReminder,
@@ -15,6 +16,7 @@ import {
   TodayActions,
 } from "@/widgets/dashboard/today-actions";
 import { UpcomingDue } from "@/widgets/dashboard/upcoming-due";
+import type { AppLocale } from "@/i18n/routing";
 
 type Props = {
   overview: ReportOverview;
@@ -27,7 +29,7 @@ type Props = {
 };
 
 /** Prehľad = sklad widget sekcií (nie monolitiná page). */
-export function DashboardSections({
+export async function DashboardSections({
   overview,
   reminders,
   drafts,
@@ -35,25 +37,46 @@ export function DashboardSections({
   monthly,
   showSectionLabel = false,
 }: Props) {
+  const t = await getTranslations("Dashboard");
+  const locale = (await getLocale()) as AppLocale;
+
   const body = (
     <>
       {overview.overdueCount > 0 ? (
         <MotionItem>
-          <OverdueAlert overview={overview} />
+          <OverdueAlert
+            overview={overview}
+            locale={locale}
+            message={t("overdueAlert", { count: overview.overdueCount })}
+            cta={t("handleReminders")}
+          />
         </MotionItem>
       ) : null}
 
       <MotionItem>
-        <LedgerLead overview={overview} />
+        <LedgerLead
+          overview={overview}
+          locale={locale}
+          labels={{
+            unpaidTotal: t("unpaidTotal"),
+            cashflowCollected: t("cashflowCollected"),
+            issued: t("issued"),
+            paid: t("paid"),
+            unpaid: t("unpaid"),
+          }}
+        />
       </MotionItem>
 
       <div className="mb-10 grid gap-10 lg:grid-cols-2">
         <MotionItem>
           <TodayActions
+            title={t("todayTitle")}
             actions={buildTodayActions({
               overview,
               reminders,
               drafts,
+              locale,
+              t,
             })}
           />
         </MotionItem>
@@ -69,15 +92,42 @@ export function DashboardSections({
 
       <div className="grid gap-10 lg:grid-cols-2">
         <MotionItem>
-          <StatusBuckets overview={overview} />
+          <StatusBuckets
+            overview={overview}
+            locale={locale}
+            labels={{
+              paid: t("paid"),
+              unpaid: t("unpaid"),
+              drafts: t("draftsTitle"),
+              all: t("all"),
+            }}
+          />
         </MotionItem>
         <MotionItem>
-          <UpcomingDue reminders={reminders} />
+          <UpcomingDue
+            reminders={reminders}
+            locale={locale}
+            t={t}
+            labels={{
+              title: t("upcomingTitle"),
+              empty: t("upcomingEmpty"),
+              emptyHint: t("sectionHint"),
+            }}
+          />
         </MotionItem>
       </div>
 
       <MotionItem className="mt-10">
-        <RecentInvoices items={recent} />
+        <RecentInvoices
+          items={recent}
+          locale={locale}
+          labels={{
+            title: t("recentTitle"),
+            all: t("all"),
+            empty: t("recentEmpty"),
+            emptyHint: t("sectionHint"),
+          }}
+        />
       </MotionItem>
     </>
   );
@@ -89,18 +139,17 @@ export function DashboardSections({
       <div className="mb-6 flex items-baseline justify-between gap-3 border-b border-rule pb-3">
         <div>
           <p className="text-[11px] font-medium tracking-[0.14em] text-faint uppercase">
-            Plocha
+            {t("sectionSurface")}
           </p>
           <h2
             id="dashboard-widgets-heading"
             className="mt-1 text-[18px] font-semibold tracking-tight text-ink"
           >
-            Widgety
+            {t("sectionWidgets")}
           </h2>
         </div>
         <p className="max-w-xs text-right text-[12px] leading-snug text-muted-foreground">
-          Neuhradené, splatnosti, cashflow a posledné faktúry — naplnia sa po
-          prvej faktúre.
+          {t("sectionHint")}
         </p>
       </div>
       {body}

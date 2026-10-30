@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { RefreshCw } from "lucide-react";
 import { toast } from "@/shared/toast";
 import {
@@ -12,6 +13,7 @@ import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { Button } from "@/shared/ui/button";
 
 export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
+  const t = useTranslations("Reminders");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -28,17 +30,18 @@ export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
             toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
             return;
           }
-          toast.success("Upomienka označená ako odoslaná");
+          toast.success(t("markedSent"));
           router.refresh();
         });
       }}
     >
-      {pending ? "Ukladám…" : "Označiť odoslané"}
+      {pending ? "Ukladám…" : t("markSent")}
     </Button>
   );
 }
 
 export function SyncOverdueButton() {
+  const t = useTranslations("Reminders");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -59,14 +62,14 @@ export function SyncOverdueButton() {
           toast.success(
             result.data.updatedCount > 0
               ? `Aktualizovaných ${result.data.updatedCount} faktúr`
-              : "Žiadne zmeny",
+              : t("noChanges"),
           );
           router.refresh();
         });
       }}
     >
       <RefreshCw className={pending ? "animate-spin" : undefined} />
-      {pending ? "Synchronizujem…" : "Obnoviť omeškané"}
+      {pending ? "Synchronizujem…" : t("refreshOverdue")}
     </Button>
   );
 }

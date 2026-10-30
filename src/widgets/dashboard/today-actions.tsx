@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { dueDaysLabel } from "@/widgets/dashboard/due-days";
+import { dueDaysLabel, type DueDaysTranslate } from "@/widgets/dashboard/due-days";
 import { Button } from "@/shared/ui/button";
 import type { InvoiceListItem, InvoiceReminder, ReportOverview } from "@/shared/api/types";
 import { formatDate, formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
 export type TodayAction = {
   id: string;
@@ -16,12 +17,30 @@ export type TodayAction = {
   cta: string;
 };
 
+type DashboardTranslate = DueDaysTranslate &
+  ((
+    key:
+      | "overdueInvoices"
+      | "handleReminders"
+      | "dueSoon"
+      | "draftsTitle"
+      | "emptyTitle"
+      | "todayIdle"
+      | "emptyBody"
+      | "sectionHint"
+      | "newInvoice"
+      | "todayTitle",
+    values?: { count: number },
+  ) => string);
+
 export function buildTodayActions(params: {
   overview: ReportOverview;
   reminders: InvoiceReminder[];
   drafts: InvoiceListItem[];
+  locale: AppLocale;
+  t: DashboardTranslate;
 }): TodayAction[] {
-  const { overview, reminders, drafts } = params;
+  const { overview, reminders, drafts, locale, t } = params;
   const actions: TodayAction[] = [];
 
   if (overview.overdueCount > 0) {
@@ -29,13 +48,10 @@ export function buildTodayActions(params: {
       id: "overdue",
       priority: 0,
       tone: "negative",
-      title:
-        overview.overdueCount === 1
-          ? "1 faktúra po splatnosti"
-          : `${overview.overdueCount} faktúr po splatnosti`,
-      detail: formatMoney(overview.overdueAmount, overview.currency),
+      title: t("overdueInvoices", { count: overview.overdueCount }),
+      detail: formatMoney(overview.overdueAmount, overview.currency, locale),
       href: "/reminders?overdue=1",
-      cta: "Riešiť",
+      cta: t("handleReminders"),
     });
   }
 
@@ -48,14 +64,14 @@ export function buildTodayActions(params: {
       tone: "warning",
       title:
         dueSoon.length === 1
-          ? `${first.number} o ${dueDaysLabel(first)}`
-          : `${dueSoon.length} splatností do 3 dní`,
+          ? `${first.number} · ${dueDaysLabel(first, t)}`
+          : t("dueSoon"),
       detail:
         dueSoon.length === 1
-          ? `${first.customerName} · ${formatMoney(first.total, first.currency)}`
-          : `Najbližšie ${formatDate(first.dueDate)}`,
+          ? `${first.customerName} · ${formatMoney(first.total, first.currency, locale)}`
+          : formatDate(first.dueDate, locale),
       href: "/reminders",
-      cta: "Pozrieť",
+      cta: t("dueSoon"),
     });
   }
 
@@ -67,17 +83,17 @@ export function buildTodayActions(params: {
       tone: "ink",
       title:
         drafts.length === 1
-          ? `Dokončiť koncept ${d.number}`
-          : `${drafts.length} konceptov čaká na vystavenie`,
+          ? `${t("draftsTitle")} ${d.number}`
+          : `${drafts.length} · ${t("draftsTitle")}`,
       detail:
         drafts.length === 1
           ? d.customerName
-          : `Napr. ${d.number} · ${d.customerName}`,
+          : `${d.number} · ${d.customerName}`,
       href:
         drafts.length === 1
           ? `/invoices/${d.id}/edit`
           : "/invoices?status=Draft",
-      cta: "Otvoriť",
+      cta: t("draftsTitle"),
     });
   }
 
@@ -88,25 +104,31 @@ export function buildTodayActions(params: {
       tone: "muted",
       title:
         overview.totalInvoices === 0
-          ? "Začni prvou faktúrou"
-          : "Dnes nič naliehavé",
+          ? t("emptyTitle")
+          : t("todayIdle"),
       detail:
         overview.totalInvoices === 0
-          ? "Widgety nižšie sa naplnia, keď vystavíš prvý doklad."
-          : "Ledger je v poriadku — môžeš vystaviť ďalšiu faktúru.",
+          ? t("emptyBody")
+          : t("sectionHint"),
       href: "/invoices/new",
-      cta: "Nová faktúra",
+      cta: t("newInvoice"),
     });
   }
 
   return actions.sort((a, b) => a.priority - b.priority).slice(0, 4);
 }
 
-export function TodayActions({ actions }: { actions: TodayAction[] }) {
+export function TodayActions({
+  actions,
+  title,
+}: {
+  actions: TodayAction[];
+  title: string;
+}) {
   return (
     <div>
       <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="text-[15px] font-medium text-ink">Čo urobiť dnes</h2>
+        <h2 className="text-[15px] font-medium text-ink">{title}</h2>
         <span className="text-[12px] text-faint tabular-nums">
           {actions.length}
         </span>

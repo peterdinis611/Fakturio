@@ -13,10 +13,17 @@ function normalizeCountry(country: string | null | undefined): "SK" | "CZ" | nul
   return null;
 }
 
+export type RegistryLookupMessages = {
+  needIco: string;
+  filledRpo: string;
+  filledAres: string;
+};
+
 export function useRegistryLookup(opts: {
   ico: string | null | undefined;
   country: string | null | undefined;
   onFound: (data: RegistryCompany) => void;
+  messages?: RegistryLookupMessages;
 }) {
   const [pending, startTransition] = useTransition();
   const [lookingUp, setLookingUp] = useState(false);
@@ -25,6 +32,7 @@ export function useRegistryLookup(opts: {
   const onFoundRef = useRef(opts.onFound);
   const icoRef = useRef(opts.ico);
   const countryRef = useRef(opts.country);
+  const messagesRef = useRef(opts.messages);
 
   useEffect(() => {
     onFoundRef.current = opts.onFound;
@@ -35,6 +43,10 @@ export function useRegistryLookup(opts: {
     countryRef.current = opts.country;
   }, [opts.ico, opts.country]);
 
+  useEffect(() => {
+    messagesRef.current = opts.messages;
+  }, [opts.messages]);
+
   const registryCountry = normalizeCountry(opts.country);
   const ico = (opts.ico ?? "").trim();
   const canLookup = Boolean(registryCountry && isValidIco(ico));
@@ -42,12 +54,13 @@ export function useRegistryLookup(opts: {
   const lookup = useCallback((mode: "auto" | "manual" = "manual") => {
     const country = normalizeCountry(countryRef.current);
     const value = (icoRef.current ?? "").trim();
+    const messages = messagesRef.current;
     if (!country || !isValidIco(value)) {
       if (mode === "manual") {
         toast.error(
           !country
             ? "Doplnenie z registra je pre SK a CZ."
-            : "Zadaj platné 8-miestne IČO.",
+            : (messages?.needIco ?? "Zadaj platné 8-miestne IČO."),
         );
       }
       return;
@@ -71,7 +84,9 @@ export function useRegistryLookup(opts: {
         lastKeyRef.current = key;
         onFoundRef.current(result.data);
         toast.success(
-          country === "CZ" ? "Údaje doplnené z ARES" : "Údaje doplnené z RPO",
+          country === "CZ"
+            ? (messages?.filledAres ?? "Údaje doplnené z ARES")
+            : (messages?.filledRpo ?? "Údaje doplnené z RPO"),
         );
       } finally {
         inFlightRef.current = false;

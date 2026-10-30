@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { DatePickerField } from "@/features/reports/ui/date-picker-field";
 import { Button } from "@/shared/ui/button";
@@ -44,6 +45,8 @@ function buildHref(values: Partial<ReportsFilterValues> & { year: number }) {
 }
 
 export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
+  const t = useTranslations("Reports");
+  const tc = useTranslations("Common");
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const thisYear = yearBounds(currentYear);
@@ -59,7 +62,7 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
   const presets = [
     {
       key: "ytd",
-      label: "Tento rok",
+      label: t("thisYear"),
       href: buildHref({
         year: currentYear,
         from: thisYear.from,
@@ -72,7 +75,7 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
     },
     {
       key: "last",
-      label: "Minulý rok",
+      label: t("lastYear"),
       href: buildHref({
         year: currentYear - 1,
         from: lastYear.from,
@@ -94,7 +97,7 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
     },
     {
       key: "all",
-      label: "Celé obdobie",
+      label: t("allTime"),
       href: buildHref({ year: values.year, top: values.top }),
       active: !values.from && !values.to,
     },
@@ -127,14 +130,14 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
         <DatePickerField
           id="reports-from"
           name="from"
-          label="Od"
+          label={t("from")}
           value={from}
           onChange={setFrom}
         />
         <DatePickerField
           id="reports-to"
           name="to"
-          label="Do"
+          label={t("to")}
           value={to}
           onChange={setTo}
         />
@@ -182,12 +185,12 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
         </div>
 
         <Button type="submit" className="h-9">
-          Použiť filtre
+          {t("applyFilters")}
         </Button>
         {(from || to) && (
           <Button asChild variant="ghost" className="h-9">
             <Link href={buildHref({ year: Number(year), top: Number(top) })}>
-              Zrušiť dátumy
+              {tc("cancel")}
             </Link>
           </Button>
         )}

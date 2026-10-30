@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -25,20 +26,39 @@ import {
 } from "@/shared/ui/table";
 import type { ResumeEntry } from "@/shared/api/types";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
-import { resumeEntryTypeLabels } from "@/entities/resume/model/schema";
 
 type Props = {
   items: ResumeEntry[];
 };
 
-function formatPeriod(entry: ResumeEntry): string {
+function entryTypeLabel(
+  type: ResumeEntry["type"],
+  t: ReturnType<typeof useTranslations<"Resume">>,
+) {
+  switch (type) {
+    case "experience":
+      return t("experience");
+    case "education":
+      return t("education");
+    case "certification":
+      return t("certificate");
+    default:
+      return type;
+  }
+}
+
+function formatPeriod(
+  entry: ResumeEntry,
+  currentLabel: string,
+): string {
   const start = entry.startDate ?? "—";
-  if (entry.isCurrent) return `${start} – teraz`;
+  if (entry.isCurrent) return `${start} – ${currentLabel}`;
   const end = entry.endDate ?? "—";
   return `${start} – ${end}`;
 }
 
 export function ResumeEntriesTable({ items }: Props) {
+  const t = useTranslations("Resume");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
@@ -55,7 +75,7 @@ export function ResumeEntriesTable({ items }: Props) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Mazanie zlyhalo");
         return;
       }
-      toast.success("Položka odstránená");
+      toast.success(t("entryDeleted"));
       refresh();
     });
   }
@@ -68,12 +88,12 @@ export function ResumeEntriesTable({ items }: Props) {
           <DialogTrigger asChild>
             <Button type="button">
               <Plus className="size-4" aria-hidden />
-              Nová položka
+              {t("newEntry")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nová položka</DialogTitle>
+              <DialogTitle>{t("newEntry")}</DialogTitle>
             </DialogHeader>
             <ResumeEntryForm
               onDone={() => {
@@ -87,8 +107,8 @@ export function ResumeEntriesTable({ items }: Props) {
 
       {items.length === 0 ? (
         <EmptyState
-          title="Zatiaľ bez položiek"
-          description="Pridaj skúsenosti, vzdelanie alebo certifikáty."
+          title={t("emptyEntries")}
+          description={t("description")}
         />
       ) : (
         <div className="panel overflow-hidden">
@@ -114,12 +134,12 @@ export function ResumeEntriesTable({ items }: Props) {
               {items.map((item) => (
                 <TableRow key={item.id} className="h-11">
                   <TableCell className="text-muted-foreground">
-                    {resumeEntryTypeLabels[item.type] ?? item.type}
+                    {entryTypeLabel(item.type, t)}
                   </TableCell>
                   <TableCell className="font-medium">{item.title}</TableCell>
                   <TableCell>{item.organization || "—"}</TableCell>
                   <TableCell className="data-num text-[13px] text-muted-foreground">
-                    {formatPeriod(item)}
+                    {formatPeriod(item, t("current"))}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">

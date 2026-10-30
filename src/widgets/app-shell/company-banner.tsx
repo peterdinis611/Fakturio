@@ -1,12 +1,19 @@
 import { AlertTriangleIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import type { CompanyCompleteness } from "@/shared/api/types";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Link } from "@/i18n/navigation";
 
-export function CompanyBanner({ status }: { status: CompanyCompleteness }) {
+export async function CompanyBanner({
+  status,
+}: {
+  status: CompanyCompleteness;
+}) {
   if (status.isReadyToInvoice) return null;
+
+  const t = await getTranslations("Dashboard");
 
   const missing = status.items
     .filter((i) => i.isRequired && !i.isComplete)
@@ -18,7 +25,7 @@ export function CompanyBanner({ status }: { status: CompanyCompleteness }) {
       <Alert className="border-warning/30 bg-pill-warning-bg text-pill-warning-ink">
         <AlertTriangleIcon />
         <AlertTitle className="flex flex-wrap items-center gap-2">
-          Firma nie je pripravená na fakturáciu
+          {t("companyBanner")}
           <Badge
             variant="outline"
             className="rounded-[4px] border-current/30 data-num"
@@ -31,7 +38,7 @@ export function CompanyBanner({ status }: { status: CompanyCompleteness }) {
             Chýba: {missing.join(", ") || "povinné údaje"}. Doplníš to vo Firma.
           </span>
           <Button asChild variant="outline" size="sm" className="shrink-0">
-            <Link href="/settings/company">Doplniť</Link>
+            <Link href="/settings/company">{t("companyBannerCta")}</Link>
           </Button>
         </AlertDescription>
       </Alert>

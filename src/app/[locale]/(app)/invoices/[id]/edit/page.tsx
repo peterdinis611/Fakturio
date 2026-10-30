@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getCompany } from "@/features/company/api/company";
 import { listCustomers } from "@/features/customers/api/customers";
 import { getInvoice } from "@/features/invoices/api/invoices";
@@ -7,13 +8,17 @@ import { InvoiceForm } from "@/features/invoices/ui/invoice-form";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { isApiError } from "@/shared/api/errors";
 
-export const metadata = { title: "Upraviť faktúru" };
+export async function generateMetadata() {
+  const t = await getTranslations("InvoiceDetail");
+  return { title: t("editTitle") };
+}
 
 export default async function EditInvoicePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = await getTranslations("InvoiceDetail");
   const { id } = await params;
   let invoice;
   try {
@@ -35,7 +40,7 @@ export default async function EditInvoicePage({
 
   return (
     <div>
-      <PageHeader title={`Upraviť · ${invoice.number}`} />
+      <PageHeader title={`${t("editTitle")} · ${invoice.number}`} />
       <InvoiceForm
         initial={invoice}
         customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}

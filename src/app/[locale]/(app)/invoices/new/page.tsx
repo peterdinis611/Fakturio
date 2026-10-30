@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { listCustomers } from "@/features/customers/api/customers";
 import { getCompany } from "@/features/company/api/company";
 import { listServices } from "@/features/services/api/services";
@@ -5,13 +6,17 @@ import { InvoiceForm } from "@/features/invoices/ui/invoice-form";
 import { NewInvoiceNeedsCustomer } from "@/features/invoices/ui/new-invoice-gate";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 
-export const metadata = { title: "Nová faktúra" };
+export async function generateMetadata() {
+  const t = await getTranslations("InvoiceDetail");
+  return { title: t("newTitle") };
+}
 
 export default async function NewInvoicePage({
   searchParams,
 }: {
   searchParams: Promise<{ customerId?: string; type?: string }>;
 }) {
+  const t = await getTranslations("InvoiceDetail");
   const sp = await searchParams;
   const documentType = sp.type === "Proforma" ? "Proforma" : "Invoice";
   const [customers, company, services] = await Promise.all([
@@ -23,7 +28,7 @@ export default async function NewInvoicePage({
   if (customers.items.length === 0) {
     return (
       <div>
-        <PageHeader title="Nová faktúra" />
+        <PageHeader title={t("newTitle")} />
         <NewInvoiceNeedsCustomer />
       </div>
     );
@@ -32,7 +37,9 @@ export default async function NewInvoicePage({
   return (
     <div>
       <PageHeader
-        title={documentType === "Proforma" ? "Nová zálohová" : "Nová faktúra"}
+        title={
+          documentType === "Proforma" ? t("newProforma") : t("newTitle")
+        }
         description={
           documentType === "Proforma"
             ? "Zálohová (ZF…) nie je daňový doklad — neskôr ju môžeš finalizovať."
@@ -43,9 +50,9 @@ export default async function NewInvoicePage({
             <span>
               {company.isVatPayer
                 ? `Predvolené DPH ${company.defaultVatRate}%`
-                : "Neplatca DPH"}
+                : t("notVatPayer")}
             </span>
-            <span>Splatnosť {company.defaultDueDays} dní</span>
+            <span>{t("dueInDays", { count: company.defaultDueDays })}</span>
             <span>{company.defaultCurrency}</span>
           </>
         }

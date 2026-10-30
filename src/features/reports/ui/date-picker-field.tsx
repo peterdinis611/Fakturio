@@ -1,10 +1,11 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { sk as skDateFns } from "date-fns/locale";
+import { enUS as enDateFns, sk as skDateFns } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { sk } from "react-day-picker/locale";
+import { enUS as enDayPicker, sk as skDayPicker } from "react-day-picker/locale";
 import { Button } from "@/shared/ui/button";
 import { Calendar } from "@/shared/ui/calendar";
 import { Label } from "@/shared/ui/label";
@@ -14,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/popover";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
 function parseDate(value?: string) {
   if (!value) return undefined;
@@ -34,7 +36,7 @@ export function DatePickerField({
   label,
   value,
   onChange,
-  placeholder = "Vybrať dátum",
+  placeholder,
 }: {
   id: string;
   name: string;
@@ -43,8 +45,12 @@ export function DatePickerField({
   onChange: (next?: string) => void;
   placeholder?: string;
 }) {
+  const t = useTranslations("Reports");
+  const locale = useLocale() as AppLocale;
   const [open, setOpen] = useState(false);
   const selected = parseDate(value);
+  const dateFnsLocale = locale === "en" ? enDateFns : skDateFns;
+  const dayPickerLocale = locale === "en" ? enDayPicker : skDayPicker;
 
   return (
     <div className="grid gap-1">
@@ -63,14 +69,14 @@ export function DatePickerField({
           >
             <CalendarIcon className="size-3.5 opacity-70" aria-hidden />
             {selected
-              ? format(selected, "d. M. yyyy", { locale: skDateFns })
-              : placeholder}
+              ? format(selected, "d. M. yyyy", { locale: dateFnsLocale })
+              : (placeholder ?? t("pickDate"))}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            locale={sk}
+            locale={dayPickerLocale}
             selected={selected}
             onSelect={(date) => {
               onChange(date ? toIsoDay(date) : undefined);

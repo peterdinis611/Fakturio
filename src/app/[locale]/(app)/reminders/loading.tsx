@@ -1,5 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import { PageLoader } from "@/shared/ui/spinner";
 
-export default function RemindersLoading() {
-  return <PageLoader label="Načítavam upomienky…" />;
+export default async function RemindersLoading() {
+  const t = await getTranslations("Loading");
+  return <PageLoader label={t("reminders")} />;
 }

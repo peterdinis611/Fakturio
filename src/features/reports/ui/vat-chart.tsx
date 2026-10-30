@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { Cell, Pie, PieChart } from "recharts";
 import {
   ChartContainer,
@@ -10,6 +11,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
+import type { AppLocale } from "@/i18n/routing";
 
 const palette = [
   "var(--chart-3)",
@@ -26,6 +28,8 @@ export function VatChart({
   currency: string;
   rows: { vatRate: number; vatAmount: number; taxBase: number }[];
 }) {
+  const t = useTranslations("Reports");
+  const locale = useLocale() as AppLocale;
   const config = Object.fromEntries(
     rows.map((r, i) => [
       `rate_${r.vatRate}`,
@@ -47,7 +51,7 @@ export function VatChart({
   if (data.length === 0 || data.every((d) => d.vat === 0 && d.taxBase === 0)) {
     return (
       <div className="flex h-[220px] items-center justify-center text-[14px] text-muted-foreground">
-        Žiadne DPH údaje v období
+        {t("noVatData")}
       </div>
     );
   }
@@ -65,11 +69,15 @@ export function VatChart({
                     {item?.payload?.rate ?? ""} %
                   </span>
                   <span className="money text-ink">
-                    DPH {formatMoney(Number(value), currency)}
+                    DPH {formatMoney(Number(value), currency, locale)}
                   </span>
                   <span className="text-muted-foreground">
                     Základ{" "}
-                    {formatMoney(Number(item?.payload?.taxBase ?? 0), currency)}
+                    {formatMoney(
+                      Number(item?.payload?.taxBase ?? 0),
+                      currency,
+                      locale,
+                    )}
                   </span>
                 </div>
               )}

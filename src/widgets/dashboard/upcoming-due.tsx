@@ -1,14 +1,29 @@
 import Link from "next/link";
 import type { InvoiceReminder } from "@/shared/api/types";
-import { dueDaysLabel } from "@/widgets/dashboard/due-days";
+import {
+  dueDaysLabel,
+  type DueDaysTranslate,
+} from "@/widgets/dashboard/due-days";
 import { formatDate, formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
-export function UpcomingDue({ reminders }: { reminders: InvoiceReminder[] }) {
+type Props = {
+  reminders: InvoiceReminder[];
+  locale: AppLocale;
+  t: DueDaysTranslate;
+  labels: {
+    title: string;
+    empty: string;
+    emptyHint: string;
+  };
+};
+
+export function UpcomingDue({ reminders, locale, t, labels }: Props) {
   return (
     <section>
       <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-[15px] font-medium text-ink">Splatnosti</h2>
+        <h2 className="text-[15px] font-medium text-ink">{labels.title}</h2>
         <Link
           href="/reminders"
           className="text-[13px] font-medium text-ink underline-offset-2 hover:underline"
@@ -18,9 +33,9 @@ export function UpcomingDue({ reminders }: { reminders: InvoiceReminder[] }) {
       </div>
       {reminders.length === 0 ? (
         <div className="border-t border-rule py-5">
-          <p className="text-[14px] text-ink">Nič nesplatné v 14 dňoch</p>
+          <p className="text-[14px] text-ink">{labels.empty}</p>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Keď sa blíži splatnosť, uvidíš tu faktúry na upomienku.
+            {labels.emptyHint}
           </p>
         </div>
       ) : (
@@ -58,7 +73,7 @@ export function UpcomingDue({ reminders }: { reminders: InvoiceReminder[] }) {
                       r.isOverdue ? "text-negative" : "text-faint",
                     )}
                   >
-                    {dueDaysLabel(r)} · {formatDate(r.dueDate)}
+                    {dueDaysLabel(r, t)} · {formatDate(r.dueDate, locale)}
                   </p>
                 </div>
               </div>
@@ -68,7 +83,7 @@ export function UpcomingDue({ reminders }: { reminders: InvoiceReminder[] }) {
                   r.isOverdue ? "text-negative" : "text-ink",
                 )}
               >
-                {formatMoney(r.total, r.currency)}
+                {formatMoney(r.total, r.currency, locale)}
               </span>
             </li>
           ))}

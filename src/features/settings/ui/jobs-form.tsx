@@ -3,6 +3,7 @@
 import { useTransition, type ComponentProps } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { updateJobSettingsAction } from "@/features/settings/api/jobs";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
@@ -93,6 +94,7 @@ function BoolField({
 }
 
 export function JobsForm({ initial }: { initial: JobSettings }) {
+  const t = useTranslations("Settings");
   const [pending, startTransition] = useTransition();
   const {
     register,
@@ -108,10 +110,12 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
     startTransition(async () => {
       const result = await updateJobSettingsAction(values);
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        toast.error(
+          actionErrorMessage(result ?? {}) ?? t("jobsSaveFailed"),
+        );
         return;
       }
-      toast.success("Automatizácia uložená");
+      toast.success(t("jobsSaved"));
     });
   }
 
@@ -124,7 +128,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
       <section className="space-y-4 border-t border-rule pt-5">
         <div>
           <h2 className="text-[15px] font-medium text-ink">
-            Faktúry po splatnosti
+            {t("overdueJob")}
           </h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Raz denne označí vystavené faktúry, ktorým už uplynul termín
@@ -203,7 +207,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="reminder-enabled"
-              label="Zapnúť prípravu upomienok"
+              label={t("remindersJob")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -300,11 +304,11 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
         <Button type="submit" disabled={pending || !isDirty}>
           {pending ? (
             <>
-              <Spinner size="sm" label="Ukladám" />
-              Ukladám…
+              <Spinner size="sm" label={t("save")} />
+              {t("save")}…
             </>
           ) : (
-            "Uložiť"
+            t("save")
           )}
         </Button>
         <p className="text-[12px] text-faint">

@@ -1,11 +1,16 @@
+import { getTranslations } from "next-intl/server";
 import { getResumeProfile, listResumeEntries } from "@/features/resume/api/resume";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ResumeEntriesTable } from "@/features/resume/ui/resume-entries-table";
 import { ResumeProfileForm } from "@/features/resume/ui/resume-profile-form";
 
-export const metadata = { title: "Životopis" };
+export async function generateMetadata() {
+  const t = await getTranslations("Resume");
+  return { title: t("title") };
+}
 
 export default async function ResumePage() {
+  const t = await getTranslations("Resume");
   const [profile, entries] = await Promise.all([
     getResumeProfile(),
     listResumeEntries({ pageSize: 100 }),
@@ -14,8 +19,8 @@ export default async function ResumePage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Životopis"
-        description="Profil a položky pre prezentáciu skúseností — skúsenosti, vzdelanie, certifikáty."
+        title={t("title")}
+        description={t("description")}
         ledger={
           <>
             <span>{entries.totalCount} položiek</span>

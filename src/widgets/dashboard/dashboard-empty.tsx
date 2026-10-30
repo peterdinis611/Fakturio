@@ -7,6 +7,7 @@ import {
   FileText,
   UserPlus,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
@@ -41,6 +42,8 @@ const STEPS = [
 ] as const;
 
 export function DashboardEmpty() {
+  const t = useTranslations("Dashboard");
+
   return (
     <div className="relative overflow-hidden border-b border-rule pb-10">
       <div
@@ -65,24 +68,23 @@ export function DashboardEmpty() {
           </div>
 
           <h2 className="mt-5 max-w-lg text-[28px] leading-[1.15] font-semibold tracking-tight text-ink sm:text-[32px]">
-            Vystav prvú faktúru
+            {t("emptyTitle")}
           </h2>
           <p className="mt-3 max-w-md text-[14px] leading-relaxed text-muted-foreground">
-            Dostane číslo, variabilný symbol a IBAN do PDF. Potom sa widgety
-            nižšie naplnia neuhradenými, splatnosťami a inkasom.
+            {t("emptyBody")}
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <Button asChild size="lg" className="h-10 px-4">
               <Link href="/invoices/new">
-                Nová faktúra
+                {t("newInvoice")}
                 <ArrowRight className="size-3.5" aria-hidden />
               </Link>
             </Button>
             <CreateCustomerDialog
               trigger={
                 <Button type="button" variant="outline" size="lg" className="h-10">
-                  Pridať zákazníka
+                  {t("addCustomer")}
                 </Button>
               }
             />

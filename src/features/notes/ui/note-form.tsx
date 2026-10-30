@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { createNoteAction, updateNoteAction } from "@/features/notes/api/notes";
 import type { Note } from "@/shared/api/types";
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export function NoteForm({ initial, onDone }: Props) {
+  const t = useTranslations("Notes");
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(initial?.id);
 
@@ -49,7 +51,7 @@ export function NoteForm({ initial, onDone }: Props) {
         : await createNoteAction(values);
 
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("save"));
         const fieldErrors = toFieldErrors(result?.validationErrors);
         if (fieldErrors) {
           for (const [key, message] of Object.entries(fieldErrors)) {
@@ -59,7 +61,7 @@ export function NoteForm({ initial, onDone }: Props) {
         return;
       }
 
-      toast.success(isEdit ? "Poznámka upravená" : "Poznámka pridaná");
+      toast.success(isEdit ? t("updated") : t("added"));
       onDone?.();
     });
   }
@@ -71,7 +73,7 @@ export function NoteForm({ initial, onDone }: Props) {
       noValidate
     >
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="title">Názov</Label>
+        <Label htmlFor="title">{t("titleLabel")}</Label>
         <Input id="title" disabled={pending} {...register("title")} />
         {errors.title ? (
           <p className="text-xs text-destructive">{errors.title.message}</p>
@@ -89,7 +91,7 @@ export function NoteForm({ initial, onDone }: Props) {
               value={field.value ?? ""}
               onChange={field.onChange}
               disabled={pending}
-              placeholder="Čo si treba zapamätať…"
+              placeholder={t("placeholder")}
             />
           )}
         />
@@ -101,7 +103,7 @@ export function NoteForm({ initial, onDone }: Props) {
       <div className="flex items-center justify-between gap-3 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
         <div>
           <Label htmlFor="isPinned" className="font-normal">
-            Pripnúť hore
+            {t("pin")}
           </Label>
           <p className="text-[12px] text-muted-foreground">
             Pripnuté poznámky sú vždy prvé.
@@ -123,7 +125,7 @@ export function NoteForm({ initial, onDone }: Props) {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={pending}>
-          {isEdit ? "Uložiť" : "Pridať"}
+          {t("save")}
         </Button>
       </div>
     </form>

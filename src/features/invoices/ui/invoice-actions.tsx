@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
   cancelInvoiceAction,
@@ -37,6 +38,7 @@ type InvoiceActionsProps = {
 };
 
 export function InvoiceActions({ invoice }: InvoiceActionsProps) {
+  const t = useTranslations("InvoiceDetail");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -100,7 +102,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Dobropis zlyhal");
         return;
       }
-      toast.success("Dobropis bol vytvorený");
+      toast.success(t("creditCreated"));
       router.push(`/invoices/${result.data.id}`);
     });
   }
@@ -127,7 +129,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
   }
 
   function handleDelete() {
-    if (!window.confirm("Naozaj zmazať tento koncept?")) return;
+    if (!window.confirm(t("deleteDraftConfirm"))) return;
     startTransition(async () => {
       const result = await deleteInvoiceAction({ id: invoice.id });
       if (!result?.data) {
@@ -189,7 +191,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
     <div className="flex flex-wrap items-center gap-2">
       {canIssue ? (
         <Button type="button" size="sm" disabled={pending} onClick={handleIssue}>
-          Vystaviť
+          {t("issue")}
         </Button>
       ) : null}
 
@@ -201,7 +203,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
           disabled={pending}
           onClick={handleMarkPaid}
         >
-          Označiť ako zaplatenú
+          {t("markPaid")}
         </Button>
       ) : null}
 
@@ -233,12 +235,12 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
         <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
           <DialogTrigger asChild>
             <Button type="button" size="sm" variant="outline" disabled={pending}>
-              Zrušiť
+              {t("cancelDoc")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Zrušiť doklad</DialogTitle>
+              <DialogTitle>{t("cancelDoc")}</DialogTitle>
               <DialogDescription>
                 Uveď dôvod zrušenia dokladu {invoice.number}.
               </DialogDescription>
@@ -306,7 +308,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
           </Button>
           <Button type="button" size="sm" variant="ghost" asChild>
             <a href={pdfDownload} download>
-              Stiahnuť PDF
+              {t("downloadPdf")}
             </a>
           </Button>
           <XmlPreview

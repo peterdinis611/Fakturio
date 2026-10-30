@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { deleteServiceAction } from "@/features/services/api/services";
 import { ServiceCatalogForm } from "@/features/services/ui/service-catalog-form";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -26,6 +26,8 @@ import {
 import type { ServiceCatalogItem } from "@/shared/api/types";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { formatMoney } from "@/shared/lib/format";
+import { useRouter } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 
 type Props = {
   items: ServiceCatalogItem[];
@@ -38,6 +40,8 @@ export function ServiceCatalogTable({
   isVatPayer,
   defaultVatRate,
 }: Props) {
+  const t = useTranslations("Services");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
@@ -51,10 +55,10 @@ export function ServiceCatalogTable({
     startTransition(async () => {
       const result = await deleteServiceAction({ id });
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Mazanie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("delete"));
         return;
       }
-      toast.success("Služba odstránená");
+      toast.success(t("deleted"));
       refresh();
     });
   }
@@ -66,12 +70,12 @@ export function ServiceCatalogTable({
           <DialogTrigger asChild>
             <Button type="button">
               <Plus className="size-4" aria-hidden />
-              Nová služba
+              {t("new")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nová služba</DialogTitle>
+              <DialogTitle>{t("new")}</DialogTitle>
             </DialogHeader>
             <ServiceCatalogForm
               isVatPayer={isVatPayer}
@@ -86,31 +90,28 @@ export function ServiceCatalogTable({
       </div>
 
       {items.length === 0 ? (
-        <EmptyState
-          title="Katalóg je prázdny"
-          description="Pridaj služby a produkty — na faktúre ich pridáš jedným klikom."
-        />
+        <EmptyState title={t("empty")} description={t("emptyBody")} />
       ) : (
         <div className="panel overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="text-[12px] text-muted-foreground">
-                  Popis
+                  {t("descriptionLabel")}
                 </TableHead>
                 <TableHead className="text-[12px] text-muted-foreground">
-                  Mj.
+                  {t("unit")}
                 </TableHead>
                 <TableHead className="text-right text-[12px] text-muted-foreground">
-                  Cena
+                  {t("price")}
                 </TableHead>
                 {isVatPayer ? (
                   <TableHead className="text-right text-[12px] text-muted-foreground">
-                    DPH
+                    {t("vat")}
                   </TableHead>
                 ) : null}
                 <TableHead className="text-[12px] text-muted-foreground">
-                  Stav
+                  {t("active")}
                 </TableHead>
                 <TableHead className="w-24" />
               </TableRow>
@@ -121,7 +122,7 @@ export function ServiceCatalogTable({
                   <TableCell className="font-medium">{item.description}</TableCell>
                   <TableCell>{item.unit}</TableCell>
                   <TableCell className="data-num text-right">
-                    {formatMoney(item.unitPrice, "EUR")}
+                    {formatMoney(item.unitPrice, "EUR", locale)}
                   </TableCell>
                   {isVatPayer ? (
                     <TableCell className="data-num text-right">
@@ -129,7 +130,7 @@ export function ServiceCatalogTable({
                     </TableCell>
                   ) : null}
                   <TableCell className="text-muted-foreground">
-                    {item.isActive ? "Aktívna" : "Neaktívna"}
+                    {item.isActive ? t("active") : t("inactive")}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1">
@@ -138,7 +139,7 @@ export function ServiceCatalogTable({
                         variant="ghost"
                         size="icon-sm"
                         disabled={pending}
-                        aria-label="Upraviť"
+                        aria-label={t("edit")}
                         onClick={() => setEditItem(item)}
                       >
                         <Pencil className="size-3.5" />
@@ -148,7 +149,7 @@ export function ServiceCatalogTable({
                         variant="ghost"
                         size="icon-sm"
                         disabled={pending}
-                        aria-label="Zmazať"
+                        aria-label={t("delete")}
                         onClick={() => remove(item.id)}
                       >
                         <Trash2 className="size-3.5 text-destructive" />
@@ -170,7 +171,7 @@ export function ServiceCatalogTable({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Upraviť službu</DialogTitle>
+            <DialogTitle>{t("edit")}</DialogTitle>
           </DialogHeader>
           {editItem ? (
             <ServiceCatalogForm

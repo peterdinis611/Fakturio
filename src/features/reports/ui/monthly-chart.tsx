@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
@@ -16,32 +17,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
-
-const config = {
-  paid: {
-    label: "Zaplatené",
-    color: "var(--chart-3)",
-  },
-  issued: {
-    label: "Vystavené",
-    color: "var(--text)",
-  },
-} satisfies ChartConfig;
-
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Máj",
-  "Jún",
-  "Júl",
-  "Aug",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Dec",
-];
+import type { AppLocale } from "@/i18n/routing";
 
 export function MonthlyRevenueChart({
   currency,
@@ -54,8 +30,24 @@ export function MonthlyRevenueChart({
     issuedAmount: number;
   }[];
 }) {
+  const t = useTranslations("Reports");
+  const locale = useLocale() as AppLocale;
+  const intl = locale === "en" ? "en-US" : "sk-SK";
+
+  const config = {
+    paid: {
+      label: t("paid"),
+      color: "var(--chart-3)",
+    },
+    issued: {
+      label: t("issued"),
+      color: "var(--text)",
+    },
+  } satisfies ChartConfig;
+
+  const monthFmt = new Intl.DateTimeFormat(intl, { month: "short" });
   const data = months.map((m) => ({
-    month: monthNames[m.month - 1] ?? String(m.month),
+    month: monthFmt.format(new Date(2000, m.month - 1, 1)),
     paid: m.paidAmount,
     issued: m.issuedAmount,
   }));
@@ -77,7 +69,7 @@ export function MonthlyRevenueChart({
           width={56}
           tick={{ fill: "var(--muted)", fontSize: 11 }}
           tickFormatter={(v) =>
-            new Intl.NumberFormat("sk-SK", {
+            new Intl.NumberFormat(intl, {
               notation: "compact",
               maximumFractionDigits: 1,
             }).format(Number(v))
@@ -93,7 +85,7 @@ export function MonthlyRevenueChart({
                     {config[name as keyof typeof config]?.label ?? name}
                   </span>
                   <span className="money font-medium text-ink">
-                    {formatMoney(Number(value), currency)}
+                    {formatMoney(Number(value), currency, locale)}
                   </span>
                 </div>
               )}

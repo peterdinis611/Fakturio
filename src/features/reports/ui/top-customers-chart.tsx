@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
@@ -14,13 +15,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
-
-const config = {
-  total: {
-    label: "Obrat",
-    color: "var(--chart-3)",
-  },
-} satisfies ChartConfig;
+import type { AppLocale } from "@/i18n/routing";
 
 export function TopCustomersChart({
   currency,
@@ -34,6 +29,17 @@ export function TopCustomersChart({
     shareOfRevenuePercent: number;
   }[];
 }) {
+  const t = useTranslations("Reports");
+  const locale = useLocale() as AppLocale;
+  const intl = locale === "en" ? "en-US" : "sk-SK";
+
+  const config = {
+    total: {
+      label: t("topCustomers"),
+      color: "var(--chart-3)",
+    },
+  } satisfies ChartConfig;
+
   const data = customers.slice(0, 8).map((c) => ({
     id: c.customerId,
     name:
@@ -48,7 +54,7 @@ export function TopCustomersChart({
   if (data.length === 0) {
     return (
       <div className="flex h-[240px] items-center justify-center text-[14px] text-muted-foreground">
-        Žiadni zákazníci v období
+        {t("noInvoicesPeriod")}
       </div>
     );
   }
@@ -76,7 +82,7 @@ export function TopCustomersChart({
           axisLine={false}
           tick={{ fill: "var(--muted)", fontSize: 11 }}
           tickFormatter={(v) =>
-            new Intl.NumberFormat("sk-SK", {
+            new Intl.NumberFormat(intl, {
               notation: "compact",
               maximumFractionDigits: 1,
             }).format(Number(v))
@@ -92,10 +98,10 @@ export function TopCustomersChart({
               formatter={(value, _name, item) => (
                 <div className="flex w-full flex-col gap-0.5">
                   <span className="money font-medium text-ink">
-                    {formatMoney(Number(value), currency)}
+                    {formatMoney(Number(value), currency, locale)}
                   </span>
                   <span className="text-muted-foreground">
-                    {(item?.payload?.share ?? 0).toFixed(1)} % obratu
+                    {(item?.payload?.share ?? 0).toFixed(1)} %
                   </span>
                 </div>
               )}

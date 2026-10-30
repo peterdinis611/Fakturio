@@ -2,14 +2,15 @@
 
 import { useTheme } from "@teispace/next-themes";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { cn } from "@/shared/lib/utils";
 
 const options = [
   {
     value: "light",
-    label: "Svetlý",
-    hint: "Papierový ledger",
+    labelKey: "themeLight",
+    hintKey: "paperLedger",
     icon: Sun,
     preview: {
       ground: "#eef0f3",
@@ -20,8 +21,8 @@ const options = [
   },
   {
     value: "dark",
-    label: "Tmavý",
-    hint: "Nočný režim",
+    labelKey: "themeDark",
+    hintKey: null,
     icon: Moon,
     preview: {
       ground: "#111110",
@@ -32,8 +33,8 @@ const options = [
   },
   {
     value: "system",
-    label: "Systém",
-    hint: "Podľa zariadenia",
+    labelKey: "themeSystem",
+    hintKey: null,
     icon: Monitor,
     preview: {
       ground: "linear-gradient(135deg, #eef0f3 50%, #111110 50%)",
@@ -46,6 +47,7 @@ const options = [
 
 export function AppearanceForm() {
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("Settings");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -54,10 +56,10 @@ export function AppearanceForm() {
 
   return (
     <fieldset>
-      <legend className="sr-only">Téma</legend>
+      <legend className="sr-only">{t("theme")}</legend>
       <div
         role="radiogroup"
-        aria-label="Téma"
+        aria-label={t("theme")}
         className="grid gap-2.5 sm:grid-cols-3"
       >
         {options.map((opt) => {
@@ -116,11 +118,13 @@ export function AppearanceForm() {
                 </span>
                 <span className="min-w-0">
                   <span className="block text-[13px] font-semibold text-ink">
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </span>
-                  <span className="block text-[11px] leading-snug text-muted-foreground">
-                    {opt.hint}
-                  </span>
+                  {opt.hintKey ? (
+                    <span className="block text-[11px] leading-snug text-muted-foreground">
+                      {t(opt.hintKey)}
+                    </span>
+                  ) : null}
                 </span>
               </span>
             </button>

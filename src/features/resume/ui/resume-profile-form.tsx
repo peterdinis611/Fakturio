@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { updateResumeProfileAction } from "@/features/resume/api/resume";
 import type { ResumeProfile } from "@/shared/api/types";
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export function ResumeProfileForm({ initial }: Props) {
+  const t = useTranslations("Resume");
   const [pending, startTransition] = useTransition();
 
   const {
@@ -58,7 +60,7 @@ export function ResumeProfileForm({ initial }: Props) {
         }
         return;
       }
-      toast.success("Profil uložený");
+      toast.success(t("profileSaved"));
     });
   }
 
@@ -77,13 +79,13 @@ export function ResumeProfileForm({ initial }: Props) {
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="headline">Titulok</Label>
+          <Label htmlFor="headline">{t("headline")}</Label>
           <Input id="headline" disabled={pending} {...register("headline")} />
         </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="summary">Zhrnutie</Label>
+        <Label htmlFor="summary">{t("summary")}</Label>
         <Textarea
           id="summary"
           rows={4}
@@ -131,22 +133,20 @@ export function ResumeProfileForm({ initial }: Props) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="skills">Zručnosti</Label>
+        <Label htmlFor="skills">{t("skills")}</Label>
         <Textarea
           id="skills"
           rows={2}
-          placeholder="napr. fakturácia, Next.js, účtovníctvo"
+          placeholder={t("skillsHint")}
           disabled={pending}
           {...register("skills")}
         />
-        <p className="text-[12px] text-muted-foreground">
-          Oddel čiarkou alebo novým riadkom.
-        </p>
+        <p className="text-[12px] text-muted-foreground">{t("skillsHint")}</p>
       </div>
 
       <div className="flex justify-end">
         <Button type="submit" disabled={pending}>
-          Uložiť profil
+          {t("saveProfile")}
         </Button>
       </div>
     </form>

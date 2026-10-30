@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AlertCircle, Clock3, Mail } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getReminders } from "@/features/invoices/api/invoices";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { FadeIn } from "@/shared/ui/motion/page-motion";
@@ -12,8 +13,12 @@ import { Button } from "@/shared/ui/button";
 import type { InvoiceReminder } from "@/shared/api/types";
 import { formatDate, formatDateTime, formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
+import type { AppLocale } from "@/i18n/routing";
 
-export const metadata = { title: "Upomienky" };
+export async function generateMetadata() {
+  const t = await getTranslations("Reminders");
+  return { title: t("title") };
+}
 
 const HORIZONS = [7, 14, 30] as const;
 
@@ -27,7 +32,13 @@ function daysLabel(r: InvoiceReminder) {
   return `O ${r.daysUntilDue} dní`;
 }
 
-function ReminderRow({ r }: { r: InvoiceReminder }) {
+function ReminderRow({
+  r,
+  locale,
+}: {
+  r: InvoiceReminder;
+  locale: AppLocale;
+}) {
   return (
     <li
       className={cn(
@@ -61,7 +72,7 @@ function ReminderRow({ r }: { r: InvoiceReminder }) {
             {r.customerName}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted-foreground">
-            <span>Splatnosť {formatDate(r.dueDate)}</span>
+            <span>Splatnosť {formatDate(r.dueDate, locale)}</span>
             {r.customerEmail ? (
               <span className="inline-flex items-center gap-1 truncate">
                 <Mail className="size-3" aria-hidden />
@@ -83,13 +94,13 @@ function ReminderRow({ r }: { r: InvoiceReminder }) {
             {daysLabel(r)}
           </p>
           <p className="money text-[15px] text-ink">
-            {formatMoney(r.total, r.currency)}
+            {formatMoney(r.total, r.currency, locale)}
           </p>
           <p className="mt-0.5 text-[11px] text-faint">
             {r.reminderCount > 0
               ? `${r.reminderCount}× odoslané${
                   r.lastReminderSentAt
-                    ? ` · ${formatDateTime(r.lastReminderSentAt)}`
+                    ? ` · ${formatDateTime(r.lastReminderSentAt, locale)}`
                     : ""
                 }`
               : "Ešte neodoslané"}
@@ -106,11 +117,13 @@ function ReminderGroup({
   hint,
   tone,
   items,
+  locale,
 }: {
   title: string;
   hint: string;
   tone: "danger" | "neutral";
   items: InvoiceReminder[];
+  locale: AppLocale;
 }) {
   if (items.length === 0) return null;
 
@@ -134,7 +147,7 @@ function ReminderGroup({
       </div>
       <ul className="panel divide-y divide-rule overflow-hidden">
         {items.map((r) => (
-          <ReminderRow key={r.id} r={r} />
+          <ReminderRow key={r.id} r={r} locale={locale} />
         ))}
       </ul>
     </section>
@@ -146,6 +159,8 @@ export default async function RemindersPage({
 }: {
   searchParams: Promise<{ within?: string; overdue?: string }>;
 }) {
+  const t = await getTranslations("Reminders");
+  const locale = (await getLocale()) as AppLocale;
   const sp = await searchParams;
   const withinRaw = Number(sp.within);
   const withinDays = HORIZONS.includes(withinRaw as (typeof HORIZONS)[number])
@@ -163,12 +178,8 @@ export default async function RemindersPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
-        title="Upomienky"
-        description={
-          onlyOverdue
-            ? "Len faktúry po splatnosti — sync stavov a označ odoslanie."
-            : `Splatnosti v najbližších ${withinDays} dňoch a omeškané.`
-        }
+        title={t("title")}
+        description={t("description")}
         actions={<SyncOverdueButton />}
         ledger={
           reminders.length > 0 ? (
@@ -178,17 +189,17 @@ export default async function RemindersPage({
                 <span className="text-negative">
                   {overdue.length} po splatnosti ·{" "}
                   <span className="money">
-                    {formatMoney(overdueSum, currency)}
+                    {formatMoney(overdueSum, currency, locale)}
                   </span>
                 </span>
               ) : (
-                <span className="text-positive">Nič omeškané</span>
+                <span className="text-positive">{t("nothingOverdue")}</span>
               )}
               {!onlyOverdue && upcoming.length > 0 ? (
                 <span>
                   {upcoming.length} blíži sa ·{" "}
                   <span className="money">
-                    {formatMoney(upcomingSum, currency)}
+                    {formatMoney(upcomingSum, currency, locale)}
                   </span>
                 </span>
               ) : null}
@@ -211,7 +222,7 @@ export default async function RemindersPage({
                     : "border-transparent text-muted-foreground hover:text-ink",
                 )}
               >
-                {d} dní
+                {t("withinDays", { count: d })}
               </Link>
             ))}
           </div>
@@ -229,7 +240,7 @@ export default async function RemindersPage({
             )}
           >
             <AlertCircle className="size-3.5" aria-hidden />
-            Len po splatnosti
+            {t("onlyOverdue")}
           </Link>
         </div>
       </FadeIn>
@@ -246,9 +257,7 @@ export default async function RemindersPage({
               </span>
               <div>
                 <p className="text-[16px] font-medium text-ink">
-                  {onlyOverdue
-                    ? "Žiadne omeškané faktúry"
-                    : "Žiadne upomienky v horizonte"}
+                  {onlyOverdue ? t("emptyOverdue") : t("emptyHorizon")}
                 </p>
                 <p className="mt-1 max-w-md text-[14px] text-muted-foreground">
                   {onlyOverdue
@@ -269,18 +278,20 @@ export default async function RemindersPage({
             <ul className="mt-8 grid gap-2 text-[13px] sm:grid-cols-3">
               <li className="border border-dashed border-border px-3 py-3">
                 <p className="text-faint">Horizont</p>
-                <p className="mt-0.5 font-medium text-ink">{withinDays} dní</p>
+                <p className="mt-0.5 font-medium text-ink">
+                  {t("withinDays", { count: withinDays })}
+                </p>
               </li>
               <li className="border border-dashed border-border px-3 py-3">
                 <p className="text-faint">Filter</p>
                 <p className="mt-0.5 font-medium text-ink">
-                  {onlyOverdue ? "Len po splatnosti" : "Blížiace + omeškané"}
+                  {onlyOverdue ? t("onlyOverdue") : t("upcoming")}
                 </p>
               </li>
               <li className="border border-dashed border-border px-3 py-3">
                 <p className="text-faint">Akcia</p>
                 <p className="mt-0.5 font-medium text-ink">
-                  Obnoviť omeškané hore
+                  {t("refreshOverdue")}
                 </p>
               </li>
             </ul>
@@ -290,24 +301,27 @@ export default async function RemindersPage({
         <FadeIn delay={0.08} className="space-y-8">
           {onlyOverdue ? (
             <ReminderGroup
-              title="Po splatnosti"
-              hint={`${overdue.length} · ${formatMoney(overdueSum, currency)}`}
+              title={t("onlyOverdue")}
+              hint={`${overdue.length} · ${formatMoney(overdueSum, currency, locale)}`}
               tone="danger"
               items={overdue}
+              locale={locale}
             />
           ) : (
             <>
               <ReminderGroup
-                title="Po splatnosti"
-                hint={`${overdue.length} · ${formatMoney(overdueSum, currency)}`}
+                title={t("onlyOverdue")}
+                hint={`${overdue.length} · ${formatMoney(overdueSum, currency, locale)}`}
                 tone="danger"
                 items={overdue}
+                locale={locale}
               />
               <ReminderGroup
-                title="Blížiaca sa splatnosť"
-                hint={`${upcoming.length} · ${formatMoney(upcomingSum, currency)}`}
+                title={t("upcoming")}
+                hint={`${upcoming.length} · ${formatMoney(upcomingSum, currency, locale)}`}
                 tone="neutral"
                 items={upcoming}
+                locale={locale}
               />
             </>
           )}

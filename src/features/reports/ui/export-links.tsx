@@ -1,4 +1,7 @@
+"use client";
+
 import { Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
 import { Button } from "@/shared/ui/button";
 import { invoicesExportHref, vatExportHref } from "@/shared/lib/exports";
@@ -10,6 +13,7 @@ export function ReportExportLinks({
   from?: string;
   to?: string;
 }) {
+  const t = useTranslations("Reports");
   const range = { from, to };
   const invoicesHref = invoicesExportHref(range);
   const vatHref = vatExportHref(range);
@@ -19,9 +23,9 @@ export function ReportExportLinks({
       <CsvPreview
         href={invoicesHref}
         downloadHref={invoicesHref}
-        title="Náhľad — faktúry CSV"
+        title={t("csvPreview")}
         description="Tabuľkový náhľad exportu pred stiahnutím."
-        triggerLabel="Faktúry"
+        triggerLabel={t("invoices")}
       />
       <Button asChild variant="ghost" size="sm">
         <a href={invoicesHref} download>
@@ -33,9 +37,9 @@ export function ReportExportLinks({
       <CsvPreview
         href={vatHref}
         downloadHref={vatHref}
-        title="Náhľad — DPH CSV"
+        title={t("csvPreview")}
         description="Riadky DPH podľa sadzieb a faktúr."
-        triggerLabel="DPH"
+        triggerLabel={t("vatByRate")}
       />
       <Button asChild variant="ghost" size="sm">
         <a href={vatHref} download>

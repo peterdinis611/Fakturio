@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
   createServiceAction,
@@ -33,6 +34,7 @@ export function ServiceCatalogForm({
   defaultVatRate,
   onDone,
 }: Props) {
+  const t = useTranslations("Services");
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(initial?.id);
 
@@ -70,7 +72,7 @@ export function ServiceCatalogForm({
         : await createServiceAction(payload);
 
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("save"));
         const fieldErrors = toFieldErrors(result?.validationErrors);
         if (fieldErrors) {
           for (const [key, message] of Object.entries(fieldErrors)) {
@@ -80,7 +82,7 @@ export function ServiceCatalogForm({
         return;
       }
 
-      toast.success(isEdit ? "Služba upravená" : "Služba pridaná");
+      toast.success(isEdit ? t("updated") : t("added"));
       onDone?.();
     });
   }
@@ -92,7 +94,7 @@ export function ServiceCatalogForm({
       noValidate
     >
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="description">Popis</Label>
+        <Label htmlFor="description">{t("descriptionLabel")}</Label>
         <Input id="description" disabled={pending} {...register("description")} />
         {errors.description ? (
           <p className="text-xs text-destructive">{errors.description.message}</p>
@@ -100,11 +102,11 @@ export function ServiceCatalogForm({
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="unit">Jednotka</Label>
+          <Label htmlFor="unit">{t("unit")}</Label>
           <Input id="unit" disabled={pending} {...register("unit")} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="unitPrice">Cena</Label>
+          <Label htmlFor="unitPrice">{t("price")}</Label>
           <Input
             id="unitPrice"
             type="number"
@@ -117,7 +119,7 @@ export function ServiceCatalogForm({
         </div>
         {isVatPayer ? (
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="vatRate">DPH %</Label>
+            <Label htmlFor="vatRate">{t("vat")}</Label>
             <Input
               id="vatRate"
               type="number"
@@ -139,12 +141,12 @@ export function ServiceCatalogForm({
           }
         />
         <Label htmlFor="isActive" className="font-normal">
-          Aktívna
+          {t("active")}
         </Label>
       </div>
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={pending}>
-          {isEdit ? "Uložiť" : "Pridať"}
+          {isEdit ? t("save") : t("add")}
         </Button>
       </div>
     </form>
