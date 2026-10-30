@@ -74,18 +74,31 @@ export async function apiFetch<T>(
     skipAuth,
   } = options;
   const authHeader = skipAuth ? {} : await getAuthHeader();
-  const res = await fetch(buildUrl(path, searchParams), {
-    method,
-    headers: {
-      Accept: "application/json",
-      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...authHeader,
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    cache,
-    next,
-  });
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(path, searchParams), {
+      method,
+      headers: {
+        Accept: "application/json",
+        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...authHeader,
+        ...headers,
+      },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      cache,
+      next,
+    });
+  } catch (error) {
+    throw new ApiError(0, {
+      title: "Server unavailable",
+      detail:
+        error instanceof Error
+          ? error.message
+          : "Could not reach the API server.",
+      status: 0,
+      code: "server_unreachable",
+    });
+  }
 
   if (res.status === 204) {
     return undefined as T;

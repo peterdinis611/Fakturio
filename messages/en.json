@@ -588,5 +588,14 @@
     "lookupNeedIco": "Enter a valid 8-digit company ID.",
     "lookupFilledRpo": "Details filled from RPO",
     "lookupFilledAres": "Details filled from ARES"
+  },
+  "Offline": {
+    "titleOffline": "You're offline",
+    "bodyOffline": "You're not connected to the internet. Some actions won't work until you're back online.",
+    "titleServer": "Server unavailable",
+    "bodyServer": "The app can't reach the API. Check that the backend is running, or try again.",
+    "retry": "Try again",
+    "checking": "Checking…",
+    "backOnline": "Connection restored"
   }
 }

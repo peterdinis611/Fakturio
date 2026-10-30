@@ -588,5 +588,14 @@
     "lookupNeedIco": "Zadaj platné 8-miestne IČO.",
     "lookupFilledRpo": "Údaje doplnené z RPO",
     "lookupFilledAres": "Údaje doplnené z ARES"
+  },
+  "Offline": {
+    "titleOffline": "Ste offline",
+    "bodyOffline": "Nie ste pripojení na internet. Niektoré akcie nebudú fungovať, kým sa spojenie nevráti.",
+    "titleServer": "Server nie je dostupný",
+    "bodyServer": "Aplikácia nevie dosiahnuť API. Skontrolujte, či beží backend, alebo skúste znova.",
+    "retry": "Skúsiť znova",
+    "checking": "Kontrolujem…",
+    "backOnline": "Spojenie obnovené"
   }
 }

@@ -4,6 +4,7 @@ import { getCompanyStatus, getCompanySummary } from "@/features/company/api/comp
 import { getCurrentUser } from "@/features/auth/api/auth";
 import { AppSidebar } from "@/widgets/app-shell/app-sidebar";
 import { CompanyBanner } from "@/widgets/app-shell/company-banner";
+import { ConnectivityBanner } from "@/widgets/app-shell/connectivity-banner";
 import {
   ScrollRestoration,
   ScrollToTopButton,
@@ -39,6 +40,7 @@ async function AppShell({ children }: { children: React.ReactNode }) {
         userEmail={user!.email}
       />
       <div className="flex min-w-0 flex-1 flex-col">
+        <ConnectivityBanner />
         {status ? <CompanyBanner status={status} /> : null}
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="mx-auto w-full max-w-[1152px]">
