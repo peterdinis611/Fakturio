@@ -725,9 +725,21 @@ export function LandingShell() {
               {t("navFaq")}
             </Link>
           </div>
+          <div>
+            <span>{t("footLegal")}</span>
+            <Link href="/privacy">{t("footPrivacy")}</Link>
+            <Link href="/terms">{t("footTerms")}</Link>
+            <Link href="/support">{t("footSupport")}</Link>
+            <Link href="/privacy#cookies">{t("footCookies")}</Link>
+          </div>
         </div>
         <p className="landing-foot-copy">
-          © {new Date().getFullYear()} Fakturio
+          © {new Date().getFullYear()} Fakturio ·{" "}
+          <Link href="/privacy">{t("footPrivacy")}</Link>
+          {" · "}
+          <Link href="/terms">{t("footTerms")}</Link>
+          {" · "}
+          <Link href="/support">{t("footSupport")}</Link>
         </p>
       </footer>
     </div>

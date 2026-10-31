@@ -17,17 +17,7 @@ import {
 } from "@/shared/lib/onboarding";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { companySchema } from "@/entities/company/model/schema";
-
-const LOGO_MAX_BYTES = 2 * 1024 * 1024;
-const LOGO_TYPES = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/webp",
-  "image/svg+xml",
-]);
-
-export { LOGO_MAX_BYTES, LOGO_TYPES };
+import { LOGO_MAX_BYTES, LOGO_TYPES } from "@/features/company/model/logo";
 
 export const getCompany = cache(async (): Promise<CompanySettings> => {
   return apiFetch<CompanySettings>("/api/company", {
@@ -99,7 +89,6 @@ export async function skipOnboardingAction(): Promise<void> {
 export async function uploadCompanyLogoAction(
   formData: FormData,
 ): Promise<CompanySettings> {
-  "use server";
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
     throw new ActionError("Vyber súbor s logom.");
@@ -131,7 +120,6 @@ export async function uploadCompanyLogoAction(
 }
 
 export async function deleteCompanyLogoAction(): Promise<CompanySettings> {
-  "use server";
   try {
     const data = await apiFetch<CompanySettings>("/api/company/logo", {
       method: "DELETE",

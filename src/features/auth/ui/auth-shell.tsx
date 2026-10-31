@@ -64,6 +64,14 @@ export function AuthShell({ mode }: AuthShellProps) {
               </>
             )}
           </p>
+          <p className="auth-panel-legal">
+            {t.rich("legalNote", {
+              privacy: (chunks) => (
+                <Link href="/privacy">{chunks}</Link>
+              ),
+              terms: (chunks) => <Link href="/terms">{chunks}</Link>,
+            })}
+          </p>
         </div>
       </div>
     </div>

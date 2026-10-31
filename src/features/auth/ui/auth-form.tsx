@@ -11,7 +11,9 @@ import {
   evaluatePasswordRules,
   type PasswordRuleId,
 } from "@/shared/lib/password";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/shared/ui/button";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Spinner } from "@/shared/ui/spinner";
@@ -37,6 +39,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const passwordRules = useMemo(
@@ -47,6 +50,13 @@ export function AuthForm({ mode }: AuthFormProps) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (mode === "sign-up" && !privacyAccepted) {
+      const message = t("privacyRequired");
+      setError(message);
+      toast.error(message);
+      return;
+    }
 
     startTransition(async () => {
       const result =
@@ -159,9 +169,55 @@ export function AuthForm({ mode }: AuthFormProps) {
         ) : null}
       </div>
 
+      {mode === "sign-up" ? (
+        <div className="flex items-start gap-2.5 rounded-[4px] border border-border bg-raised/30 px-3 py-2.5">
+          <Checkbox
+            id="privacyAccepted"
+            checked={privacyAccepted}
+            onCheckedChange={(checked) =>
+              setPrivacyAccepted(checked === true)
+            }
+            disabled={pending}
+            aria-invalid={Boolean(error && !privacyAccepted)}
+            className="mt-0.5"
+          />
+          <Label
+            htmlFor="privacyAccepted"
+            className="text-[12.5px] leading-snug font-normal text-muted-foreground"
+          >
+            {t.rich("privacyConsent", {
+              privacy: (chunks) => (
+                <Link
+                  href="/privacy"
+                  className="font-medium text-ink underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {chunks}
+                </Link>
+              ),
+              terms: (chunks) => (
+                <Link
+                  href="/terms"
+                  className="font-medium text-ink underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </Label>
+        </div>
+      ) : null}
+
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
 
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button
+        type="submit"
+        disabled={pending || (mode === "sign-up" && !privacyAccepted)}
+        className="w-full"
+      >
         {pending ? (
           <span className="inline-flex items-center gap-2">
             <Spinner size="sm" label={t("submitting")} />

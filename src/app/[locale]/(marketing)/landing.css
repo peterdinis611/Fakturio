@@ -1475,6 +1475,16 @@ html {
   align-self: end;
 }
 
+.landing-foot-copy a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landing-foot-copy a:hover {
+  color: var(--lp-ink);
+}
+
 @media (max-width: 900px) {
   .landing-top {
     grid-template-columns: 1fr auto;
@@ -1962,6 +1972,23 @@ html {
 }
 
 .auth-panel-note a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-panel-legal {
+  margin: 0;
+  text-align: center;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--lp-muted) 88%, transparent);
+  max-width: 32ch;
+  align-self: center;
+}
+
+.auth-panel-legal a {
+  color: var(--lp-ink);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
 }

@@ -14,7 +14,13 @@
     "signInTitle": "Sign in",
     "signInDescription": "Sign in to Fakturio and continue invoicing.",
     "signUpTitle": "Sign up",
-    "signUpDescription": "Create your Fakturio account and issue your first invoice today."
+    "signUpDescription": "Create your Fakturio account and issue your first invoice today.",
+    "privacyTitle": "Privacy Policy",
+    "privacyDescription": "How Fakturio processes personal data under the GDPR.",
+    "termsTitle": "Terms of Service",
+    "termsDescription": "Terms for using the Fakturio service.",
+    "supportTitle": "Contact & support",
+    "supportDescription": "How to reach us and what Fakturio support covers."
   },
   "Common": {
     "account": "Account",
@@ -134,14 +140,276 @@
   },
   "Profile": {
     "title": "Profile",
-    "description": "Signed-in account details and quick actions.",
+    "description": "Account, security, company logo, and shortcuts.",
     "active": "Active",
     "firstName": "First name",
     "lastName": "Last name",
+    "email": "Email",
+    "emailLocked": "Email can only be changed via support.",
     "created": "Account created",
     "lastSeen": "Last activity",
     "companyHint": "Edit company details used on invoices under Company.",
-    "setCompany": "Set up company"
+    "setCompany": "Set up company",
+    "openAppearance": "Appearance",
+    "openSettings": "All settings",
+    "sectionAccount": "Account",
+    "sectionAccountHint": "Name shown in the app.",
+    "sectionSecurity": "Security",
+    "sectionSecurityHint": "Change your account password.",
+    "sectionLogo": "Company logo",
+    "sectionLogoHint": "Used on invoices and PDFs. Max 2 MB.",
+    "sectionShortcuts": "Shortcuts",
+    "sectionShortcutsHint": "Jump into settings quickly.",
+    "saveAccount": "Save account",
+    "accountSaved": "Account saved",
+    "accountSaveFailed": "Could not save account",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "changePassword": "Change password",
+    "passwordSaved": "Password changed",
+    "passwordSaveFailed": "Could not change password",
+    "passwordMismatch": "Passwords do not match",
+    "logoDropTitle": "Drop logo here",
+    "logoDropNow": "Release to upload",
+    "logoDropHint": "PNG, JPEG, WebP or SVG · up to {max}",
+    "logoDropAria": "Upload company logo",
+    "logoReady": "Logo is ready",
+    "logoUploading": "Uploading logo…",
+    "logoReplaceHint": "Click or drop a new file.",
+    "logoReplace": "Replace",
+    "logoRemove": "Remove",
+    "logoUpload": "Upload",
+    "logoSaved": "Logo saved",
+    "logoRemoved": "Logo removed",
+    "logoTooLarge": "Logo must be at most {max}.",
+    "logoBadType": "Allowed formats: PNG, JPEG, WebP, SVG.",
+    "logoFootnote": "Changes apply to new invoices and PDFs.",
+    "openPrivacy": "Privacy policy",
+    "openTerms": "Terms of service",
+    "openSupport": "Support"
+  },
+  "Terms": {
+    "eyebrow": "Legal",
+    "title": "Terms of Service",
+    "lead": "These terms govern use of the Fakturio web service for issuing and managing invoices. By registering or using the service you acknowledge them.",
+    "effectiveLabel": "Effective from",
+    "version": "Version 1.0",
+    "tocLabel": "Contents",
+    "footnote": "We may update these terms when the service or legal requirements change. The current version is always on this page.",
+    "facts": {
+      "provider": "Provider",
+      "email": "Contact"
+    },
+    "sections": {
+      "service": {
+        "title": "Service",
+        "body": "Fakturio is software-as-a-service for issuing invoices, managing customers, tracking due dates, and related reports and exports.",
+        "body2": "The service is not a substitute for tax, accounting or legal advice. You remain responsible for document content and statutory duties.",
+        "items": []
+      },
+      "account": {
+        "title": "Account and access",
+        "body": "You need an account with a valid email and password. Keep credentials confidential. Activity on the account is treated as yours unless you prove otherwise.",
+        "items": [
+          "you provide accurate registration details,",
+          "you do not abuse the service (attacks, scraping, limit evasion),",
+          "we may temporarily restrict access if abuse is suspected."
+        ]
+      },
+      "dataResponsibility": {
+        "title": "Data and documents",
+        "body": "Company, customer and invoice data you enter are your business data. You are responsible for accuracy, lawfulness and your right to process them.",
+        "body2": "Personal data processing is described in the Privacy Policy.",
+        "items": []
+      },
+      "availability": {
+        "title": "Availability and changes",
+        "body": "We aim for stable operation but do not guarantee uninterrupted availability. We may perform maintenance, fix bugs and change features without unreasonably defeating the core purpose of the service.",
+        "items": []
+      },
+      "fees": {
+        "title": "Pricing",
+        "body": "You may start free during beta / trial. If paid plans are introduced, we will publish prices in advance; changes apply only after explicit consent or new subscription terms.",
+        "items": []
+      },
+      "liability": {
+        "title": "Liability",
+        "body": "The service is provided “as is”. To the fullest extent permitted by law we are not liable for indirect damages, lost profits, or decisions made solely based on app outputs.",
+        "body2": "Tax and accounting consequences of invoices remain with the user (or their accountant).",
+        "items": []
+      },
+      "termination": {
+        "title": "Termination",
+        "body": "You may stop using the account at any time. We may terminate for material breach or prolonged abuse. After termination, backups required for security or legal duties may remain as described in the privacy notice.",
+        "items": []
+      },
+      "law": {
+        "title": "Governing law",
+        "body": "These terms are governed by the law of the Slovak Republic. Disputes should first be resolved amicably; otherwise Slovak courts have jurisdiction unless mandatory rules say otherwise.",
+        "items": []
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "Questions about these terms or the service go to the contact below. For product help use Contact & support.",
+        "items": []
+      }
+    }
+  },
+  "Support": {
+    "eyebrow": "Help",
+    "title": "Contact & support",
+    "lead": "A money product needs a human contact path. Here’s how to reach us and what we cover.",
+    "tocLabel": "Contents",
+    "footnote": "For critical outages we will add a public status page. For now, try signing in again or email us.",
+    "facts": {
+      "email": "Support",
+      "privacy": "Privacy"
+    },
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "sections": {
+      "contact": {
+        "title": "How to contact us",
+        "body": "Email a short description, invoice number (if relevant), and browser/device. We reply on business days.",
+        "items": []
+      },
+      "response": {
+        "title": "What to expect",
+        "body": "Typical requests are handled within 1–2 business days. Security incidents get higher priority.",
+        "items": []
+      },
+      "topics": {
+        "title": "What we can help with",
+        "body": "Support mainly covers:",
+        "items": [
+          "sign-in and account,",
+          "company setup and VAT mode,",
+          "invoices, PDFs and accountant exports,",
+          "payment import and VS matching,",
+          "app bugs and suspected incidents."
+        ]
+      },
+      "status": {
+        "title": "Availability",
+        "body": "If you cannot sign in or the API is down, try again later and let us know. A public status page will come with production operations.",
+        "items": []
+      },
+      "legal": {
+        "title": "Legal documents",
+        "body": "Related documents:",
+        "items": []
+      }
+    }
+  },
+  "Privacy": {
+    "eyebrow": "Legal",
+    "title": "Privacy Policy",
+    "lead": "This notice explains what personal data Fakturio processes, for which purposes, on which legal bases, and what rights you have under the GDPR.",
+    "effectiveLabel": "Effective from",
+    "version": "Version 1.0",
+    "tocLabel": "Contents",
+    "footnote": "This document is an Article 13/14 GDPR information notice. We will update it when the controller or processing scope changes, including the effective date.",
+    "facts": {
+      "controller": "Controller",
+      "ico": "Company ID",
+      "address": "Address",
+      "email": "Privacy contact",
+      "jurisdiction": "Governing law"
+    },
+    "sections": {
+      "controller": {
+        "title": "Controller",
+        "body": "The controller of personal data in connection with Fakturio is the entity listed below. For privacy questions, contact us using the email in this notice.",
+        "items": []
+      },
+      "scope": {
+        "title": "Scope and data subjects",
+        "body": "This notice covers Fakturio users (registration, sign-in, company and document management) and people whose data you enter into the app (e.g. invoice customers).",
+        "body2": "When you process your clients’ data, you are typically an independent controller of that data. Fakturio provides the tool; you remain responsible for the lawfulness of invoice and customer content.",
+        "items": []
+      },
+      "data": {
+        "title": "What we process",
+        "body": "We process only data needed to provide the service:",
+        "items": [
+          "Account: email, password (stored hashed only), first/last name, registration and last-activity timestamps.",
+          "Company: business and contact details, tax IDs, address, bank details, logo and invoice defaults.",
+          "Documents and workflow: invoices, line items, customers, payments, reminders, notes, reports and related audit logs.",
+          "Technical data: session cookie / access token, IP and diagnostic logs in a proportionate scope for security and operations."
+        ]
+      },
+      "purposes": {
+        "title": "Purposes",
+        "body": "We use data solely to:",
+        "items": [
+          "create and administer your user account,",
+          "provide invoicing features (PDFs, due dates, payment matching, reports),",
+          "secure the service, prevent abuse and handle incidents,",
+          "meet legal obligations where they arise from your use,",
+          "communicate about the service (technical notices, replies to requests)."
+        ]
+      },
+      "legalBasis": {
+        "title": "Legal bases",
+        "body": "Processing is based primarily on GDPR Article 6:",
+        "items": [
+          "performance of a contract / steps prior to a contract (providing the service after registration),",
+          "legitimate interests (security, operations, abuse prevention) balanced against your rights,",
+          "consent (where we expressly ask for it, e.g. optional features),",
+          "legal obligation, where applicable."
+        ]
+      },
+      "recipients": {
+        "title": "Recipients and processors",
+        "body": "We do not sell or publicly disclose your data. Trusted processors may process data only on our instructions (hosting, email infrastructure, monitoring), limited to what operations require.",
+        "body2": "Data may be disclosed to public authorities when required by law.",
+        "items": []
+      },
+      "retention": {
+        "title": "Retention",
+        "body": "We keep data only as long as needed for the purposes collected:",
+        "items": [
+          "account and operational data — for the life of the account and a reasonable period after deletion (technical/security reasons),",
+          "invoicing and company data — according to your settings and statutory periods that may apply to your records,",
+          "security and diagnostic logs — shorter periods, typically months, unless longer retention is justified."
+        ]
+      },
+      "rights": {
+        "title": "Your rights",
+        "body": "You have rights of access, rectification, erasure, restriction, portability and objection to processing based on legitimate interests. Where processing relies on consent, you may withdraw it at any time.",
+        "body2": "Send requests to the contact above. You may also lodge a complaint with the Slovak Data Protection Authority (Úrad na ochranu osobných údajov SR).",
+        "items": []
+      },
+      "cookies": {
+        "title": "Cookies and similar technologies",
+        "body": "Fakturio uses necessary cookies / browser storage for authentication (httpOnly session token), language and appearance. These are required for the service and do not need marketing consent.",
+        "body2": "We do not use third-party advertising trackers. If analytics cookies are introduced later, we will ask for consent and update this notice.",
+        "items": []
+      },
+      "security": {
+        "title": "Security",
+        "body": "We apply appropriate technical and organisational measures: encrypted transport (HTTPS), password hashing, access control and environment separation. No online service can guarantee absolute security.",
+        "items": []
+      },
+      "transfers": {
+        "title": "Transfers outside the EU / EEA",
+        "body": "Data is processed preferentially in the EU / EEA. If we use a provider outside that area, we will ensure an appropriate safeguard (e.g. Standard Contractual Clauses) and update this notice.",
+        "items": []
+      },
+      "changes": {
+        "title": "Changes",
+        "body": "We may update this notice when features, legal requirements or the controller change. The current version is always on this page; the effective date is shown in the header.",
+        "items": []
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "For privacy questions, rights requests or incident reports, email the address in the Controller section. We will respond within GDPR timelines.",
+        "items": []
+      }
+    }
   },
   "Nav": {
     "dashboard": "Overview",
@@ -196,7 +464,12 @@
     "invalidCredentials": "Invalid email or password",
     "checkForm": "Please check the form",
     "signedIn": "Signed in",
-    "registered": "Account created"
+    "registered": "Account created",
+    "privacyConsent": "I agree to personal data processing under the <privacy>Privacy Policy</privacy> and acknowledge the <terms>Terms of Service</terms>.",
+    "privacyLink": "Privacy Policy",
+    "termsLink": "Terms of Service",
+    "privacyRequired": "You must accept the privacy policy and terms to create an account.",
+    "legalNote": "By continuing you acknowledge the <privacy>Privacy Policy</privacy> and <terms>Terms</terms>."
   },
   "Landing": {
     "skip": "Skip to content",
@@ -298,11 +571,16 @@
     "footTagline": "Invoicing for SK freelancers and sole traders",
     "footProduct": "Product",
     "footAccount": "Account",
+    "footLegal": "Legal",
     "footFeatures": "Features",
     "footCompare": "Compare",
     "footSample": "Sample",
     "footSignIn": "Sign in",
     "footSignUp": "Sign up",
+    "footPrivacy": "Privacy",
+    "footTerms": "Terms",
+    "footSupport": "Support",
+    "footCookies": "Cookies",
     "cashflowLabel": "Cashflow trend",
     "cashflowHint": "+18 % vs last month",
     "previewOverview": "Overview",
@@ -448,6 +726,11 @@
     "applyFilters": "Apply filters",
     "csvPreview": "Preview — invoices CSV",
     "invoices": "Invoices",
+    "accountantPack": "Accountant pack",
+    "accountantPackHint": "ZIP: invoice CSV + VAT + Money S3 XML",
+    "moneyXml": "Money S3 XML",
+    "invoicesCsvHint": "Documents with VAT regime, VAT IDs and VS — Excel (;).",
+    "vatCsvHint": "VAT lines by rate, useful for return checks.",
     "noInvoicesPeriod": "No invoices in this period",
     "noVatData": "No VAT data in this period",
     "pickDate": "Pick a date",

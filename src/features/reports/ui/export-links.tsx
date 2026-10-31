@@ -1,10 +1,15 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { Download, Package } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
 import { Button } from "@/shared/ui/button";
-import { invoicesExportHref, vatExportHref } from "@/shared/lib/exports";
+import {
+  accountantPackHref,
+  invoicesExportHref,
+  moneyS3ExportHref,
+  vatExportHref,
+} from "@/shared/lib/exports";
 
 export function ReportExportLinks({
   from,
@@ -17,36 +22,58 @@ export function ReportExportLinks({
   const range = { from, to };
   const invoicesHref = invoicesExportHref(range);
   const vatHref = vatExportHref(range);
+  const moneyHref = moneyS3ExportHref(range);
+  const packHref = accountantPackHref(range);
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <CsvPreview
-        href={invoicesHref}
-        downloadHref={invoicesHref}
-        title={t("csvPreview")}
-        description="Tabuľkový náhľad exportu pred stiahnutím."
-        triggerLabel={t("invoices")}
-      />
-      <Button asChild variant="ghost" size="sm">
-        <a href={invoicesHref} download>
-          <Download className="size-3.5" aria-hidden />
-          CSV
-        </a>
-      </Button>
-      <span className="mx-0.5 hidden h-4 w-px bg-rule sm:inline" aria-hidden />
-      <CsvPreview
-        href={vatHref}
-        downloadHref={vatHref}
-        title={t("csvPreview")}
-        description="Riadky DPH podľa sadzieb a faktúr."
-        triggerLabel={t("vatByRate")}
-      />
-      <Button asChild variant="ghost" size="sm">
-        <a href={vatHref} download>
-          <Download className="size-3.5" aria-hidden />
-          CSV
-        </a>
-      </Button>
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Button asChild size="sm">
+          <a href={packHref} download>
+            <Package className="size-3.5" aria-hidden />
+            {t("accountantPack")}
+          </a>
+        </Button>
+        <Button asChild variant="secondary" size="sm">
+          <a href={moneyHref} download>
+            <Download className="size-3.5" aria-hidden />
+            {t("moneyXml")}
+          </a>
+        </Button>
+        <p className="w-full text-[12px] text-muted-foreground sm:ml-1 sm:w-auto">
+          {t("accountantPackHint")}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <CsvPreview
+          href={invoicesHref}
+          downloadHref={invoicesHref}
+          title={t("csvPreview")}
+          description={t("invoicesCsvHint")}
+          triggerLabel={t("invoices")}
+        />
+        <Button asChild variant="ghost" size="sm">
+          <a href={invoicesHref} download>
+            <Download className="size-3.5" aria-hidden />
+            CSV
+          </a>
+        </Button>
+        <span className="mx-0.5 hidden h-4 w-px bg-rule sm:inline" aria-hidden />
+        <CsvPreview
+          href={vatHref}
+          downloadHref={vatHref}
+          title={t("csvPreview")}
+          description={t("vatCsvHint")}
+          triggerLabel={t("vatByRate")}
+        />
+        <Button asChild variant="ghost" size="sm">
+          <a href={vatHref} download>
+            <Download className="size-3.5" aria-hidden />
+            CSV
+          </a>
+        </Button>
+      </div>
     </div>
   );
 }

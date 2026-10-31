@@ -24,6 +24,9 @@ function isPublicPath(path: string) {
     path === "/" ||
     path.startsWith("/sign-in") ||
     path.startsWith("/sign-up") ||
+    path.startsWith("/privacy") ||
+    path.startsWith("/terms") ||
+    path.startsWith("/support") ||
     path.startsWith("/api")
   );
 }

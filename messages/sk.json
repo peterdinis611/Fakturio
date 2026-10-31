@@ -14,7 +14,13 @@
     "signInTitle": "Prihlásenie",
     "signInDescription": "Prihlás sa do Fakturio a pokračuj vo fakturácii.",
     "signUpTitle": "Registrácia",
-    "signUpDescription": "Vytvor si účet vo Fakturio a vystav prvú faktúru ešte dnes."
+    "signUpDescription": "Vytvor si účet vo Fakturio a vystav prvú faktúru ešte dnes.",
+    "privacyTitle": "Ochrana osobných údajov",
+    "privacyDescription": "Informácie o spracúvaní osobných údajov v službe Fakturio podľa GDPR.",
+    "termsTitle": "Obchodné podmienky",
+    "termsDescription": "Podmienky používania služby Fakturio.",
+    "supportTitle": "Kontakt a podpora",
+    "supportDescription": "Ako nás kontaktovať a čo riešime v podpore Fakturio."
   },
   "Common": {
     "account": "Účet",
@@ -134,14 +140,276 @@
   },
   "Profile": {
     "title": "Profil",
-    "description": "Údaje prihláseného účtu a rýchle akcie.",
+    "description": "Účet, bezpečnosť, logo firmy a skratky.",
     "active": "Aktívny",
     "firstName": "Meno",
     "lastName": "Priezvisko",
+    "email": "E-mail",
+    "emailLocked": "E-mail sa mení len cez podporu.",
     "created": "Účet vytvorený",
     "lastSeen": "Posledná aktivita",
     "companyHint": "Firemné údaje na faktúrach upravíš vo Firma.",
-    "setCompany": "Nastaviť firmu"
+    "setCompany": "Nastaviť firmu",
+    "openAppearance": "Vzhľad",
+    "openSettings": "Všetky nastavenia",
+    "sectionAccount": "Účet",
+    "sectionAccountHint": "Meno zobrazené v aplikácii.",
+    "sectionSecurity": "Bezpečnosť",
+    "sectionSecurityHint": "Zmena hesla k účtu.",
+    "sectionLogo": "Logo firmy",
+    "sectionLogoHint": "Na faktúrach a v PDF. Max. 2 MB.",
+    "sectionShortcuts": "Skratky",
+    "sectionShortcutsHint": "Rýchly prechod do nastavení.",
+    "saveAccount": "Uložiť účet",
+    "accountSaved": "Účet uložený",
+    "accountSaveFailed": "Účet sa nepodarilo uložiť",
+    "currentPassword": "Aktuálne heslo",
+    "newPassword": "Nové heslo",
+    "confirmPassword": "Potvrdiť heslo",
+    "changePassword": "Zmeniť heslo",
+    "passwordSaved": "Heslo zmenené",
+    "passwordSaveFailed": "Heslo sa nepodarilo zmeniť",
+    "passwordMismatch": "Heslá sa nezhodujú",
+    "logoDropTitle": "Pretiahni logo sem",
+    "logoDropNow": "Pusť súbor",
+    "logoDropHint": "PNG, JPEG, WebP alebo SVG · do {max}",
+    "logoDropAria": "Nahrať logo firmy",
+    "logoReady": "Logo je pripravené",
+    "logoUploading": "Nahrávam logo…",
+    "logoReplaceHint": "Klikni alebo pretiahni nový súbor.",
+    "logoReplace": "Vymeniť",
+    "logoRemove": "Odstrániť",
+    "logoUpload": "Nahrať",
+    "logoSaved": "Logo uložené",
+    "logoRemoved": "Logo odstránené",
+    "logoTooLarge": "Logo môže mať najviac {max}.",
+    "logoBadType": "Povolené formáty: PNG, JPEG, WebP, SVG.",
+    "logoFootnote": "Zmeny sa prejavia na nových faktúrach a PDF.",
+    "openPrivacy": "Ochrana údajov",
+    "openTerms": "Obchodné podmienky",
+    "openSupport": "Podpora"
+  },
+  "Terms": {
+    "eyebrow": "Právne informácie",
+    "title": "Obchodné podmienky",
+    "lead": "Tieto podmienky upravujú používanie webovej služby Fakturio na vystavovanie a správu faktúr. Registráciou alebo používaním služby ich berieš na vedomie.",
+    "effectiveLabel": "Účinnosť od",
+    "version": "Verzia 1.0",
+    "tocLabel": "Obsah",
+    "footnote": "Pri zmene služby alebo právnych požiadaviek podmienky aktualizujeme. Aktuálna verzia je vždy na tejto stránke.",
+    "facts": {
+      "provider": "Poskytovateľ",
+      "email": "Kontakt"
+    },
+    "sections": {
+      "service": {
+        "title": "Predmet služby",
+        "body": "Fakturio je softvér ako služba (SaaS) na vystavovanie faktúr, evidenciu odberateľov, sledovanie splatností a súvisiace reporty a exporty.",
+        "body2": "Služba nie je náhradou za daňové, účtovné ani právne poradenstvo. Zodpovednosť za obsah dokladov a plnenie zákonných povinností ostáva na tebe.",
+        "items": []
+      },
+      "account": {
+        "title": "Účet a prístup",
+        "body": "Na používanie potrebuješ účet s platným e-mailom a heslom. Údaje na prihlásenie chrániš a nezdieľaš. Aktivitu na účte považujeme za tvoju, pokiaľ nepreukážeš opak.",
+        "items": [
+          "poskytuješ pravdivé registračné údaje,",
+          "nezneužívaš službu (automatizované útoky, scraping, obchádzanie limitov),",
+          "pri podozrení na zneužitie môžeme prístup dočasne obmedziť."
+        ]
+      },
+      "dataResponsibility": {
+        "title": "Údaje a doklady",
+        "body": "Údaje firmy, odberateľov a faktúr, ktoré do Fakturio vložíš, sú tvoje obchodné údaje. Si zodpovedný za ich správnosť, zákonnosť a oprávnenie ich spracúvať.",
+        "body2": "Spracúvanie osobných údajov je popísané v dokumente Ochrana osobných údajov.",
+        "items": []
+      },
+      "availability": {
+        "title": "Dostupnosť a zmeny",
+        "body": "Snažíme sa o stabilnú prevádzku, ale nezaručujeme nepretržitú dostupnosť. Môžeme vykonávať údržbu, opravovať chyby a meniť funkcie, ak to neohrozí základný účel služby neprimerane.",
+        "items": []
+      },
+      "fees": {
+        "title": "Cena",
+        "body": "Aktuálne môžeš začať bezplatne (beta / skúšobné obdobie). Ak pribudnú platené plány, zverejníme ceny vopred a zmena sa ťa bude týkať až po výslovnom súhlase alebo nových podmienkach predplatného.",
+        "items": []
+      },
+      "liability": {
+        "title": "Zodpovednosť",
+        "body": "Službu poskytujeme „ako je“. V maximálnom rozsahu dovolenom právom nezodpovedáme za nepriame škody, ušlý zisk ani za rozhodnutia urobené výhradne na základe výstupov aplikácie.",
+        "body2": "Zodpovednosť za daňové a účtovné dôsledky faktúr nesie používateľ (resp. jeho účtovník).",
+        "items": []
+      },
+      "termination": {
+        "title": "Ukončenie",
+        "body": "Účet môžeš prestať používať kedykoľvek. Môžeme účet zrušiť pri hrubom porušení týchto podmienok alebo dlhodobom zneužití. Po ukončení môžu ostať zálohy potrebné na bezpečnosť alebo zákonné povinnosti v zmysle ochrany údajov.",
+        "items": []
+      },
+      "law": {
+        "title": "Rozhodné právo",
+        "body": "Tieto podmienky sa riadia právnym poriadkom Slovenskej republiky. Spory sa prednostne riešia dohodou; inak sú príslušné slovenské súdy, pokiaľ kogentné normy nestanovujú inak.",
+        "items": []
+      },
+      "contact": {
+        "title": "Kontakt",
+        "body": "Otázky k podmienkam a službe posielaj na kontakt nižšie. Pre podporu použij aj stránku Kontakt a podpora.",
+        "items": []
+      }
+    }
+  },
+  "Support": {
+    "eyebrow": "Pomoc",
+    "title": "Kontakt a podpora",
+    "lead": "Money produkt potrebuje ľudský kontakt. Tu nájdeš, ako nás osloviť a čo vieme riešiť.",
+    "tocLabel": "Obsah",
+    "footnote": "Pri kritickom výpadku služby doplníme verejný status. Zatiaľ over dostupnosť prihlásením alebo e-mailom.",
+    "facts": {
+      "email": "Podpora",
+      "privacy": "Ochrana údajov"
+    },
+    "links": {
+      "privacy": "Ochrana osobných údajov",
+      "terms": "Obchodné podmienky"
+    },
+    "sections": {
+      "contact": {
+        "title": "Ako nás kontaktovať",
+        "body": "Napíš e-mail s popisom problému, číslom faktúry (ak ide o doklad) a prehliadačom / zariadením. Odpovedáme v pracovných dňoch.",
+        "items": []
+      },
+      "response": {
+        "title": "Čo očakávať",
+        "body": "Bežné požiadavky riešime typicky do 1–2 pracovných dní. Pri bezpečnostnom incidente prioritu zvyšujeme.",
+        "items": []
+      },
+      "topics": {
+        "title": "Čo vieme pomôcť",
+        "body": "Podpora pokrýva najmä:",
+        "items": [
+          "prihlásenie a účet,",
+          "nastavenie firmy a DPH režimu,",
+          "faktúry, PDF a exporty pre účtovníka,",
+          "import platieb a párovanie VS,",
+          "chyby aplikácie a podozrenie na incident."
+        ]
+      },
+      "status": {
+        "title": "Dostupnosť",
+        "body": "Ak sa nemôžeš prihlásiť alebo API neodpovedá, skús neskôr a daj nám vedieť. Plánovaný status page doplníme pri produkčnej prevádzke.",
+        "items": []
+      },
+      "legal": {
+        "title": "Právne dokumenty",
+        "body": "Súvisiace texty:",
+        "items": []
+      }
+    }
+  },
+  "Privacy": {
+    "eyebrow": "Právne informácie",
+    "title": "Ochrana osobných údajov",
+    "lead": "Tento dokument vysvetľuje, aké osobné údaje spracúvame v službe Fakturio, na aký účel, na akom právnom základe a aké máš práva podľa GDPR a zákona č. 18/2018 Z. z.",
+    "effectiveLabel": "Účinnosť od",
+    "version": "Verzia 1.0",
+    "tocLabel": "Obsah",
+    "footnote": "Dokument je informačný podľa čl. 13/14 GDPR. Pri zmene prevádzkovateľa alebo rozsahu spracúvania ho aktualizujeme a dátum účinnosti upravíme.",
+    "facts": {
+      "controller": "Prevádzkovateľ",
+      "ico": "IČO",
+      "address": "Adresa",
+      "email": "Kontakt na ochranu údajov",
+      "jurisdiction": "Právny poriadok"
+    },
+    "sections": {
+      "controller": {
+        "title": "Prevádzkovateľ",
+        "body": "Prevádzkovateľom osobných údajov v súvislosti so službou Fakturio je subjekt uvedený nižšie. V otázkach ochrany údajov nás kontaktuj e-mailom uvedeným v tomto dokumente.",
+        "items": []
+      },
+      "scope": {
+        "title": "Rozsah a dotknuté osoby",
+        "body": "Tieto informácie sa vzťahujú na používateľov Fakturio (registrácia, prihlásenie, správa firmy a dokladov) a na osoby, ktorých údaje vložíš do aplikácie (napr. odberatelia na faktúrach).",
+        "body2": "Ak spracúvaš údaje svojich klientov, si typicky samostatným prevádzkovateľom týchto údajov. Fakturio ti poskytuje nástroj; zodpovednosť za zákonnosť obsahu faktúr a zákazníckych kariet ostáva na tebe.",
+        "items": []
+      },
+      "data": {
+        "title": "Aké údaje spracúvame",
+        "body": "Spracúvame len údaje potrebné na poskytnutie služby:",
+        "items": [
+          "Účet: e-mail, heslo (uložené iba v hashovanej podobe), meno a priezvisko, čas registrácie a poslednej aktivity.",
+          "Firma: obchodné a kontaktné údaje, IČO/DIČ/IČ DPH, adresa, bankové údaje, logo a predvolené hodnoty faktúr.",
+          "Doklady a agenda: faktúry, položky, odberatelia, platby, upomienky, poznámky, reporty a súvisiace auditné záznamy.",
+          "Technické údaje: session cookie / prístupový token, IP a diagnostické logy v primeranom rozsahu na bezpečnosť a prevádzku."
+        ]
+      },
+      "purposes": {
+        "title": "Účely spracúvania",
+        "body": "Údaje používame výhradne na:",
+        "items": [
+          "vytvorenie a správu používateľského účtu,",
+          "poskytovanie fakturačnej funkcionality (PDF, splatnosti, párovanie platieb, reporty),",
+          "zabezpečenie služby, predchádzanie zneužitiu a riešenie incidentov,",
+          "plnenie zákonných povinností (napr. daňové a účtovné súvislosti, ak vyplývajú z tvojho používania),",
+          "komunikáciu o službe (technické oznámenia, odpovede na žiadosti)."
+        ]
+      },
+      "legalBasis": {
+        "title": "Právny základ",
+        "body": "Spracúvanie stoja najmä na týchto základoch podľa čl. 6 GDPR:",
+        "items": [
+          "plnenie zmluvy / kroky pred uzavretím zmluvy (poskytnutie služby po registrácii),",
+          "oprávnený záujem (bezpečnosť, prevádzka, ochrana pred zneužitím) — pri zachovaní tvojich práv,",
+          "súhlas (ak ho výslovne vyžadujeme, napr. pri voliteľných funkciách),",
+          "zákonná povinnosť, ak ju treba uplatniť."
+        ]
+      },
+      "recipients": {
+        "title": "Príjemcovia a sprostredkovatelia",
+        "body": "Údaje nezverejňujeme a nepredávame. Môžu ich spracúvať dôveryhodní sprostredkovatelia výhradne na našich pokynoch (hosting, e-mailová infraštruktúra, monitoring), v rozsahu nevyhnutnom na prevádzku.",
+        "body2": "Údaje môžu byť sprístupnené orgánom verejnej moci, ak to vyžaduje právny predpis.",
+        "items": []
+      },
+      "retention": {
+        "title": "Doba uchovávania",
+        "body": "Údaje uchovávame len po dobu potrebnú na účely, na ktoré boli získané:",
+        "items": [
+          "účet a prevádzkové údaje — počas trvania účtu a primerane po jeho zrušení (technické a bezpečnostné dôvody),",
+          "fakturačné a firemné údaje — podľa tvojich nastavení a zákonných lehôt, ktoré sa na tvoje doklady môžu vzťahovať,",
+          "logy a bezpečnostné záznamy — kratšie obdobie, typicky mesiace, ak nie je dôvod na dlhšie uchovanie."
+        ]
+      },
+      "rights": {
+        "title": "Tvoje práva",
+        "body": "Ako dotknutá osoba máš najmä právo na prístup, opravu, výmaz, obmedzenie spracúvania, prenosnosť údajov a právo namietať proti spracúvaniu založenému na oprávnenom záujme. Súhlas môžeš kedykoľvek odvolať, ak je spracúvanie na ňom založené.",
+        "body2": "Žiadosť pošli na kontakt uvedený vyššie. Máš aj právo podať sťažnosť Úradu na ochranu osobných údajov SR.",
+        "items": []
+      },
+      "cookies": {
+        "title": "Cookies a podobné technológie",
+        "body": "Fakturio používa nevyhnutné cookies / úložisko prehliadača na prihlásenie (httpOnly session token), jazyk a vzhľad. Tieto technológie sú potrebné na fungovanie služby a nevyžadujú marketingový súhlas.",
+        "body2": "Nepoužívame reklamné trackery tretích strán. Ak v budúcnosti pribudnú analytické cookies, vyžiadame si súhlas a aktualizujeme tento dokument.",
+        "items": []
+      },
+      "security": {
+        "title": "Bezpečnosť",
+        "body": "Uplatňujeme primerané technické a organizačné opatrenia: šifrovaný prenos (HTTPS), hashovanie hesiel, riadenie prístupu a oddelenie prostredí. Absolútnu bezpečnosť však žiadna online služba nevie garantovať.",
+        "items": []
+      },
+      "transfers": {
+        "title": "Prenosy mimo EÚ / EHP",
+        "body": "Údaje sa spracúvajú prednostne v EÚ / EHP. Ak by sme využili poskytovateľa mimo tohto priestoru, zabezpečíme vhodný právny mechanizmus (napr. štandardné zmluvné doložky) a informujeme ťa aktualizáciou tohto dokumentu.",
+        "items": []
+      },
+      "changes": {
+        "title": "Zmeny dokumentu",
+        "body": "Dokument môžeme aktualizovať pri zmene funkcionality, právnych požiadaviek alebo prevádzkovateľa. Aktuálna verzia je vždy dostupná na tejto stránke; dátum účinnosti je uvedený v záhlaví.",
+        "items": []
+      },
+      "contact": {
+        "title": "Kontakt",
+        "body": "V otázkach ochrany osobných údajov, uplatnenia práv alebo nahlásenia incidentu nás kontaktuj na e-mail uvedený v sekcii Prevádzkovateľ. Odpovieme v primeranej lehote stanovenej GDPR.",
+        "items": []
+      }
+    }
   },
   "Nav": {
     "dashboard": "Prehľad",
@@ -196,7 +464,12 @@
     "invalidCredentials": "Neplatný e-mail alebo heslo",
     "checkForm": "Skontroluj formulár",
     "signedIn": "Si prihlásený",
-    "registered": "Účet bol vytvorený"
+    "registered": "Účet bol vytvorený",
+    "privacyConsent": "Súhlasím so spracúvaním osobných údajov podľa <privacy>Ochrany osobných údajov</privacy> a beriem na vedomie <terms>Obchodné podmienky</terms>.",
+    "privacyLink": "Ochrana osobných údajov",
+    "termsLink": "Obchodné podmienky",
+    "privacyRequired": "Na registráciu je potrebný súhlas s ochranou údajov a obchodnými podmienkami.",
+    "legalNote": "Pokračovaním potvrdzuješ <privacy>Ochranu údajov</privacy> a <terms>Obchodné podmienky</terms>."
   },
   "Landing": {
     "skip": "Preskočiť na obsah",
@@ -298,11 +571,16 @@
     "footTagline": "Fakturácia pre SK freelancerov a SZČO",
     "footProduct": "Produkt",
     "footAccount": "Účet",
+    "footLegal": "Právne",
     "footFeatures": "Funkcie",
     "footCompare": "Porovnanie",
     "footSample": "Ukážka",
     "footSignIn": "Prihlásenie",
     "footSignUp": "Registrácia",
+    "footPrivacy": "Ochrana údajov",
+    "footTerms": "Podmienky",
+    "footSupport": "Podpora",
+    "footCookies": "Cookies",
     "cashflowLabel": "Cashflow trend",
     "cashflowHint": "+18 % oproti minulému mesiacu",
     "previewOverview": "Prehľad",
@@ -448,6 +726,11 @@
     "applyFilters": "Použiť filtre",
     "csvPreview": "Náhľad — faktúry CSV",
     "invoices": "Faktúry",
+    "accountantPack": "Balík pre účtovníka",
+    "accountantPackHint": "ZIP: CSV faktúry + DPH + Money S3 XML",
+    "moneyXml": "Money S3 XML",
+    "invoicesCsvHint": "Doklady s režimom DPH, IČ DPH a VS — Excel (;).",
+    "vatCsvHint": "Riadky DPH podľa sadzieb, vhodné na kontrolu priznania.",
     "noInvoicesPeriod": "Žiadne faktúry v období",
     "noVatData": "Žiadne DPH údaje v období",
     "pickDate": "Vybrať dátum",

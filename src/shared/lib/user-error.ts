@@ -32,6 +32,8 @@ const BY_CODE: Record<string, string> = {
   unsupported_country: "Doplnenie z registra je dostupné pre SK a CZ.",
   registry_not_found: "Firma s týmto IČO sa v registri nenašla.",
   registry_unavailable: "Register je dočasne nedostupný. Skús neskôr.",
+  file_too_large: "Súbor je príliš veľký (max. 2 MB).",
+  invalid_file_type: "Nepodporovaný typ súboru.",
 };
 
 const BY_EXACT_EN: Record<string, string> = {
@@ -66,6 +68,8 @@ const BY_PARTIAL_EN: Array<{ match: RegExp; message: string }> = [
   { match: /unauthorized|authentication|jwt/i, message: "Nie si prihlásený alebo vypršala relácia." },
   { match: /temporarily unavailable|unavailable/i, message: "Služba je dočasne nedostupná. Skús neskôr." },
   { match: /validation failed|one or more validation/i, message: "Skontroluj formulár." },
+  { match: /at most 2 mb|too large|file too large/i, message: "Súbor je príliš veľký (max. 2 MB)." },
+  { match: /allowed formats|invalid file/i, message: "Nepodporovaný typ súboru." },
 ];
 
 const GENERIC_SK = "Niečo sa pokazilo. Skús znova.";
