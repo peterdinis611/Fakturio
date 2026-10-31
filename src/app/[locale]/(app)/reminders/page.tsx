@@ -22,22 +22,28 @@ export async function generateMetadata() {
 
 const HORIZONS = [7, 14, 30] as const;
 
-function daysLabel(r: InvoiceReminder) {
+type RemindersT = Awaited<ReturnType<typeof getTranslations<"Reminders">>>;
+
+function daysLabel(r: InvoiceReminder, tr: RemindersT) {
   if (r.isOverdue) {
     const days = Math.abs(r.daysUntilDue);
-    return days === 0 ? "Dnes po splatnosti" : `${days} d po splatnosti`;
+    return days === 0
+      ? tr("overdueToday")
+      : tr("overdueByDays", { count: days });
   }
-  if (r.daysUntilDue === 0) return "Splatné dnes";
-  if (r.daysUntilDue === 1) return "Zajtra";
-  return `O ${r.daysUntilDue} dní`;
+  if (r.daysUntilDue === 0) return tr("dueToday");
+  if (r.daysUntilDue === 1) return tr("tomorrow");
+  return tr("dueInDays", { count: r.daysUntilDue });
 }
 
 function ReminderRow({
   r,
   locale,
+  tr,
 }: {
   r: InvoiceReminder;
   locale: AppLocale;
+  tr: RemindersT;
 }) {
   return (
     <li
@@ -91,19 +97,19 @@ function ReminderRow({
               r.isOverdue ? "text-negative" : "text-ink",
             )}
           >
-            {daysLabel(r)}
+            {daysLabel(r, tr)}
           </p>
           <p className="money text-[15px] text-ink">
             {formatMoney(r.total, r.currency, locale)}
           </p>
           <p className="mt-0.5 text-[11px] text-faint">
             {r.reminderCount > 0
-              ? `${r.reminderCount}× odoslané${
+              ? `${tr("sentTimes", { count: r.reminderCount })}${
                   r.lastReminderSentAt
                     ? ` · ${formatDateTime(r.lastReminderSentAt, locale)}`
                     : ""
                 }`
-              : "Ešte neodoslané"}
+              : tr("notSentYet")}
           </p>
         </div>
         <MarkReminderSentButton invoiceId={r.id} />
@@ -118,12 +124,14 @@ function ReminderGroup({
   tone,
   items,
   locale,
+  tr,
 }: {
   title: string;
   hint: string;
   tone: "danger" | "neutral";
   items: InvoiceReminder[];
   locale: AppLocale;
+  tr: RemindersT;
 }) {
   if (items.length === 0) return null;
 
@@ -147,7 +155,7 @@ function ReminderGroup({
       </div>
       <ul className="panel divide-y divide-rule overflow-hidden">
         {items.map((r) => (
-          <ReminderRow key={r.id} r={r} locale={locale} />
+          <ReminderRow key={r.id} r={r} locale={locale} tr={tr} />
         ))}
       </ul>
     </section>
@@ -261,15 +269,15 @@ export default async function RemindersPage({
                 </p>
                 <p className="mt-1 max-w-md text-[14px] text-muted-foreground">
                   {onlyOverdue
-                    ? "Všetky splatnosti sú v poriadku. Môžeš synchronizovať stavy alebo skontrolovať faktúry."
-                    : `V najbližších ${withinDays} dňoch nie sú splatné ani omeškané faktúry.`}
+                    ? t("emptyAllOk")
+                    : t("emptyHorizonBody", { count: withinDays })}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button asChild>
-                    <Link href="/invoices">Faktúry</Link>
+                    <Link href="/invoices">{t("goInvoices")}</Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link href="/invoices?status=Issued">Vystavené</Link>
+                    <Link href="/invoices?status=Issued">{t("goIssued")}</Link>
                   </Button>
                 </div>
               </div>
@@ -306,6 +314,7 @@ export default async function RemindersPage({
               tone="danger"
               items={overdue}
               locale={locale}
+              tr={t}
             />
           ) : (
             <>
@@ -315,6 +324,7 @@ export default async function RemindersPage({
                 tone="danger"
                 items={overdue}
                 locale={locale}
+                tr={t}
               />
               <ReminderGroup
                 title={t("upcoming")}
@@ -322,6 +332,7 @@ export default async function RemindersPage({
                 tone="neutral"
                 items={upcoming}
                 locale={locale}
+                tr={t}
               />
             </>
           )}

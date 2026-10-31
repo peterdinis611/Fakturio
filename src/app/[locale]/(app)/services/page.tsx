@@ -3,6 +3,8 @@ import { getCompany } from "@/features/company/api/company";
 import { listServices } from "@/features/services/api/services";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ServiceCatalogTable } from "@/features/services/ui/service-catalog-table";
+import { Button } from "@/shared/ui/button";
+import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata() {
   const t = await getTranslations("Services");
@@ -11,6 +13,7 @@ export async function generateMetadata() {
 
 export default async function ServicesPage() {
   const t = await getTranslations("Services");
+  const tRec = await getTranslations("Recurring");
   const [data, company] = await Promise.all([
     listServices({ pageSize: 100 }),
     getCompany(),
@@ -28,6 +31,11 @@ export default async function ServicesPage() {
               <span>{company.defaultVatRate}%</span>
             ) : null}
           </>
+        }
+        actions={
+          <Button asChild variant="secondary">
+            <Link href="/recurring">{tRec("title")}</Link>
+          </Button>
         }
       />
       <ServiceCatalogTable

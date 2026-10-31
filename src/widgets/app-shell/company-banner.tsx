@@ -35,7 +35,9 @@ export async function CompanyBanner({
         </AlertTitle>
         <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
           <span>
-            Chýba: {missing.join(", ") || "povinné údaje"}. Doplníš to vo Firma.
+            {t("companyBannerMissing", {
+              list: missing.join(", ") || t("companyBannerMissingFallback"),
+            })}
           </span>
           <Button asChild variant="outline" size="sm" className="shrink-0">
             <Link href="/settings/company">{t("companyBannerCta")}</Link>

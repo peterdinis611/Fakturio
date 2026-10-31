@@ -53,14 +53,18 @@ type CompanyFormProps = {
   mode: "onboarding" | "settings";
 };
 
-const LEGAL_FORMS = [
+const LEGAL_FORMS: {
+  value: string;
+  label?: string;
+  labelKey?: "legalFormOther";
+}[] = [
   { value: "s.r.o.", label: "s.r.o." },
   { value: "SZČO", label: "SZČO" },
   { value: "a.s.", label: "a.s." },
   { value: "v.o.s.", label: "v.o.s." },
   { value: "k.s.", label: "k.s." },
-  { value: "iné", label: "Iné" },
-] as const;
+  { value: "iné", labelKey: "legalFormOther" },
+];
 
 function toFormValues(initial: CompanySettings): CompanyFormInput {
   return {
@@ -173,6 +177,7 @@ function Section({
 export function CompanyForm({ initial, mode }: CompanyFormProps) {
   const t = useTranslations("Company");
   const tOnboarding = useTranslations("Onboarding");
+  const tc = useTranslations("Common");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -243,7 +248,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         return;
       }
       toast.success(t("saved"));
-      router.push("/dashboard");
+      router.push(mode === "onboarding" ? "/first-invoice" : "/dashboard");
       router.refresh();
     });
   }
@@ -261,7 +266,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       <Section
         index="01"
         title={t("identity")}
-        hint="Čo ide do hlavičky faktúry."
+        hint={t("identityHint")}
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
@@ -272,7 +277,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.name?.message} />
         </Field>
         <Field>
-          <Label htmlFor="legalForm">Právna forma</Label>
+          <Label htmlFor="legalForm">{t("legalForm")}</Label>
           <Controller
             control={control}
             name="legalForm"
@@ -285,12 +290,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                   id="legalForm"
                   className="h-9 w-full rounded-[4px] border-border bg-ground"
                 >
-                  <SelectValue placeholder="Vyber…" />
+                  <SelectValue placeholder={tc("selectPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {LEGAL_FORMS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
+                      {opt.labelKey ? t(opt.labelKey) : opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -300,7 +305,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="ico">
-            IČO <RequiredMark />
+            {t("ico")} <RequiredMark />
           </Label>
           <IcoLookupField
             id="ico"
@@ -314,13 +319,14 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.ico?.message} />
           {registrySupported ? (
             <p className="text-[11px] text-muted-foreground">
-              Po zadaní IČO doplníme firmu, DIČ a IČ DPH z{" "}
-              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO / FS"}.
+              {t("icoLookupHint", {
+                source: country?.toUpperCase() === "CZ" ? "ARES" : "RPO / FS",
+              })}
             </p>
           ) : null}
         </Field>
         <Field>
-          <Label htmlFor="dic">DIČ</Label>
+          <Label htmlFor="dic">{t("dic")}</Label>
           <Input
             id="dic"
             className="data-num"
@@ -328,11 +334,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             aria-invalid={!!errors.dic}
           />
           <FieldError message={errors.dic?.message} />
-          <p className="text-[11px] text-muted-foreground">Voliteľné.</p>
+          <p className="text-[11px] text-muted-foreground">{t("optional")}</p>
         </Field>
         <Field>
           <Label htmlFor="icDph">
-            IČ DPH {isVatPayer ? <RequiredMark /> : null}
+            {t("icDph")} {isVatPayer ? <RequiredMark /> : null}
           </Label>
           <Input
             id="icDph"
@@ -341,14 +347,14 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
           <FieldError message={errors.icDph?.message} />
           <p className="text-[11px] text-muted-foreground">
-            {isVatPayer ? "Povinné pri platcovi DPH." : "Voliteľné pri neplatcovi."}
+            {isVatPayer ? t("vatRequired") : t("vatOptional")}
           </p>
         </Field>
         <Field className="sm:col-span-2">
           <div className="flex items-center justify-between gap-3 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
             <div className="min-w-0">
               <Label htmlFor="isVatPayer" className="font-normal">
-                Platca DPH
+                {t("vatPayer")}
               </Label>
               {!isVatPayer ? (
                 <p className="mt-0.5 text-[12px] text-muted-foreground">
@@ -356,7 +362,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 </p>
               ) : (
                 <p className="mt-0.5 text-[12px] text-muted-foreground">
-                  IČ DPH je povinné pri platcovi.
+                  {t("vatPayerRequired")}
                 </p>
               )}
             </div>
@@ -373,13 +379,13 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           </div>
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="commercialRegister">Obchodný register</Label>
+          <Label htmlFor="commercialRegister">{t("commercialRegister")}</Label>
           <Input id="commercialRegister" {...register("commercialRegister")} />
-          <p className="text-[11px] text-muted-foreground">Voliteľné.</p>
+          <p className="text-[11px] text-muted-foreground">{t("optional")}</p>
         </Field>
         <Field>
           <Label htmlFor="email">
-            E-mail <RequiredMark />
+            {t("email")} <RequiredMark />
           </Label>
           <Input
             id="email"
@@ -390,11 +396,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.email?.message} />
         </Field>
         <Field>
-          <Label htmlFor="invoiceEmail">E-mail na faktúry</Label>
+          <Label htmlFor="invoiceEmail">{t("invoiceEmail")}</Label>
           <Input id="invoiceEmail" type="email" {...register("invoiceEmail")} />
         </Field>
         <Field>
-          <Label htmlFor="phone">Telefón</Label>
+          <Label htmlFor="phone">{t("phone")}</Label>
           <Controller
             control={control}
             name="phone"
@@ -409,11 +415,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="website">Web</Label>
+          <Label htmlFor="website">{t("website")}</Label>
           <Input id="website" type="url" {...register("website")} />
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="contactPerson">Kontaktná osoba</Label>
+          <Label htmlFor="contactPerson">{t("contactPerson")}</Label>
           <Input id="contactPerson" {...register("contactPerson")} />
         </Field>
       </Section>
@@ -421,7 +427,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       <Section index="02" title={t("address")} quiet={mode === "settings"}>
         <Field className="sm:col-span-2">
           <Label htmlFor="street">
-            Ulica <RequiredMark />
+            {t("street")} <RequiredMark />
           </Label>
           <Input
             id="street"
@@ -432,14 +438,14 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field>
           <Label htmlFor="city">
-            Mesto <RequiredMark />
+            {t("city")} <RequiredMark />
           </Label>
           <Input id="city" {...register("city")} aria-invalid={!!errors.city} />
           <FieldError message={errors.city?.message} />
         </Field>
         <Field>
           <Label htmlFor="postalCode">
-            PSČ <RequiredMark />
+            {t("postalCode")} <RequiredMark />
           </Label>
           <Input
             id="postalCode"
@@ -451,7 +457,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         </Field>
         <Field className="sm:col-span-2">
           <Label htmlFor="country">
-            Krajina <RequiredMark />
+            {t("country")} <RequiredMark />
           </Label>
           <Controller
             control={control}
@@ -470,7 +476,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       <Section
         index="03"
         title={t("bank")}
-        hint="Predvolený účet na faktúrach."
+        hint={t("bankHint")}
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
@@ -486,23 +492,23 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.bankIban?.message} />
         </Field>
         <Field>
-          <Label htmlFor="bankBic">BIC / SWIFT</Label>
+          <Label htmlFor="bankBic">{t("bic")}</Label>
           <Input id="bankBic" className="data-num" {...register("bankBic")} />
         </Field>
         <Field>
-          <Label htmlFor="bankName">Názov banky</Label>
+          <Label htmlFor="bankName">{t("bankName")}</Label>
           <Input id="bankName" {...register("bankName")} />
         </Field>
       </Section>
 
       <Section
         index="04"
-        title="Predvolené hodnoty"
-        hint="Použijú sa pri novej faktúre."
+        title={t("defaultsTitle")}
+        hint={t("defaultsHint")}
         quiet={mode === "settings"}
       >
         <Field>
-          <Label htmlFor="defaultDueDays">Splatnosť (dni)</Label>
+          <Label htmlFor="defaultDueDays">{t("defaultDueDays")}</Label>
           <Input
             id="defaultDueDays"
             type="number"
@@ -513,7 +519,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="defaultVatRate">DPH (%)</Label>
+          <Label htmlFor="defaultVatRate">{t("defaultVatShort")}</Label>
           <Input
             id="defaultVatRate"
             type="number"
@@ -526,7 +532,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="defaultCurrency">Mena</Label>
+          <Label htmlFor="defaultCurrency">{t("currency")}</Label>
           <Controller
             control={control}
             name="defaultCurrency"
@@ -540,11 +546,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="invoicePrefix">Prefix faktúr</Label>
+          <Label htmlFor="invoicePrefix">{t("invoicePrefix")}</Label>
           <Input id="invoicePrefix" {...register("invoicePrefix")} />
         </Field>
         <Field>
-          <Label htmlFor="defaultPaymentMethod">Spôsob platby</Label>
+          <Label htmlFor="defaultPaymentMethod">{t("paymentMethod")}</Label>
           <Controller
             control={control}
             name="defaultPaymentMethod"
@@ -558,7 +564,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="defaultConstantSymbol">Konštantný symbol</Label>
+          <Label htmlFor="defaultConstantSymbol">{t("constantSymbol")}</Label>
           <Input
             id="defaultConstantSymbol"
             className="data-num"
@@ -566,7 +572,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="defaultInvoiceNotes">Poznámka na faktúre</Label>
+          <Label htmlFor="defaultInvoiceNotes">{t("defaultInvoiceNotes")}</Label>
           <Textarea
             id="defaultInvoiceNotes"
             rows={3}
@@ -574,11 +580,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="invoiceFooter">Pätička faktúry</Label>
+          <Label htmlFor="invoiceFooter">{t("invoiceFooter")}</Label>
           <Textarea id="invoiceFooter" rows={3} {...register("invoiceFooter")} />
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="notes">Interné poznámky</Label>
+          <Label htmlFor="notes">{t("notes")}</Label>
           <Textarea id="notes" rows={3} {...register("notes")} />
         </Field>
       </Section>
@@ -592,7 +598,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       >
         <div className="flex min-w-0 flex-col gap-1">
           <p className="text-[12px] text-muted-foreground">
-            Zmeny sa prejavia na nových faktúrach.
+            {t("footerNote")}
           </p>
           {mode === "onboarding" ? (
             <>

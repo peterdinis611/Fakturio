@@ -9,8 +9,20 @@ import {
 } from "react";
 import type { ConnectivityStatus, HealthProbeResult } from "./types";
 
-const HEALTHY_POLL_MS = 20_000;
-const UNHEALTHY_POLL_MS = 5_000;
+/** Calm when healthy — banner only matters when something breaks. */
+const HEALTHY_POLL_MS = 120_000;
+/** Still gentle while recovering; user can hit Retry anytime. */
+const UNHEALTHY_POLL_MS = 30_000;
+/** Skip a new probe if one finished this recently (Strict Mode / remounts). */
+const MIN_PROBE_GAP_MS = 15_000;
+
+type ProbeOutcome = {
+  status: ConnectivityStatus;
+  at: number;
+};
+
+let inFlight: Promise<ConnectivityStatus> | null = null;
+let lastProbe: ProbeOutcome | null = null;
 
 async function probeServer(): Promise<boolean> {
   try {
@@ -25,6 +37,36 @@ async function probeServer(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function runProbe(force: boolean): Promise<ConnectivityStatus> {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    lastProbe = { status: "offline", at: Date.now() };
+    return "offline";
+  }
+
+  const now = Date.now();
+  if (
+    !force &&
+    lastProbe &&
+    now - lastProbe.at < MIN_PROBE_GAP_MS &&
+    lastProbe.status === "online"
+  ) {
+    return lastProbe.status;
+  }
+
+  if (inFlight) return inFlight;
+
+  inFlight = (async () => {
+    const ok = await probeServer();
+    const status: ConnectivityStatus = ok ? "online" : "server-down";
+    lastProbe = { status, at: Date.now() };
+    return status;
+  })().finally(() => {
+    inFlight = null;
+  });
+
+  return inFlight;
 }
 
 /**
@@ -48,15 +90,10 @@ export function useConnectivity() {
     setLastCheckedAt(Date.now());
   });
 
-  const check = useCallback(async () => {
+  const check = useCallback(async (force = false) => {
     setChecking(true);
     try {
-      if (typeof navigator !== "undefined" && !navigator.onLine) {
-        applyStatus("offline");
-        return "offline" as const;
-      }
-      const ok = await probeServer();
-      const next: ConnectivityStatus = ok ? "online" : "server-down";
+      const next = await runProbe(force);
       applyStatus(next);
       return next;
     } finally {
@@ -66,31 +103,45 @@ export function useConnectivity() {
   }, []);
 
   useEffect(() => {
-    void check();
+    void check(false);
 
     function onOnline() {
-      void check();
+      void check(true);
     }
     function onOffline() {
+      lastProbe = { status: "offline", at: Date.now() };
       applyStatus("offline");
       setReady(true);
+    }
+    function onVisibility() {
+      if (document.visibilityState !== "visible") return;
+      const stale =
+        !lastProbe || Date.now() - lastProbe.at >= HEALTHY_POLL_MS;
+      if (stale) void check(false);
     }
 
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [check]);
 
   useEffect(() => {
     if (!ready) return;
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      return;
+    }
+
     const intervalMs =
       status === "online" ? HEALTHY_POLL_MS : UNHEALTHY_POLL_MS;
     const id = window.setInterval(() => {
-      void check();
+      if (document.visibilityState === "hidden") return;
+      void check(false);
     }, intervalMs);
     return () => window.clearInterval(id);
   }, [status, check, ready]);
@@ -109,7 +160,7 @@ export function useConnectivity() {
     isServerDown: status === "server-down",
     checking,
     lastCheckedAt,
-    check,
+    check: () => check(true),
     consumeRestoredFlag,
   };
 }

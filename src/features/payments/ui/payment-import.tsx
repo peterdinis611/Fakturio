@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { FileSpreadsheet, PencilLine } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
@@ -8,6 +9,8 @@ import {
   previewPaymentImportAction,
 } from "@/features/payments/api/payments";
 import { CsvUploader } from "@/features/payments/ui/csv-uploader";
+import { CsvEditorDialog } from "@/widgets/preview/csv-editor-dialog";
+import { countCsvDataRows } from "@/widgets/preview/csv-sheet";
 import { VirtualList } from "@/shared/ui/virtual-list";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -22,7 +25,6 @@ import {
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
 import { Separator } from "@/shared/ui/separator";
-import { Textarea } from "@/shared/ui/textarea";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import type {
   PaymentImportPreviewResponse,
@@ -34,22 +36,30 @@ import type { AppLocale } from "@/i18n/routing";
 
 export function PaymentImportPanel() {
   const t = useTranslations("Payments");
+  const tv = useTranslations("CsvViewer");
   const tc = useTranslations("Common");
   const locale = useLocale() as AppLocale;
   const [pending, startTransition] = useTransition();
   const [csvText, setCsvText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [preview, setPreview] = useState<PaymentImportPreviewResponse | null>(
     null,
   );
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const rowCount = useMemo(
+    () => (csvText.trim() ? countCsvDataRows(csvText) : 0),
+    [csvText],
+  );
+  const hasCsv = Boolean(csvText.trim());
+
   const statusLabel: Record<PaymentImportRowResult["matchStatus"], string> = {
     matched: t("matched"),
     ambiguous: t("ambiguous"),
     unmatched: t("noInvoice"),
-    already_paid: "Už zaplatené",
-    skipped: "Preskočené",
+    already_paid: t("alreadyPaid"),
+    skipped: t("skipped"),
   };
 
   const matchedRows = useMemo(
@@ -64,7 +74,7 @@ export function PaymentImportPanel() {
     startTransition(async () => {
       const result = await previewPaymentImportAction({ csvText });
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Náhľad zlyhal");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("previewFailed"));
         return;
       }
       setPreview(result.data);
@@ -103,7 +113,7 @@ export function PaymentImportPanel() {
     startTransition(async () => {
       const result = await confirmPaymentImportAction({ rows });
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Import zlyhal");
+        toast.error(actionErrorMessage(result ?? {}) ?? t("previewFailed"));
         return;
       }
       toast.success(t("importDone"));
@@ -120,6 +130,7 @@ export function PaymentImportPanel() {
       setCsvText(String(reader.result ?? ""));
       setFileName(file.name);
       setPreview(null);
+      setEditorOpen(true);
     };
     reader.readAsText(file);
   }
@@ -136,14 +147,14 @@ export function PaymentImportPanel() {
               </CardDescription>
             </div>
             <Badge variant="outline" className="rounded-[4px] text-[10px]">
-              VS párovanie
+              {t("vsBadge")}
             </Badge>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-4">
           <div className="space-y-1.5">
-            <Label>Súbor</Label>
+            <Label>{t("fileLabel")}</Label>
             <CsvUploader
               disabled={pending}
               fileName={fileName}
@@ -159,35 +170,60 @@ export function PaymentImportPanel() {
           <div className="flex items-center gap-3">
             <Separator className="flex-1" />
             <span className="text-[11px] font-medium tracking-[0.08em] text-faint uppercase">
-              alebo
+              {t("or")}
             </span>
             <Separator className="flex-1" />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="csv-text">Vlož CSV text</Label>
-            <Textarea
-              id="csv-text"
-              rows={7}
-              className="font-mono text-[12px]"
-              placeholder={
-                "Dátum;VS;Suma;Protistrana\n12.03.2026;20260001;120.00;Firma s.r.o."
-              }
-              value={csvText}
-              disabled={pending}
-              onChange={(e) => {
-                setCsvText(e.target.value);
-                setFileName(null);
-                setPreview(null);
-              }}
-            />
-          </div>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => setEditorOpen(true)}
+            className={cn(
+              "group flex w-full items-center gap-3 rounded-[6px] border border-dashed px-4 py-3.5 text-left transition-colors",
+              "hover:border-control hover:bg-raised/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20",
+              hasCsv ? "border-border bg-surface" : "border-border bg-ground/40",
+              pending && "pointer-events-none opacity-50",
+            )}
+          >
+            <span
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-[5px] border transition-colors",
+                hasCsv
+                  ? "border-ink/20 bg-ink text-primary-foreground"
+                  : "border-border bg-raised/50 text-muted-foreground group-hover:border-control group-hover:text-ink",
+              )}
+              aria-hidden
+            >
+              {hasCsv ? (
+                <FileSpreadsheet className="size-4" strokeWidth={1.75} />
+              ) : (
+                <PencilLine className="size-4" strokeWidth={1.75} />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] font-medium text-ink">
+                {hasCsv ? tv("changeCsv") : t("pasteShort")}
+              </span>
+              <span className="mt-0.5 block text-[12px] text-muted-foreground">
+                {hasCsv
+                  ? tv("hasData", { rows: rowCount })
+                  : t("pasteLabel")}
+              </span>
+            </span>
+            <Badge
+              variant="secondary"
+              className="shrink-0 rounded-[4px] text-[10px]"
+            >
+              {t("openCsvEditor")}
+            </Badge>
+          </button>
         </CardContent>
 
         <CardFooter className="justify-end border-t border-rule bg-raised/20">
           <Button
             type="button"
-            disabled={pending || !csvText.trim()}
+            disabled={pending || !hasCsv}
             onClick={runPreview}
           >
             {t("preview")}
@@ -195,11 +231,23 @@ export function PaymentImportPanel() {
         </CardFooter>
       </Card>
 
+      <CsvEditorDialog
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        value={csvText}
+        fileName={fileName}
+        onChange={(next) => {
+          setCsvText(next);
+          setPreview(null);
+          if (!next.trim()) setFileName(null);
+        }}
+      />
+
       {preview ? (
         <section className="space-y-4">
           <div className="flex flex-wrap gap-1.5">
             <Badge variant="secondary" className="rounded-[4px] data-num">
-              Riadky {preview.totalRows}
+              {t("rowsBadge", { count: preview.totalRows })}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
               {t("matched")} {preview.matched}
@@ -211,7 +259,7 @@ export function PaymentImportPanel() {
               {t("noInvoice")} {preview.unmatched}
             </Badge>
             <Badge variant="outline" className="rounded-[4px] data-num">
-              Už zaplatené {preview.alreadyPaid}
+              {t("alreadyPaid")} {preview.alreadyPaid}
             </Badge>
           </div>
 
@@ -219,11 +267,11 @@ export function PaymentImportPanel() {
             <div className="grid grid-cols-[2rem_2.5rem_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(5rem,1fr)_minmax(6rem,1.4fr)] gap-2 border-b border-border px-3 py-2 text-[12px] text-muted-foreground">
               <span />
               <span>#</span>
-              <span>VS</span>
-              <span>Suma</span>
-              <span>Faktúra</span>
-              <span>Stav</span>
-              <span>Poznámka</span>
+              <span>{t("colVs")}</span>
+              <span>{t("colAmount")}</span>
+              <span>{t("colInvoice")}</span>
+              <span>{t("colStatus")}</span>
+              <span>{t("colNote")}</span>
             </div>
             <VirtualList
               items={preview.rows}
@@ -247,7 +295,9 @@ export function PaymentImportPanel() {
                           checked={checked}
                           disabled={pending}
                           onCheckedChange={() => toggle(row.invoiceId!)}
-                          aria-label={`Vybrať ${row.invoiceNumber}`}
+                          aria-label={t("selectInvoice", {
+                            number: row.invoiceNumber ?? "",
+                          })}
                         />
                       ) : null}
                     </span>

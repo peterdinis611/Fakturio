@@ -12,6 +12,7 @@ import {
 import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/features/auth/api/auth";
 import { getCompany } from "@/features/company/api/company";
+import { GdprPanel } from "@/features/gdpr/ui/gdpr-panel";
 import { LogoUploader } from "@/features/profile/ui/logo-uploader";
 import { ProfileAccountForm } from "@/features/profile/ui/profile-account-form";
 import { ProfilePasswordForm } from "@/features/profile/ui/profile-password-form";
@@ -153,6 +154,14 @@ export default async function ProfilePage() {
 
       <ProfileSection
         index="04"
+        title={t("sectionGdpr")}
+        description={t("sectionGdprHint")}
+      >
+        <GdprPanel />
+      </ProfileSection>
+
+      <ProfileSection
+        index="05"
         title={t("sectionShortcuts")}
         description={t("sectionShortcutsHint")}
       >

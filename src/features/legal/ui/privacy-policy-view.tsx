@@ -147,6 +147,15 @@ export async function PrivacyPolicyView({ locale }: { locale: string }) {
                   ))}
                 </ul>
               ) : null}
+
+              {id === "rights" && t.has("sections.rights.action") ? (
+                <p className="legal-doc__action">
+                  {t("sections.rights.action")}{" "}
+                  <Link href="/profile#gdpr">
+                    {t("sections.rights.actionHrefLabel")}
+                  </Link>
+                </p>
+              ) : null}
             </section>
           );
         })}

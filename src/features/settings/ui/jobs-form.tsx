@@ -131,8 +131,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
             {t("overdueJob")}
           </h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Raz denne označí vystavené faktúry, ktorým už uplynul termín
-            splatnosti.
+            {t("overdueJobBody")}
           </p>
         </div>
 
@@ -142,7 +141,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="overdue-enabled"
-              label="Zapnúť kontrolu"
+              label={t("enableCheck")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -155,8 +154,8 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="overdue-startup"
-              label="Skontrolovať aj pri zapnutí"
-              hint="Jednorazovo po štarte, potom podľa denného času nižšie."
+              label={t("runOnStartup")}
+              hint={t("runOnStartupHint")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -167,24 +166,24 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
         <div className="grid gap-4 sm:grid-cols-3">
           <NumberField
             id="overdue-hour"
-            label="Hodina"
-            hint="UTC"
+            label={t("hour")}
+            hint={t("utc")}
             disabled={pending}
             error={errors.overdueSync?.runAtHourUtc?.message}
             {...register("overdueSync.runAtHourUtc")}
           />
           <NumberField
             id="overdue-minute"
-            label="Minúta"
-            hint="UTC"
+            label={t("minute")}
+            hint={t("utc")}
             disabled={pending}
             error={errors.overdueSync?.runAtMinuteUtc?.message}
             {...register("overdueSync.runAtMinuteUtc")}
           />
           <NumberField
             id="overdue-delay"
-            label="Oneskorenie (s)"
-            hint="Po zapnutí aplikácie"
+            label={t("startupDelay")}
+            hint={t("startupDelayHint")}
             disabled={pending}
             error={errors.overdueSync?.startupDelaySeconds?.message}
             {...register("overdueSync.startupDelaySeconds")}
@@ -194,10 +193,9 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
 
       <section className="space-y-4 border-t border-rule pt-5">
         <div>
-          <h2 className="text-[15px] font-medium text-ink">Upomienky</h2>
+          <h2 className="text-[15px] font-medium text-ink">{t("remindersSection")}</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Denne pripraví zoznam faktúr na upomienku. E-mail zatiaľ neposiela —
-            zapisovanie odoslania zapni až keď budeš mať notifikácie.
+            {t("remindersJobBody")}
           </p>
         </div>
 
@@ -220,7 +218,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="reminder-startup"
-              label="Skontrolovať aj pri zapnutí"
+              label={t("runOnStartup")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -233,8 +231,8 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="reminder-only-overdue"
-              label="Len faktúry po splatnosti"
-              hint="Preskočí faktúry, ktorým termín ešte neuplynul."
+              label={t("onlyOverdue")}
+              hint={t("onlyOverdueHint")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -247,8 +245,8 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
           render={({ field }) => (
             <BoolField
               id="reminder-mark"
-              label="Zapísať odoslanie upomienky"
-              hint="Označí faktúru, že upomienka už prebehla (dátum a počet)."
+              label={t("markAsSentLabel")}
+              hint={t("markAsSentDetail")}
               checked={field.value}
               disabled={pending}
               onCheckedChange={field.onChange}
@@ -259,40 +257,40 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
         <div className="grid gap-4 sm:grid-cols-3">
           <NumberField
             id="reminder-hour"
-            label="Hodina"
-            hint="UTC"
+            label={t("hour")}
+            hint={t("utc")}
             disabled={pending}
             error={errors.reminderJob?.runAtHourUtc?.message}
             {...register("reminderJob.runAtHourUtc")}
           />
           <NumberField
             id="reminder-minute"
-            label="Minúta"
-            hint="UTC"
+            label={t("minute")}
+            hint={t("utc")}
             disabled={pending}
             error={errors.reminderJob?.runAtMinuteUtc?.message}
             {...register("reminderJob.runAtMinuteUtc")}
           />
           <NumberField
             id="reminder-within"
-            label="Dni dopredu"
-            hint="Koľko dní pred/po splatnosti hľadať (0–90)."
+            label={t("withinDaysLabel")}
+            hint={t("withinDaysHint")}
             disabled={pending}
             error={errors.reminderJob?.withinDays?.message}
             {...register("reminderJob.withinDays")}
           />
           <NumberField
             id="reminder-cooldown"
-            label="Min. dní medzi"
-            hint="Koľko dní počkať pred ďalšou upomienkou."
+            label={t("cooldownLabel")}
+            hint={t("cooldownHint")}
             disabled={pending}
             error={errors.reminderJob?.minDaysBetweenReminders?.message}
             {...register("reminderJob.minDaysBetweenReminders")}
           />
           <NumberField
             id="reminder-delay"
-            label="Oneskorenie (s)"
-            hint="Po zapnutí aplikácie"
+            label={t("startupDelay")}
+            hint={t("startupDelayHint")}
             disabled={pending}
             error={errors.reminderJob?.startupDelaySeconds?.message}
             {...register("reminderJob.startupDelaySeconds")}
@@ -311,9 +309,7 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
             t("save")
           )}
         </Button>
-        <p className="text-[12px] text-faint">
-          Zmeny platia od nasledujúceho denného behu — reštart nie je potrebný.
-        </p>
+        <p className="text-[12px] text-faint">{t("jobsApplyNote")}</p>
       </div>
     </form>
   );

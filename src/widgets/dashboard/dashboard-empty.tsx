@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   ArrowRight,
   Building2,
@@ -11,38 +10,40 @@ import { useTranslations } from "next-intl";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
-
-const STEPS = [
-  {
-    n: "01",
-    title: "Firma",
-    body: "IČO, IBAN a predvoľby faktúry",
-    href: "/settings/company",
-    icon: Building2,
-    cta: "Nastavenia",
-  },
-  {
-    n: "02",
-    title: "Zákazník",
-    body: "Odberateľ pred prvou faktúrou",
-    href: "/customers",
-    icon: UserPlus,
-    cta: "Zákazníci",
-    customer: true,
-  },
-  {
-    n: "03",
-    title: "Faktúra",
-    body: "Číslo, VS a PDF s QR",
-    href: "/invoices/new",
-    icon: FileText,
-    cta: "Vystaviť",
-    primary: true,
-  },
-] as const;
+import { Link } from "@/i18n/navigation";
 
 export function DashboardEmpty() {
   const t = useTranslations("Dashboard");
+  const tc = useTranslations("Common");
+
+  const steps = [
+    {
+      n: "01",
+      title: t("emptyStepCompanyTitle"),
+      body: t("emptyStepCompanyBody"),
+      href: "/settings/company",
+      icon: Building2,
+      cta: t("emptyStepCompanyCta"),
+    },
+    {
+      n: "02",
+      title: t("emptyStepCustomerTitle"),
+      body: t("emptyStepCustomerBody"),
+      href: "/customers",
+      icon: UserPlus,
+      cta: t("emptyStepCustomerCta"),
+      customer: true as const,
+    },
+    {
+      n: "03",
+      title: t("emptyStepInvoiceTitle"),
+      body: t("emptyStepInvoiceBody"),
+      href: "/first-invoice",
+      icon: FileText,
+      cta: t("emptyStepInvoiceCta"),
+      primary: true as const,
+    },
+  ];
 
   return (
     <div className="relative overflow-hidden border-b border-rule pb-10">
@@ -63,7 +64,7 @@ export function DashboardEmpty() {
               <span className="text-[13px] font-bold tracking-wide">F</span>
             </span>
             <p className="text-[11px] font-medium tracking-[0.16em] text-faint uppercase">
-              Ledger · deň 0
+              {t("emptyLedgerMark")}
             </p>
           </div>
 
@@ -76,7 +77,7 @@ export function DashboardEmpty() {
 
           <div className="mt-6 flex flex-wrap items-center gap-2">
             <Button asChild size="lg" className="h-10 px-4">
-              <Link href="/invoices/new">
+              <Link href="/first-invoice">
                 {t("newInvoice")}
                 <ArrowRight className="size-3.5" aria-hidden />
               </Link>
@@ -89,13 +90,13 @@ export function DashboardEmpty() {
               }
             />
             <Button asChild variant="ghost" size="lg" className="h-10">
-              <Link href="/settings">Nastavenia</Link>
+              <Link href="/settings">{tc("settings")}</Link>
             </Button>
           </div>
         </div>
 
         <ol className="divide-y divide-rule border-y border-rule">
-          {STEPS.map((step) => {
+          {steps.map((step) => {
             const Icon = step.icon;
             const rowClass =
               "group flex w-full items-center gap-3 py-3.5 text-left transition-colors hover:bg-raised/40";

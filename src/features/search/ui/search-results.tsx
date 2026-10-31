@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { searchGlobal } from "@/features/search/api/search";
 import { FadeIn } from "@/shared/ui/motion/page-motion";
 import {
@@ -14,7 +15,13 @@ function isCustomer(hit: SearchHit) {
   return hit.type.toLowerCase() === "customer";
 }
 
-function HitRow({ hit }: { hit: SearchHit }) {
+function HitRow({
+  hit,
+  typeLabel,
+}: {
+  hit: SearchHit;
+  typeLabel: string;
+}) {
   const customer = isCustomer(hit);
   const href = customer ? `/customers/${hit.id}` : `/invoices/${hit.id}`;
   const meta = [hit.subtitle, hit.number, hit.ico, hit.email]
@@ -62,9 +69,7 @@ function HitRow({ hit }: { hit: SearchHit }) {
               {formatDate(hit.issueDate)}
             </p>
           ) : (
-            <p className="text-[12px] text-faint">
-              {customer ? "Zákazník" : "Faktúra"}
-            </p>
+            <p className="text-[12px] text-faint">{typeLabel}</p>
           )}
         </div>
       </Link>
@@ -76,10 +81,12 @@ function ResultGroup({
   label,
   count,
   hits,
+  itemTypeLabel,
 }: {
   label: string;
   count: number;
   hits: SearchHit[];
+  itemTypeLabel: string;
 }) {
   if (hits.length === 0) return null;
 
@@ -93,7 +100,11 @@ function ResultGroup({
       </div>
       <ul className="panel divide-y divide-rule overflow-hidden">
         {hits.map((hit) => (
-          <HitRow key={`${hit.type}-${hit.id}`} hit={hit} />
+          <HitRow
+            key={`${hit.type}-${hit.id}`}
+            hit={hit}
+            typeLabel={itemTypeLabel}
+          />
         ))}
       </ul>
     </section>
@@ -101,6 +112,8 @@ function ResultGroup({
 }
 
 export async function SearchResults({ query }: { query: string }) {
+  const t = await getTranslations("Search");
+
   if (query.length < 2) {
     return (
       <FadeIn delay={0.08}>
@@ -125,19 +138,31 @@ export async function SearchResults({ query }: { query: string }) {
     <FadeIn delay={0.08} className="space-y-8">
       <div className="ledger-strip">
         <span>
-          Dotaz <span className="text-ink">„{result.query}“</span>
+          {t("queryStrip")}{" "}
+          <span className="text-ink">„{result.query}“</span>
         </span>
-        <span className="data-num">{result.totalHits} zásahov</span>
         <span className="data-num">
-          {customers.length} zákazníkov · {invoices.length} faktúr
+          {t("hitsStrip", { count: result.totalHits })}
+        </span>
+        <span className="data-num">
+          {t("breakdownStrip", {
+            customers: customers.length,
+            invoices: invoices.length,
+          })}
         </span>
       </div>
       <ResultGroup
-        label="Zákazníci"
+        label={t("customers")}
         count={customers.length}
         hits={customers}
+        itemTypeLabel={t("customer")}
       />
-      <ResultGroup label="Faktúry" count={invoices.length} hits={invoices} />
+      <ResultGroup
+        label={t("invoices")}
+        count={invoices.length}
+        hits={invoices}
+        itemTypeLabel={t("invoice")}
+      />
     </FadeIn>
   );
 }

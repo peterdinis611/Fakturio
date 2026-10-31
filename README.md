@@ -1,5 +1,7 @@
 # Fakturio frontend
 
+> **WIP** — na aplikácii sa stále pracuje. API, UI aj správanie sa môžu meniť.
+
 Next.js App Router (TypeScript) — BFF cez server actions k ASP.NET API.
 
 ## Screenshoty

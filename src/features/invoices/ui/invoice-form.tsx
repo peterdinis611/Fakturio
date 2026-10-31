@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  formatForDisplay,
+  useAppHotkeys,
+  useHotkeys,
+} from "@tanstack/react-hotkeys";
 import { toast } from "@/shared/toast";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import {
@@ -231,40 +236,43 @@ export function InvoiceForm({
     });
   }
 
-  useEffect(() => {
-    if (readOnly) return;
+  const hotkeys = useAppHotkeys();
+  useHotkeys(
+    [
+      {
+        hotkey: hotkeys["invoice.save"],
+        callback: () => {
+          void handleSubmit((values) => submit(values))();
+        },
+      },
+      {
+        hotkey: hotkeys["invoice.addLine"],
+        callback: () => addEmptyLine(),
+      },
+      {
+        hotkey: hotkeys["invoice.removeEmptyLine"],
+        callback: () => {
+          const items = watchedItems ?? [];
+          if (items.length <= 1) return;
+          const last = items[items.length - 1];
+          if (last && !String(last.description ?? "").trim()) {
+            remove(items.length - 1);
+          }
+        },
+      },
+    ],
+    { enabled: !readOnly },
+  );
 
-    function onKeyDown(e: KeyboardEvent) {
-      const meta = e.metaKey || e.ctrlKey;
-      if (!meta) return;
-
-      if (e.key === "Enter" && e.shiftKey) {
-        e.preventDefault();
-        addEmptyLine();
-        return;
-      }
-
-      if (e.key === "Enter") {
-        e.preventDefault();
-        void handleSubmit((values) => submit(values))();
-        return;
-      }
-
-      if (e.key === "Backspace" && e.shiftKey) {
-        const items = watchedItems ?? [];
-        if (items.length <= 1) return;
-        const last = items[items.length - 1];
-        if (last && !String(last.description ?? "").trim()) {
-          e.preventDefault();
-          remove(items.length - 1);
-        }
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- stable shortcuts for editor session
-  }, [readOnly, watchedItems, fields.length]);
+  const saveHint = hotkeys["invoice.save"].hotkey
+    ? formatForDisplay(hotkeys["invoice.save"].hotkey)
+    : null;
+  const addLineHint = hotkeys["invoice.addLine"].hotkey
+    ? formatForDisplay(hotkeys["invoice.addLine"].hotkey)
+    : null;
+  const removeLineHint = hotkeys["invoice.removeEmptyLine"].hotkey
+    ? formatForDisplay(hotkeys["invoice.removeEmptyLine"].hotkey)
+    : null;
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -558,10 +566,17 @@ export function InvoiceForm({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="font-heading text-sm font-medium">Položky</h2>
-            {!readOnly ? (
+            {!readOnly && (saveHint || addLineHint || removeLineHint) ? (
               <p className="mt-0.5 text-[11px] text-faint">
-                ⌘/Ctrl+Enter uložiť · ⌘/Ctrl+Shift+Enter nový riadok ·
-                ⌘/Ctrl+Shift+⌫ zmazať prázdny
+                {[
+                  saveHint ? `${saveHint} ${t("shortcutSave")}` : null,
+                  addLineHint ? `${addLineHint} ${t("shortcutAddLine")}` : null,
+                  removeLineHint
+                    ? `${removeLineHint} ${t("shortcutRemoveEmpty")}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
               </p>
             ) : null}
           </div>

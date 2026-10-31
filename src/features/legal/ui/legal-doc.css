@@ -222,6 +222,19 @@
   gap: 0.5rem;
 }
 
+.legal-doc__action {
+  margin-top: 0.85rem;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.legal-doc__action a {
+  color: var(--ink);
+  font-weight: 500;
+  text-underline-offset: 2px;
+}
+
 @media (min-width: 720px) {
   .legal-doc {
     padding-inline: 1.5rem;
