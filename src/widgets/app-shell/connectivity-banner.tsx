@@ -14,17 +14,18 @@ import { cn } from "@/shared/lib/utils";
  */
 export function ConnectivityBanner() {
   const t = useTranslations("Offline");
-  const { status, checking, check, consumeRestoredFlag, isOnline } =
+  const { status, ready, checking, check, consumeRestoredFlag, isOnline } =
     useConnectivity();
 
   useEffect(() => {
-    if (!isOnline) return;
+    if (!ready || !isOnline) return;
     if (consumeRestoredFlag()) {
       toast.message(t("backOnline"));
     }
-  }, [isOnline, consumeRestoredFlag, t]);
+  }, [ready, isOnline, consumeRestoredFlag, t]);
 
-  if (status === "online") return null;
+  // Avoid SSR/client HTML mismatch — wait until the first client probe finishes.
+  if (!ready || status === "online") return null;
 
   const offline = status === "offline";
 

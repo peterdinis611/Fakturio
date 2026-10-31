@@ -1,12 +1,12 @@
 import type { RegistryCompany } from "@/shared/api/types";
-import { isValidDic } from "@/shared/lib/validations/sk";
+import { isValidDic, isValidIcDph } from "@/shared/lib/validations/sk";
 
 const LEGAL_FORM_MAP: Array<{ match: RegExp; value: string }> = [
   { match: /s\.?\s*r\.?\s*o\.?|ručením\s+obmedzeným|ručenim\s+obmedzenym/i, value: "s.r.o." },
   { match: /a\.?\s*s\.?|akciov/i, value: "a.s." },
   { match: /k\.?\s*s\.?|komanditn/i, value: "k.s." },
   { match: /v\.?\s*o\.?\s*s\.?|verejn[aá]\s+obchodn/i, value: "v.o.s." },
-  { match: /živnost|zivnost|szčo|szco|fyzick/i, value: "SZČO" },
+  { match: /živnost|zivnost|szčo|szco|fyzick|podnikate/i, value: "SZČO" },
 ];
 
 export function mapRegistryLegalForm(legalForm: string | null | undefined): string | null {
@@ -22,6 +22,8 @@ export type RegistryAutofillFields = {
   name: string;
   ico: string;
   dic?: string | null;
+  icDph?: string | null;
+  isVatPayer?: boolean | null;
   street?: string | null;
   city?: string | null;
   postalCode?: string | null;
@@ -46,6 +48,16 @@ export function toRegistryAutofill(
 
   if (data.dic && isValidDic(data.dic)) {
     fields.dic = data.dic;
+  }
+
+  if (data.icDph && isValidIcDph(data.icDph)) {
+    fields.icDph = data.icDph.trim().toUpperCase();
+  }
+
+  if (typeof data.isVatPayer === "boolean") {
+    fields.isVatPayer = data.isVatPayer;
+  } else if (fields.icDph) {
+    fields.isVatPayer = true;
   }
 
   if (opts.includeCompanyExtras) {

@@ -101,6 +101,14 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-[12px] text-negative">{message}</p>;
 }
 
+function RequiredMark() {
+  return (
+    <span className="text-negative" aria-hidden="true">
+      *
+    </span>
+  );
+}
+
 function Field({
   className,
   children,
@@ -198,6 +206,13 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
       if (fields.city) setValue("city", fields.city, opts);
       if (fields.postalCode) setValue("postalCode", fields.postalCode, opts);
       if (fields.dic) setValue("dic", fields.dic, opts);
+      if (fields.icDph) setValue("icDph", fields.icDph, opts);
+      if (typeof fields.isVatPayer === "boolean") {
+        setValue("isVatPayer", fields.isVatPayer, opts);
+        if (!fields.isVatPayer && !fields.icDph) {
+          setValue("icDph", "", opts);
+        }
+      }
       if (fields.legalForm) setValue("legalForm", fields.legalForm, opts);
       if (fields.commercialRegister) {
         setValue("commercialRegister", fields.commercialRegister, opts);

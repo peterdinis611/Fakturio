@@ -36,11 +36,16 @@ export async function GET() {
       reason: "ok" as const,
       latencyMs: Date.now() - started,
     });
-  } catch {
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to reach API";
+    console.warn(`[health] API unreachable at ${base}: ${message}`);
     return NextResponse.json(
       {
         ok: false,
         reason: "unreachable" as const,
+        detail: message,
+        target: `${base}/api/health`,
         latencyMs: Date.now() - started,
       },
       { status: 503 },

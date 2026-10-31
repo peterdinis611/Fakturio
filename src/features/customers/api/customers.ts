@@ -5,7 +5,13 @@ import { returnValidationErrors } from "next-safe-action";
 import { z } from "zod";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
-import type { Customer, CreateCustomerInput, PagedResponse } from "@/shared/api/types";
+import type {
+  Customer,
+  CustomerLookupItem,
+  CustomerSummary,
+  CreateCustomerInput,
+  PagedResponse,
+} from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { customerSchema } from "@/entities/customer/model/schema";
 
@@ -24,8 +30,33 @@ export async function listCustomers(params?: {
   });
 }
 
+export async function lookupCustomers(params?: {
+  search?: string;
+  limit?: number;
+}): Promise<CustomerLookupItem[]> {
+  return apiFetch<CustomerLookupItem[]>("/api/customers/lookup", {
+    searchParams: {
+      search: params?.search,
+      limit: params?.limit ?? 20,
+    },
+    next: { tags: ["customers"], revalidate: 20 },
+  });
+}
+
 export async function getCustomer(id: string): Promise<Customer> {
   return apiFetch<Customer>(`/api/customers/${id}`, {
+    next: { tags: [`customer-${id}`, "customers"], revalidate: 20 },
+  });
+}
+
+export async function getCustomerByIco(ico: string): Promise<Customer> {
+  return apiFetch<Customer>(`/api/customers/by-ico/${encodeURIComponent(ico)}`, {
+    next: { tags: ["customers"], revalidate: 20 },
+  });
+}
+
+export async function getCustomerSummary(id: string): Promise<CustomerSummary> {
+  return apiFetch<CustomerSummary>(`/api/customers/${id}/summary`, {
     next: { tags: [`customer-${id}`, "customers"], revalidate: 20 },
   });
 }

@@ -59,6 +59,31 @@ export type Customer = {
   invoiceCount: number;
 };
 
+export type CustomerLookupItem = {
+  id: string;
+  name: string;
+  ico: string | null;
+  city: string | null;
+};
+
+export type CustomerSummary = {
+  id: string;
+  name: string;
+  ico: string | null;
+  invoiceCount: number;
+  draftCount: number;
+  issuedCount: number;
+  paidCount: number;
+  overdueCount: number;
+  cancelledCount: number;
+  totalInvoiced: number;
+  paidAmount: number;
+  outstandingAmount: number;
+  overdueAmount: number;
+  currency: string;
+  lastInvoiceDate: string | null;
+};
+
 export type CreateCustomerInput = {
   name: string;
   ico?: string | null;
@@ -135,6 +160,14 @@ export type CompanySummary = {
   isVatPayer: boolean;
   logoUrl: string | null;
   isReadyToInvoice: boolean;
+};
+
+export type CompanyBank = {
+  bankIban: string | null;
+  bankBic: string | null;
+  bankName: string | null;
+  defaultPaymentMethod: string | null;
+  defaultConstantSymbol: string | null;
 };
 
 export type InvoiceParty = {
@@ -438,7 +471,7 @@ export type ApiProblem = {
   instance?: string;
 };
 
-/** Normalized company from ARES (CZ) or RPO (SK). */
+/** Normalized company from ARES (CZ) or RPO + FS (SK). */
 export type RegistryCompany = {
   country: string;
   source: string;
@@ -446,6 +479,7 @@ export type RegistryCompany = {
   name: string;
   legalForm: string | null;
   dic: string | null;
+  icDph: string | null;
   street: string | null;
   city: string | null;
   postalCode: string | null;

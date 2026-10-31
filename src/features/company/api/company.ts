@@ -6,6 +6,7 @@ import { cache } from "react";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
 import type {
+  CompanyBank,
   CompanyCompleteness,
   CompanySettings,
   CompanySummary,
@@ -31,6 +32,12 @@ export const getCompanySummary = cache(async (): Promise<CompanySummary> => {
 
 export const getCompanyStatus = cache(async (): Promise<CompanyCompleteness> => {
   return apiFetch<CompanyCompleteness>("/api/company/status", {
+    next: { tags: ["company"], revalidate: 60 },
+  });
+});
+
+export const getCompanyBank = cache(async (): Promise<CompanyBank> => {
+  return apiFetch<CompanyBank>("/api/company/bank", {
     next: { tags: ["company"], revalidate: 60 },
   });
 });

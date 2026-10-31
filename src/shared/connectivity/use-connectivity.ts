@@ -27,18 +27,13 @@ async function probeServer(): Promise<boolean> {
   }
 }
 
-function browserOnline() {
-  if (typeof navigator === "undefined") return true;
-  return navigator.onLine;
-}
-
 /**
  * Detects browser offline state and API backend reachability via /api/health.
+ * Status stays "online" until after mount to avoid SSR hydration mismatches.
  */
 export function useConnectivity() {
-  const [status, setStatus] = useState<ConnectivityStatus>(() =>
-    browserOnline() ? "online" : "offline",
-  );
+  const [status, setStatus] = useState<ConnectivityStatus>("online");
+  const [ready, setReady] = useState(false);
   const [checking, setChecking] = useState(false);
   const [lastCheckedAt, setLastCheckedAt] = useState<number | null>(null);
   const wasDownRef = useRef(false);
@@ -56,7 +51,7 @@ export function useConnectivity() {
   const check = useCallback(async () => {
     setChecking(true);
     try {
-      if (!browserOnline()) {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
         applyStatus("offline");
         return "offline" as const;
       }
@@ -66,6 +61,7 @@ export function useConnectivity() {
       return next;
     } finally {
       setChecking(false);
+      setReady(true);
     }
   }, []);
 
@@ -77,6 +73,7 @@ export function useConnectivity() {
     }
     function onOffline() {
       applyStatus("offline");
+      setReady(true);
     }
 
     window.addEventListener("online", onOnline);
@@ -89,13 +86,14 @@ export function useConnectivity() {
   }, [check]);
 
   useEffect(() => {
+    if (!ready) return;
     const intervalMs =
       status === "online" ? HEALTHY_POLL_MS : UNHEALTHY_POLL_MS;
     const id = window.setInterval(() => {
       void check();
     }, intervalMs);
     return () => window.clearInterval(id);
-  }, [status, check]);
+  }, [status, check, ready]);
 
   const consumeRestoredFlag = useCallback(() => {
     if (!wasDownRef.current) return false;
@@ -105,6 +103,7 @@ export function useConnectivity() {
 
   return {
     status,
+    ready,
     isOnline: status === "online",
     isOffline: status === "offline",
     isServerDown: status === "server-down",
