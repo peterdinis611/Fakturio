@@ -148,7 +148,6 @@
     "invoices": "Faktúry",
     "customers": "Zákazníci",
     "services": "Katalóg",
-    "resume": "Životopis",
     "notes": "Poznámky",
     "payments": "Platby",
     "reminders": "Upomienky",
@@ -479,26 +478,6 @@
     "edit": "Upraviť",
     "delete": "Zmazať"
   },
-  "Resume": {
-    "title": "Životopis",
-    "description": "Profil a položky pre prezentáciu skúseností.",
-    "skills": "Zručnosti",
-    "saveProfile": "Uložiť profil",
-    "profileSaved": "Profil uložený",
-    "skillsHint": "Oddel čiarkou…",
-    "newEntry": "Nová položka",
-    "emptyEntries": "Zatiaľ bez položiek",
-    "entryDeleted": "Položka odstránená",
-    "entryAdded": "Položka pridaná",
-    "entryUpdated": "Položka upravená",
-    "position": "Názov / pozícia",
-    "current": "Prebieha / aktuálne",
-    "experience": "Skúsenosť",
-    "education": "Vzdelanie",
-    "certificate": "Certifikát",
-    "summary": "Zhrnutie",
-    "headline": "Titulok"
-  },
   "Onboarding": {
     "stepCompany": "Krok 1 · Firma",
     "title": "Nastavenie firmy",
@@ -532,7 +511,6 @@
     "reminders": "Načítavam upomienky…",
     "payments": "Načítavam import…",
     "services": "Načítavam katalóg…",
-    "resume": "Načítavam životopis…",
     "logs": "Načítavam logy…"
   },
   "InvoiceDetail": {

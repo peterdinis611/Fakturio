@@ -148,7 +148,6 @@
     "invoices": "Invoices",
     "customers": "Customers",
     "services": "Catalog",
-    "resume": "CV",
     "notes": "Notes",
     "payments": "Payments",
     "reminders": "Reminders",
@@ -479,26 +478,6 @@
     "edit": "Edit",
     "delete": "Delete"
   },
-  "Resume": {
-    "title": "Resume",
-    "description": "Profile and entries to present your experience.",
-    "skills": "Skills",
-    "saveProfile": "Save profile",
-    "profileSaved": "Profile saved",
-    "skillsHint": "Separate with commas…",
-    "newEntry": "New entry",
-    "emptyEntries": "No entries yet",
-    "entryDeleted": "Entry deleted",
-    "entryAdded": "Entry added",
-    "entryUpdated": "Entry updated",
-    "position": "Title / role",
-    "current": "Ongoing / current",
-    "experience": "Experience",
-    "education": "Education",
-    "certificate": "Certificate",
-    "summary": "Summary",
-    "headline": "Headline"
-  },
   "Onboarding": {
     "stepCompany": "Step 1 · Company",
     "title": "Company setup",
@@ -532,7 +511,6 @@
     "reminders": "Loading reminders…",
     "payments": "Loading import…",
     "services": "Loading catalog…",
-    "resume": "Loading resume…",
     "logs": "Loading logs…"
   },
   "InvoiceDetail": {

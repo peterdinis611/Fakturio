@@ -527,41 +527,6 @@ export type ServiceCatalogItem = {
   updatedAt: string;
 };
 
-export type ResumeEntryType =
-  | "experience"
-  | "education"
-  | "certification"
-  | "language"
-  | "other";
-
-export type ResumeProfile = {
-  id: string;
-  fullName: string;
-  headline: string;
-  summary: string;
-  email: string;
-  phone: string;
-  location: string;
-  website: string;
-  skills: string;
-  updatedAt: string;
-};
-
-export type ResumeEntry = {
-  id: string;
-  type: ResumeEntryType;
-  title: string;
-  organization: string;
-  location: string;
-  startDate: string | null;
-  endDate: string | null;
-  isCurrent: boolean;
-  description: string;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type AppUser = {
   id: string;
   email: string;

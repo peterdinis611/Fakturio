@@ -14,15 +14,9 @@ import {
 } from "@/shared/lib/validations/common";
 import { isValidEmail, isValidIban, isValidIco, isValidPostalCode } from "@/shared/lib/validations/sk";
 
-const requiredTrimmed = (message: string) =>
-  z
-    .string({ required_error: message })
-    .trim()
-    .min(1, message);
-
 export const companySchema = z
   .object({
-    name: requiredTrimmed("Názov firmy je povinný").max(200),
+    name: z.string().trim().min(1, "Názov firmy je povinný").max(200),
     legalForm: optionalString,
     ico: optionalIco.refine((v) => v !== null && isValidIco(v), {
       message: "IČO je povinné (8 číslic + kontrolná cifra)",

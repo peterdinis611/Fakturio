@@ -2,13 +2,19 @@
 
 const ALLOWED_VAT = new Set([0, 5, 19, 23]);
 
+/** Strip spaces / whitespace so "57 267 073" is accepted as IČO. */
+export function normalizeIco(value: string): string {
+  return value.replace(/\s+/g, "");
+}
+
 export function isValidIco(value: string): boolean {
-  if (!/^\d{8}$/.test(value)) return false;
+  const ico = normalizeIco(value);
+  if (!/^\d{8}$/.test(ico)) return false;
   let sum = 0;
-  for (let i = 0; i < 7; i++) sum += Number(value[i]) * (8 - i);
+  for (let i = 0; i < 7; i++) sum += Number(ico[i]) * (8 - i);
   const remainder = sum % 11;
   const check = remainder === 0 ? 1 : remainder === 1 ? 0 : 11 - remainder;
-  return check === Number(value[7]);
+  return check === Number(ico[7]);
 }
 
 export function isValidDic(value: string): boolean {

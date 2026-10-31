@@ -5,7 +5,7 @@ import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
 import type { RegistryCompany } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
-import { isValidIco } from "@/shared/lib/validations/sk";
+import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
 
 const lookupSchema = z.object({
   country: z
@@ -13,11 +13,11 @@ const lookupSchema = z.object({
     .trim()
     .transform((v) => v.toUpperCase())
     .refine((v) => v === "SK" || v === "CZ", {
-      message: "Lookup je dostupný pre SK a CZ",
+      message: "Doplnenie z registra je dostupné pre SK a CZ",
     }),
   ico: z
     .string()
-    .trim()
+    .transform((v) => normalizeIco(v))
     .refine((v) => isValidIco(v), {
       message: "Neplatné IČO (8 číslic + kontrolná cifra)",
     }),
@@ -45,8 +45,10 @@ export const lookupRegistryAction = actionClient
         if (error.problem.code === "invalid_ico") {
           throw new ActionError("Neplatné IČO (8 číslic + kontrolná cifra).");
         }
-        throw new ActionError(error.message);
+        throw new ActionError(
+          error.message || "Doplnenie z registra zlyhalo.",
+        );
       }
-      throw error;
+      throw new ActionError("Doplnenie z registra zlyhalo.");
     }
   });

@@ -1,4 +1,5 @@
 import { flattenValidationErrors } from "next-safe-action";
+import { localizeFieldError, toUserFacingError } from "@/shared/lib/user-error";
 
 type FlatErrors = {
   formErrors?: string[];
@@ -26,11 +27,11 @@ export function toFieldErrors(
   const out: Record<string, string> = {};
 
   for (const [key, messages] of Object.entries(flat.fieldErrors ?? {})) {
-    if (messages?.[0]) out[key] = messages[0];
+    if (messages?.[0]) out[key] = localizeFieldError(messages[0]);
   }
 
   if (flat.formErrors?.[0] && !out.form) {
-    out.form = flat.formErrors[0];
+    out.form = localizeFieldError(flat.formErrors[0]);
   }
 
   return Object.keys(out).length > 0 ? out : undefined;
@@ -40,7 +41,7 @@ export function actionErrorMessage(result: {
   serverError?: string;
   validationErrors?: unknown;
 }): string | undefined {
-  if (result.serverError) return result.serverError;
+  if (result.serverError) return toUserFacingError(result.serverError);
   const fields = toFieldErrors(result.validationErrors);
   if (fields?.form) return fields.form;
   if (fields && Object.keys(fields).length > 0) return "Skontroluj formulár";

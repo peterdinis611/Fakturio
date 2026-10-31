@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
 import { lookupRegistryAction } from "@/features/registry/api/registry";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
-import { isValidIco } from "@/shared/lib/validations/sk";
+import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
 import type { RegistryCompany } from "@/shared/api/types";
 
 function normalizeCountry(country: string | null | undefined): "SK" | "CZ" | null {
@@ -48,18 +48,18 @@ export function useRegistryLookup(opts: {
   }, [opts.messages]);
 
   const registryCountry = normalizeCountry(opts.country);
-  const ico = (opts.ico ?? "").trim();
+  const ico = normalizeIco(opts.ico ?? "");
   const canLookup = Boolean(registryCountry && isValidIco(ico));
 
   const lookup = useCallback((mode: "auto" | "manual" = "manual") => {
     const country = normalizeCountry(countryRef.current);
-    const value = (icoRef.current ?? "").trim();
+    const value = normalizeIco(icoRef.current ?? "");
     const messages = messagesRef.current;
     if (!country || !isValidIco(value)) {
       if (mode === "manual") {
         toast.error(
           !country
-            ? "Doplnenie z registra je pre SK a CZ."
+            ? "Doplnenie z registra je dostupné pre SK a CZ."
             : (messages?.needIco ?? "Zadaj platné 8-miestne IČO."),
         );
       }

@@ -243,11 +243,8 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         return;
       }
       toast.success(t("saved"));
-      if (mode === "onboarding") {
-        router.push("/");
-      } else {
-        router.refresh();
-      }
+      router.push("/dashboard");
+      router.refresh();
     });
   }
 
@@ -268,7 +265,9 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
-          <Label htmlFor="name">{t("name")}</Label>
+          <Label htmlFor="name">
+            {t("name")} <RequiredMark />
+          </Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
           <FieldError message={errors.name?.message} />
         </Field>
@@ -300,7 +299,9 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
         </Field>
         <Field>
-          <Label htmlFor="ico">IČO</Label>
+          <Label htmlFor="ico">
+            IČO <RequiredMark />
+          </Label>
           <IcoLookupField
             id="ico"
             register={register("ico")}
@@ -313,18 +314,35 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.ico?.message} />
           {registrySupported ? (
             <p className="text-[11px] text-muted-foreground">
-              Po zadaní IČO doplníme firmu z{" "}
-              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO"}.
+              Po zadaní IČO doplníme firmu, DIČ a IČ DPH z{" "}
+              {country?.toUpperCase() === "CZ" ? "ARES" : "RPO / FS"}.
             </p>
           ) : null}
         </Field>
         <Field>
           <Label htmlFor="dic">DIČ</Label>
-          <Input id="dic" className="data-num" {...register("dic")} />
+          <Input
+            id="dic"
+            className="data-num"
+            {...register("dic")}
+            aria-invalid={!!errors.dic}
+          />
+          <FieldError message={errors.dic?.message} />
+          <p className="text-[11px] text-muted-foreground">Voliteľné.</p>
         </Field>
         <Field>
-          <Label htmlFor="icDph">IČ DPH</Label>
-          <Input id="icDph" {...register("icDph")} />
+          <Label htmlFor="icDph">
+            IČ DPH {isVatPayer ? <RequiredMark /> : null}
+          </Label>
+          <Input
+            id="icDph"
+            {...register("icDph")}
+            aria-invalid={!!errors.icDph}
+          />
+          <FieldError message={errors.icDph?.message} />
+          <p className="text-[11px] text-muted-foreground">
+            {isVatPayer ? "Povinné pri platcovi DPH." : "Voliteľné pri neplatcovi."}
+          </p>
         </Field>
         <Field className="sm:col-span-2">
           <div className="flex items-center justify-between gap-3 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
@@ -346,7 +364,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
               id="isVatPayer"
               checked={isVatPayer}
               onCheckedChange={(checked) =>
-                setValue("isVatPayer", checked, { shouldDirty: true })
+                setValue("isVatPayer", checked, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
               }
             />
           </div>
@@ -354,10 +375,19 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         <Field className="sm:col-span-2">
           <Label htmlFor="commercialRegister">Obchodný register</Label>
           <Input id="commercialRegister" {...register("commercialRegister")} />
+          <p className="text-[11px] text-muted-foreground">Voliteľné.</p>
         </Field>
         <Field>
-          <Label htmlFor="email">E-mail</Label>
-          <Input id="email" type="email" {...register("email")} />
+          <Label htmlFor="email">
+            E-mail <RequiredMark />
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            {...register("email")}
+            aria-invalid={!!errors.email}
+          />
+          <FieldError message={errors.email?.message} />
         </Field>
         <Field>
           <Label htmlFor="invoiceEmail">E-mail na faktúry</Label>
@@ -390,19 +420,39 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
 
       <Section index="02" title={t("address")} quiet={mode === "settings"}>
         <Field className="sm:col-span-2">
-          <Label htmlFor="street">Ulica</Label>
-          <Input id="street" {...register("street")} />
+          <Label htmlFor="street">
+            Ulica <RequiredMark />
+          </Label>
+          <Input
+            id="street"
+            {...register("street")}
+            aria-invalid={!!errors.street}
+          />
+          <FieldError message={errors.street?.message} />
         </Field>
         <Field>
-          <Label htmlFor="city">Mesto</Label>
-          <Input id="city" {...register("city")} />
+          <Label htmlFor="city">
+            Mesto <RequiredMark />
+          </Label>
+          <Input id="city" {...register("city")} aria-invalid={!!errors.city} />
+          <FieldError message={errors.city?.message} />
         </Field>
         <Field>
-          <Label htmlFor="postalCode">PSČ</Label>
-          <Input id="postalCode" className="data-num" {...register("postalCode")} />
+          <Label htmlFor="postalCode">
+            PSČ <RequiredMark />
+          </Label>
+          <Input
+            id="postalCode"
+            className="data-num"
+            {...register("postalCode")}
+            aria-invalid={!!errors.postalCode}
+          />
+          <FieldError message={errors.postalCode?.message} />
         </Field>
         <Field className="sm:col-span-2">
-          <Label htmlFor="country">Krajina</Label>
+          <Label htmlFor="country">
+            Krajina <RequiredMark />
+          </Label>
           <Controller
             control={control}
             name="country"
@@ -424,8 +474,16 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         quiet={mode === "settings"}
       >
         <Field className="sm:col-span-2">
-          <Label htmlFor="bankIban">{t("iban")}</Label>
-          <Input id="bankIban" className="data-num" {...register("bankIban")} />
+          <Label htmlFor="bankIban">
+            {t("iban")} <RequiredMark />
+          </Label>
+          <Input
+            id="bankIban"
+            className="data-num"
+            {...register("bankIban")}
+            aria-invalid={!!errors.bankIban}
+          />
+          <FieldError message={errors.bankIban?.message} />
         </Field>
         <Field>
           <Label htmlFor="bankBic">BIC / SWIFT</Label>

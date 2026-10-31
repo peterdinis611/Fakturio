@@ -53,9 +53,10 @@ async function parseProblem(res: Response): Promise<ApiProblem> {
     };
   } catch {
     return {
-      title: res.statusText || "Request failed",
+      title: "Požiadavka zlyhala",
       detail: `HTTP ${res.status}`,
       status: res.status,
+      code: "bad_request",
     };
   }
 }
@@ -88,13 +89,56 @@ export async function apiFetch<T>(
       cache,
       next,
     });
-  } catch (error) {
+  } catch {
     throw new ApiError(0, {
-      title: "Server unavailable",
-      detail:
-        error instanceof Error
-          ? error.message
-          : "Could not reach the API server.",
+      title: "Server nedostupný",
+      detail: "Server je nedostupný. Skontroluj pripojenie a skús znova.",
+      status: 0,
+      code: "server_unreachable",
+    });
+  }
+
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
+  if (!res.ok) {
+    throw new ApiError(res.status, await parseProblem(res));
+  }
+
+  if (res.headers.get("content-type")?.includes("application/json")) {
+    return (await res.json()) as T;
+  }
+
+  return undefined as T;
+}
+
+/** Multipart upload — do not set Content-Type (boundary is set by fetch). */
+export async function apiFetchFormData<T>(
+  path: string,
+  formData: FormData,
+  options: Omit<RequestOptions, "body"> = {},
+): Promise<T> {
+  const { method = "POST", searchParams, headers, cache, next, skipAuth } =
+    options;
+  const authHeader = skipAuth ? {} : await getAuthHeader();
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(path, searchParams), {
+      method,
+      headers: {
+        Accept: "application/json",
+        ...authHeader,
+        ...headers,
+      },
+      body: formData,
+      cache,
+      next,
+    });
+  } catch {
+    throw new ApiError(0, {
+      title: "Server nedostupný",
+      detail: "Server je nedostupný. Skontroluj pripojenie a skús znova.",
       status: 0,
       code: "server_unreachable",
     });

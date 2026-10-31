@@ -11,6 +11,7 @@ import {
   isValidIco,
   isValidPostalCode,
   isValidVariableSymbol,
+  normalizeIco,
 } from "@/shared/lib/validations/sk";
 
 /** Empty string / null / undefined → null for optional API fields. */
@@ -22,10 +23,17 @@ export const optionalString = z
     return trimmed === "" ? null : trimmed;
   });
 
-export const optionalIco = optionalString.refine(
-  (v) => v === null || isValidIco(v),
-  { message: "Neplatné IČO (8 číslic + kontrolná cifra)" },
-);
+/** Accepts spaced IČO ("57 267 073"); stores digits only. */
+export const optionalIco = z
+  .union([z.string(), z.null(), z.undefined()])
+  .transform((v) => {
+    if (v == null) return null;
+    const normalized = normalizeIco(v);
+    return normalized === "" ? null : normalized;
+  })
+  .refine((v) => v === null || isValidIco(v), {
+    message: "Neplatné IČO (8 číslic + kontrolná cifra)",
+  });
 
 export const optionalDic = optionalString.refine(
   (v) => v === null || isValidDic(v),

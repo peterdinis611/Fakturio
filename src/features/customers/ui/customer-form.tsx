@@ -98,6 +98,7 @@ export function CustomerForm({
       if (fields.city) setValue("city", fields.city, opts);
       if (fields.postalCode) setValue("postalCode", fields.postalCode, opts);
       if (fields.dic) setValue("dic", fields.dic, opts);
+      if (fields.icDph) setValue("icDph", fields.icDph, opts);
     },
     [setValue],
   );

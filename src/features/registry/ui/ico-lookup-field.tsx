@@ -6,6 +6,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Spinner } from "@/shared/ui/spinner";
 import { cn } from "@/shared/lib/utils";
+import { normalizeIco } from "@/shared/lib/validations/sk";
 
 type IcoLookupFieldProps = {
   id: string;
@@ -29,7 +30,7 @@ export function IcoLookupField({
   className,
 }: IcoLookupFieldProps) {
   const t = useTranslations("CustomerDetail");
-  const { onBlur, ...rest } = register;
+  const { onBlur, onChange, ...rest } = register;
 
   return (
     <div className={cn("flex gap-2", className)}>
@@ -41,13 +42,29 @@ export function IcoLookupField({
         aria-invalid={ariaInvalid}
         aria-busy={lookingUp || undefined}
         {...rest}
+        onChange={onChange}
         onBlur={(event) => {
+          const cleaned = normalizeIco(event.target.value);
+          if (cleaned !== event.target.value) {
+            event.target.value = cleaned;
+            onChange(event);
+          }
           onBlur(event);
           if (registrySupported) onLookup("auto");
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter" && registrySupported) {
             event.preventDefault();
+            const target = event.currentTarget;
+            const cleaned = normalizeIco(target.value);
+            if (cleaned !== target.value) {
+              target.value = cleaned;
+              onChange({
+                ...event,
+                target,
+                currentTarget: target,
+              } as React.ChangeEvent<HTMLInputElement>);
+            }
             onLookup("manual");
           }
         }}

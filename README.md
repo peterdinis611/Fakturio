@@ -2,6 +2,28 @@
 
 Next.js App Router (TypeScript) — BFF cez server actions k ASP.NET API.
 
+## Screenshoty
+
+### Prehľad
+
+![Dashboard — prehľad faktúr a inkasa](docs/screenshots/dashboard.png)
+
+### Faktúry
+
+![Zoznam faktúr so filtrami a stavmi](docs/screenshots/invoices.png)
+
+### Detail faktúry
+
+![Detail zaplatenej faktúry FA20260001](docs/screenshots/invoice-detail.png)
+
+### Zákazníci
+
+![Zoznam odberateľov](docs/screenshots/customers.png)
+
+### Reporty
+
+![Reporty — obrat, aging a DPH](docs/screenshots/reports.png)
+
 ## Spustenie
 
 ```bash
