@@ -48,21 +48,17 @@ export function NotificationBell() {
     refresh();
     let cancelled = false;
 
-    (async () => {
-      try {
-        const hub = await startSignalHub();
-        if (cancelled) return;
+    void (async () => {
+      const hub = await startSignalHub();
+      if (cancelled || !hub) return;
 
-        hub.on("notification", (n: AppNotification) => {
-          setItems((prev) => [n, ...prev].slice(0, 20));
-          setUnread((c) => c + 1);
-        });
-        hub.on("unreadCount", (count: number) => {
-          setUnread(count);
-        });
-      } catch {
-        // SignalR optional — inbox still works via REST
-      }
+      hub.on("notification", (n: AppNotification) => {
+        setItems((prev) => [n, ...prev].slice(0, 20));
+        setUnread((c) => c + 1);
+      });
+      hub.on("unreadCount", (count: number) => {
+        setUnread(count);
+      });
     })();
 
     return () => {

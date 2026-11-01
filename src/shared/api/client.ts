@@ -1,5 +1,6 @@
 import { getAccessToken } from "@/shared/auth/session";
 import { ApiError } from "./errors";
+import { logApiFailure } from "./log";
 import type { ApiProblem } from "./types";
 
 const DEFAULT_BASE = "http://localhost:5148";
@@ -89,13 +90,15 @@ export async function apiFetch<T>(
       cache,
       next,
     });
-  } catch {
-    throw new ApiError(0, {
+  } catch (cause) {
+    const problem: ApiProblem = {
       title: "Server nedostupný",
       detail: "Server je nedostupný. Skontroluj pripojenie a skús znova.",
       status: 0,
       code: "server_unreachable",
-    });
+    };
+    logApiFailure({ method, path, status: 0, problem, cause });
+    throw new ApiError(0, problem);
   }
 
   if (res.status === 204) {
@@ -103,7 +106,9 @@ export async function apiFetch<T>(
   }
 
   if (!res.ok) {
-    throw new ApiError(res.status, await parseProblem(res));
+    const problem = await parseProblem(res);
+    logApiFailure({ method, path, status: res.status, problem });
+    throw new ApiError(res.status, problem);
   }
 
   if (res.headers.get("content-type")?.includes("application/json")) {
@@ -135,13 +140,15 @@ export async function apiFetchFormData<T>(
       cache,
       next,
     });
-  } catch {
-    throw new ApiError(0, {
+  } catch (cause) {
+    const problem: ApiProblem = {
       title: "Server nedostupný",
       detail: "Server je nedostupný. Skontroluj pripojenie a skús znova.",
       status: 0,
       code: "server_unreachable",
-    });
+    };
+    logApiFailure({ method, path, status: 0, problem, cause });
+    throw new ApiError(0, problem);
   }
 
   if (res.status === 204) {
@@ -149,7 +156,9 @@ export async function apiFetchFormData<T>(
   }
 
   if (!res.ok) {
-    throw new ApiError(res.status, await parseProblem(res));
+    const problem = await parseProblem(res);
+    logApiFailure({ method, path, status: res.status, problem });
+    throw new ApiError(res.status, problem);
   }
 
   if (res.headers.get("content-type")?.includes("application/json")) {
@@ -165,13 +174,27 @@ export async function apiFetchBlob(
   accept = "application/pdf, text/csv, */*",
 ): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
   const authHeader = await getAuthHeader();
-  const res = await fetch(buildUrl(path, searchParams), {
-    headers: { Accept: accept, ...authHeader },
-    cache: "no-store",
-  });
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(path, searchParams), {
+      headers: { Accept: accept, ...authHeader },
+      cache: "no-store",
+    });
+  } catch (cause) {
+    const problem: ApiProblem = {
+      title: "Server nedostupný",
+      detail: "Server je nedostupný. Skontroluj pripojenie a skús znova.",
+      status: 0,
+      code: "server_unreachable",
+    };
+    logApiFailure({ method: "GET", path, status: 0, problem, cause });
+    throw new ApiError(0, problem);
+  }
 
   if (!res.ok) {
-    throw new ApiError(res.status, await parseProblem(res));
+    const problem = await parseProblem(res);
+    logApiFailure({ method: "GET", path, status: res.status, problem });
+    throw new ApiError(res.status, problem);
   }
 
   const disposition = res.headers.get("content-disposition");

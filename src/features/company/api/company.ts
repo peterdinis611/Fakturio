@@ -73,7 +73,7 @@ export const updateCompanyAction = actionClient
             ) as never,
           );
         }
-        throw new ActionError(error.message);
+        throw ActionError.fromApi(error);
       }
       throw error;
     }
@@ -114,7 +114,7 @@ export async function uploadCompanyLogoAction(
     revalidatePath("/settings/company");
     return data;
   } catch (error) {
-    if (isApiError(error)) throw new ActionError(error.message);
+    if (isApiError(error)) throw ActionError.fromApi(error);
     throw error;
   }
 }
@@ -130,7 +130,7 @@ export async function deleteCompanyLogoAction(): Promise<CompanySettings> {
     revalidatePath("/settings/company");
     return data;
   } catch (error) {
-    if (isApiError(error)) throw new ActionError(error.message);
+    if (isApiError(error)) throw ActionError.fromApi(error);
     throw error;
   }
 }
