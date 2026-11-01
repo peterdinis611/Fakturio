@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { getCompany } from "@/features/company/api/company";
+import { CompanyNotReadyGate } from "@/features/company/ui/company-not-ready-gate";
 import { lookupCustomers } from "@/features/customers/api/customers";
 import { listInvoices } from "@/features/invoices/api/invoices";
 import { listServices } from "@/features/services/api/services";
@@ -26,6 +27,15 @@ export default async function FirstInvoicePage() {
 
   if (invoices.totalCount > 0) {
     redirect({ href: "/dashboard", locale });
+  }
+
+  if (!company.completeness.isReadyToInvoice) {
+    return (
+      <div>
+        <PageHeader title={t("title")} description={t("description")} />
+        <CompanyNotReadyGate />
+      </div>
+    );
   }
 
   return (

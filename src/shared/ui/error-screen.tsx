@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/shared/ui/button";
 
 type ErrorScreenProps = {
-  code: "404" | "500";
+  code: "404" | "500" | "offline";
   title: string;
   description: string;
   primaryHref?: string;
@@ -19,14 +19,17 @@ export function ErrorScreen({
   primaryLabel = "Späť na prehľad",
   secondary,
 }: ErrorScreenProps) {
+  const stamp = code === "404" ? "?" : "!";
+  const label = code === "offline" ? "API" : code;
+
   return (
     <div className="flex min-h-[70vh] flex-col items-start justify-center px-4 py-16 sm:px-6">
       <div className="w-full max-w-md">
         <div className="ledger-strip mb-6 border-0 pb-0">
           <span className="stamp" aria-hidden>
-            {code === "404" ? "?" : "!"}
+            {stamp}
           </span>
-          <span className="money text-[13px] text-faint">{code}</span>
+          <span className="money text-[13px] text-faint">{label}</span>
         </div>
         <h1 className="text-[22px] font-semibold tracking-tight text-ink">
           {title}

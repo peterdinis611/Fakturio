@@ -188,7 +188,17 @@ export default async function RemindersPage({
       <PageHeader
         title={t("title")}
         description={t("description")}
-        actions={<SyncOverdueButton />}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/settings/notifications">
+                <Mail className="size-3.5" aria-hidden />
+                {t("configureNotifications")}
+              </Link>
+            </Button>
+            <SyncOverdueButton />
+          </div>
+        }
         ledger={
           reminders.length > 0 ? (
             <>

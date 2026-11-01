@@ -5,6 +5,17 @@ import { useTranslations } from "next-intl";
 import { ErrorScreen } from "@/shared/ui/error-screen";
 import { Button } from "@/shared/ui/button";
 
+function isUnreachable(error: Error) {
+  const msg = error.message.toLowerCase();
+  return (
+    error.name === "ApiError" &&
+    (msg.includes("nedostupn") ||
+      msg.includes("unavailable") ||
+      msg.includes("unreachable") ||
+      msg.includes("skontroluj pripojenie"))
+  );
+}
+
 export default function AppErrorPage({
   error,
   reset,
@@ -13,6 +24,7 @@ export default function AppErrorPage({
   reset: () => void;
 }) {
   const t = useTranslations("Errors");
+  const offline = isUnreachable(error);
 
   useEffect(() => {
     console.error(error);
@@ -20,9 +32,9 @@ export default function AppErrorPage({
 
   return (
     <ErrorScreen
-      code="500"
-      title={t("errorTitle")}
-      description={t("errorBody")}
+      code={offline ? "offline" : "500"}
+      title={offline ? t("offlineTitle") : t("errorTitle")}
+      description={offline ? t("offlineBody") : t("errorBody")}
       secondary={
         <Button type="button" variant="outline" onClick={reset}>
           {t("tryAgain")}

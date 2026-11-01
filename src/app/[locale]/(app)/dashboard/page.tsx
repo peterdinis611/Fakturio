@@ -1,14 +1,14 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { getCompanySummary } from "@/features/company/api/company";
+import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
 import { getReminders, listInvoices } from "@/features/invoices/api/invoices";
 import { getMonthlyRevenue, getReportOverview } from "@/features/reports/api/reports";
 import { DashboardEmpty } from "@/widgets/dashboard/dashboard-empty";
 import { DashboardSections } from "@/widgets/dashboard/dashboard-sections";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { MotionItem } from "@/shared/ui/motion/page-motion";
-import { Button } from "@/shared/ui/button";
 import { formatDate, formatMoney } from "@/shared/lib/format";
 import type { AppLocale } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
 
 export async function generateMetadata() {
   const t = await getTranslations("Dashboard");
@@ -19,15 +19,18 @@ export default async function DashboardPage() {
   const t = await getTranslations("Dashboard");
   const locale = (await getLocale()) as AppLocale;
   const year = new Date().getFullYear();
-  const [overview, recent, reminders, monthly, draftsPage] = await Promise.all([
-    getReportOverview(),
-    listInvoices({ page: 1, pageSize: 8 }),
-    getReminders({ withinDays: 14 }),
-    getMonthlyRevenue(year),
-    listInvoices({ page: 1, pageSize: 5, status: "Draft" }),
-  ]);
+  const [overview, recent, reminders, monthly, draftsPage, company] =
+    await Promise.all([
+      getReportOverview(),
+      listInvoices({ page: 1, pageSize: 8 }),
+      getReminders({ withinDays: 14 }),
+      getMonthlyRevenue(year),
+      listInvoices({ page: 1, pageSize: 5, status: "Draft" }),
+      getCompanySummary().catch(() => null),
+    ]);
 
   const isEmpty = overview.totalInvoices === 0;
+  const ready = company?.isReadyToInvoice ?? false;
 
   const finding = isEmpty
     ? t("emptyFinding")
@@ -54,9 +57,9 @@ export default async function DashboardPage() {
         description={finding}
         actions={
           isEmpty ? undefined : (
-            <Button asChild>
-              <Link href="/invoices/new">{t("newInvoice")}</Link>
-            </Button>
+            <InvoiceReadyLink href="/invoices/new" ready={ready}>
+              {t("newInvoice")}
+            </InvoiceReadyLink>
           )
         }
       />

@@ -36,6 +36,7 @@ type Props = {
   documentType?: InvoiceDocumentType;
   overdueOnly?: boolean;
   truncated?: boolean;
+  canCreate?: boolean;
 };
 
 export function InvoicesFuzzyTable({
@@ -45,6 +46,7 @@ export function InvoicesFuzzyTable({
   documentType,
   overdueOnly = false,
   truncated = false,
+  canCreate = true,
 }: Props) {
   const t = useTranslations("Invoices");
   const tc = useTranslations("Common");
@@ -81,8 +83,12 @@ export function InvoicesFuzzyTable({
           description={
             query.trim() ? tc("tryAnotherQuery") : t("emptyBody")
           }
-          actionLabel={query.trim() ? undefined : t("new")}
-          actionHref={query.trim() ? undefined : "/invoices/new"}
+          actionLabel={
+            query.trim() || !canCreate ? undefined : t("new")
+          }
+          actionHref={
+            query.trim() || !canCreate ? undefined : "/invoices/new"
+          }
         />
       ) : (
         <div className="panel overflow-hidden">

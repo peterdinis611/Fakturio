@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { listCustomers } from "@/features/customers/api/customers";
 import { getCompany } from "@/features/company/api/company";
+import { CompanyNotReadyGate } from "@/features/company/ui/company-not-ready-gate";
 import { listServices } from "@/features/services/api/services";
 import { InvoiceForm } from "@/features/invoices/ui/invoice-form";
 import { NewInvoiceNeedsCustomer } from "@/features/invoices/ui/new-invoice-gate";
@@ -24,6 +25,15 @@ export default async function NewInvoicePage({
     getCompany(),
     listServices({ pageSize: 100, activeOnly: true }),
   ]);
+
+  if (!company.completeness.isReadyToInvoice) {
+    return (
+      <div>
+        <PageHeader title={t("newTitle")} />
+        <CompanyNotReadyGate />
+      </div>
+    );
+  }
 
   if (customers.items.length === 0) {
     return (

@@ -41,6 +41,7 @@ type Props = {
   isVatPayer: boolean;
   defaultVatRate: number;
   defaultDueDays: number;
+  isReadyToInvoice: boolean;
 };
 
 export function RecurringTable({
@@ -50,6 +51,7 @@ export function RecurringTable({
   isVatPayer,
   defaultVatRate,
   defaultDueDays,
+  isReadyToInvoice,
 }: Props) {
   const t = useTranslations("Recurring");
   const locale = useLocale() as AppLocale;
@@ -76,6 +78,10 @@ export function RecurringTable({
   }
 
   function generate(id: string) {
+    if (!isReadyToInvoice) {
+      toast.error(t("blockedGenerate"));
+      return;
+    }
     startTransition(async () => {
       const result = await generateRecurringAction({ id });
       if (!result?.data) {
@@ -90,30 +96,37 @@ export function RecurringTable({
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button type="button">
-              <Plus className="size-4" aria-hidden />
-              {t("new")}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>{t("new")}</DialogTitle>
-            </DialogHeader>
-            <RecurringForm
-              customers={customers}
-              catalogItems={catalogItems}
-              isVatPayer={isVatPayer}
-              defaultVatRate={defaultVatRate}
-              defaultDueDays={defaultDueDays}
-              onDone={() => {
-                setCreateOpen(false);
-                router.refresh();
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+        {isReadyToInvoice ? (
+          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+            <DialogTrigger asChild>
+              <Button type="button">
+                <Plus className="size-4" aria-hidden />
+                {t("new")}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-xl">
+              <DialogHeader>
+                <DialogTitle>{t("new")}</DialogTitle>
+              </DialogHeader>
+              <RecurringForm
+                customers={customers}
+                catalogItems={catalogItems}
+                isVatPayer={isVatPayer}
+                defaultVatRate={defaultVatRate}
+                defaultDueDays={defaultDueDays}
+                onDone={() => {
+                  setCreateOpen(false);
+                  router.refresh();
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <Button type="button" disabled title={t("blockedGenerate")}>
+            <Plus className="size-4" aria-hidden />
+            {t("new")}
+          </Button>
+        )}
       </div>
 
       {items.length === 0 ? (
@@ -150,9 +163,13 @@ export function RecurringTable({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      disabled={pending}
+                      disabled={pending || !isReadyToInvoice}
                       onClick={() => generate(item.id)}
-                      title={t("generateNow")}
+                      title={
+                        isReadyToInvoice
+                          ? t("generateNow")
+                          : t("blockedGenerate")
+                      }
                     >
                       <RefreshCw className="size-3.5" aria-hidden />
                     </Button>

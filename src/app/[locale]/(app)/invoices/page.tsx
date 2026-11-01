@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { Download } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getCompanySummary } from "@/features/company/api/company";
+import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
 import { listInvoices } from "@/features/invoices/api/invoices";
 import {
   InvoiceFilters,
@@ -42,13 +43,17 @@ export default async function InvoicesPage({
   const search = sp.q?.trim() || "";
   const overdueOnly = sp.overdue === "1";
 
-  const data = await listInvoices({
-    page: 1,
-    pageSize: CATALOG_SIZE,
-    status,
-    documentType,
-    overdueOnly,
-  });
+  const [data, company] = await Promise.all([
+    listInvoices({
+      page: 1,
+      pageSize: CATALOG_SIZE,
+      status,
+      documentType,
+      overdueOnly,
+    }),
+    getCompanySummary().catch(() => null),
+  ]);
+  const ready = company?.isReadyToInvoice ?? false;
 
   return (
     <div>
@@ -72,12 +77,16 @@ export default async function InvoicesPage({
                 {tc("download")}
               </a>
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/invoices/new?type=Proforma">{t("proforma")}</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/invoices/new">{t("new")}</Link>
-            </Button>
+            <InvoiceReadyLink
+              href="/invoices/new?type=Proforma"
+              ready={ready}
+              variant="outline"
+            >
+              {t("proforma")}
+            </InvoiceReadyLink>
+            <InvoiceReadyLink href="/invoices/new" ready={ready}>
+              {t("new")}
+            </InvoiceReadyLink>
           </div>
         }
       />
@@ -95,6 +104,7 @@ export default async function InvoicesPage({
         documentType={documentType}
         overdueOnly={overdueOnly}
         truncated={data.totalCount > data.items.length}
+        canCreate={ready}
       />
     </div>
   );

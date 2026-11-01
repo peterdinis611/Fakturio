@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { getCompanySummary } from "@/features/company/api/company";
+import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
 import { getCustomer } from "@/features/customers/api/customers";
 import { listInvoices } from "@/features/invoices/api/invoices";
 import { PageHeader } from "@/widgets/app-shell/page-header";
@@ -51,6 +53,9 @@ export default async function CustomerDetailPage({
     throw e;
   }
 
+  const company = await getCompanySummary().catch(() => null);
+  const ready = company?.isReadyToInvoice ?? false;
+
   const invoices = await listInvoices({
     customerId: id,
     pageSize: 20,
@@ -75,9 +80,12 @@ export default async function CustomerDetailPage({
             <Button asChild variant="outline">
               <Link href={`/customers/${id}/edit`}>{t("edit")}</Link>
             </Button>
-            <Button asChild>
-              <Link href={`/invoices/new?customerId=${id}`}>{t("newInvoice")}</Link>
-            </Button>
+            <InvoiceReadyLink
+              href={`/invoices/new?customerId=${id}`}
+              ready={ready}
+            >
+              {t("newInvoice")}
+            </InvoiceReadyLink>
           </>
         }
       />

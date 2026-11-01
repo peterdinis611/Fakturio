@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { NotificationBell } from "@/features/notifications/ui/notification-bell";
 import { NavLink } from "@/widgets/app-shell/nav-link";
 import { SidebarAccount } from "@/widgets/app-shell/sidebar-account";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -124,15 +125,18 @@ export function AppSidebar({
           </span>
           <span className="text-[15px] font-semibold">Fakturio</span>
         </Link>
-        <button
-          type="button"
-          className="inline-flex size-9 items-center justify-center text-muted-foreground hover:bg-raised hover:text-ink"
-          aria-expanded={open}
-          aria-label={open ? tc("closeMenu") : tc("openMenu")}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X className="size-4" /> : <Menu className="size-4" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <button
+            type="button"
+            className="inline-flex size-9 items-center justify-center text-muted-foreground hover:bg-raised hover:text-ink"
+            aria-expanded={open}
+            aria-label={open ? tc("closeMenu") : tc("openMenu")}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="size-4" /> : <Menu className="size-4" />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -158,6 +162,9 @@ export function AppSidebar({
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <Brand companyName={companyName} />
+              <div className="flex items-center justify-end px-3 pb-1">
+                <NotificationBell />
+              </div>
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto">
                 <SidebarAccount email={userEmail} />
@@ -169,6 +176,9 @@ export function AppSidebar({
 
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <Brand companyName={companyName} />
+        <div className="flex items-center justify-end px-3 pb-1">
+          <NotificationBell />
+        </div>
         <NavLinks pathname={pathname} />
         <div className="mt-auto">
           <SidebarAccount email={userEmail} />
