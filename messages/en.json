@@ -895,6 +895,9 @@
   "Notifications": {
     "title": "Notifications",
     "empty": "No alerts yet",
+    "emptyHint": "Due-date reminders and system messages will show up here.",
+    "unreadCount": "{count, plural, one {# unread} other {# unread}}",
+    "allCaughtUp": "You're all caught up",
     "markAllRead": "Mark all read",
     "settings": "Notification settings",
     "bellAria": "Notifications, unread: {count}",

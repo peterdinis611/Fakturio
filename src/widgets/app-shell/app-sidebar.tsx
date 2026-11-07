@@ -88,21 +88,31 @@ function NavLinks({
   );
 }
 
-function Brand({ companyName }: { companyName?: string }) {
+function BrandHeader({ companyName }: { companyName?: string }) {
   return (
-    <Link href="/dashboard" className="block px-4 py-5">
-      <div className="flex items-center gap-2.5">
-        <span className="stamp" aria-hidden>
-          F
-        </span>
-        <span className="text-[16px] font-semibold text-ink">Fakturio</span>
+    <div className="border-b border-sidebar-border px-3 py-3.5">
+      <div className="flex items-start gap-2">
+        <Link
+          href="/dashboard"
+          className="min-w-0 flex-1 rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-ink/25"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="stamp" aria-hidden>
+              F
+            </span>
+            <span className="text-[16px] font-semibold tracking-tight text-ink">
+              Fakturio
+            </span>
+          </div>
+          {companyName ? (
+            <p className="mt-1.5 truncate pl-[1.875rem] text-[11px] leading-snug text-muted-foreground">
+              {companyName}
+            </p>
+          ) : null}
+        </Link>
+        <NotificationBell className="mt-0.5" />
       </div>
-      {companyName ? (
-        <p className="mt-1.5 truncate text-[12px] text-muted-foreground">
-          {companyName}
-        </p>
-      ) : null}
-    </Link>
+    </div>
   );
 }
 
@@ -120,18 +130,18 @@ export function AppSidebar({
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 md:hidden">
-        <Link href="/dashboard" className="flex items-center gap-2 text-ink">
+      <div className="sticky top-0 z-40 flex h-12 items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 md:hidden">
+        <Link href="/dashboard" className="flex min-w-0 items-center gap-2 text-ink">
           <span className="stamp" aria-hidden>
             F
           </span>
-          <span className="text-[15px] font-semibold">Fakturio</span>
+          <span className="truncate text-[15px] font-semibold">Fakturio</span>
         </Link>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           <NotificationBell />
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center text-muted-foreground hover:bg-raised hover:text-ink"
+            className="inline-flex size-9 items-center justify-center rounded-[3px] border border-transparent text-muted-foreground hover:border-sidebar-border hover:bg-raised hover:text-ink"
             aria-expanded={open}
             aria-label={open ? tc("closeMenu") : tc("openMenu")}
             onClick={() => setOpen((v) => !v)}
@@ -163,10 +173,7 @@ export function AppSidebar({
               exit={{ x: -20 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Brand companyName={companyName} />
-              <div className="flex items-center justify-end px-3 pb-1">
-                <NotificationBell />
-              </div>
+              <BrandHeader companyName={companyName} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto">
                 <SidebarAccount email={userEmail} />
@@ -177,10 +184,7 @@ export function AppSidebar({
       </AnimatePresence>
 
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
-        <Brand companyName={companyName} />
-        <div className="flex items-center justify-end px-3 pb-1">
-          <NotificationBell />
-        </div>
+        <BrandHeader companyName={companyName} />
         <NavLinks pathname={pathname} />
         <div className="mt-auto">
           <SidebarAccount email={userEmail} />

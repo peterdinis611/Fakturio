@@ -895,6 +895,9 @@
   "Notifications": {
     "title": "Notifikácie",
     "empty": "Zatiaľ žiadne upozornenia",
+    "emptyHint": "Upomienky splatností a systémové správy sa zobrazia tu.",
+    "unreadCount": "{count, plural, one {# neprečítaná} few {# neprečítané} other {# neprečítaných}}",
+    "allCaughtUp": "Všetko prečítané",
     "markAllRead": "Označiť všetky",
     "settings": "Nastavenia notifikácií",
     "bellAria": "Notifikácie, neprečítané: {count}",

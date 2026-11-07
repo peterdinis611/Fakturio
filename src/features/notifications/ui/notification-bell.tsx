@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, BellOff, Settings2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import {
@@ -8,7 +8,10 @@ import {
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/features/notifications/api/notifications";
-import { startSignalHub, stopSignalHub } from "@/features/notifications/lib/signal-hub";
+import {
+  startSignalHub,
+  stopSignalHub,
+} from "@/features/notifications/lib/signal-hub";
 import type { AppNotification } from "@/features/notifications/model/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatDateTime } from "@/shared/lib/format";
@@ -18,19 +21,25 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
 
-export function NotificationBell() {
+export function NotificationBell({
+  className,
+  align = "end",
+}: {
+  className?: string;
+  align?: "start" | "center" | "end";
+}) {
   const t = useTranslations("Notifications");
   const locale = useLocale() as AppLocale;
   const router = useRouter();
   const [items, setItems] = useState<AppNotification[]>([]);
   const [unread, setUnread] = useState(0);
   const [pending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
   const refresh = useCallback(() => {
     startTransition(async () => {
@@ -73,11 +82,14 @@ export function NotificationBell() {
         await markNotificationReadAction({ id: n.id });
         setItems((prev) =>
           prev.map((x) =>
-            x.id === n.id ? { ...x, isRead: true, readAt: new Date().toISOString() } : x,
+            x.id === n.id
+              ? { ...x, isRead: true, readAt: new Date().toISOString() }
+              : x,
           ),
         );
         setUnread((c) => Math.max(0, c - 1));
       }
+      setOpen(false);
       if (n.href) {
         router.push(n.href);
       }
@@ -88,77 +100,166 @@ export function NotificationBell() {
     startTransition(async () => {
       await markAllNotificationsReadAction({});
       setItems((prev) =>
-        prev.map((x) => ({ ...x, isRead: true, readAt: new Date().toISOString() })),
+        prev.map((x) => ({
+          ...x,
+          isRead: true,
+          readAt: new Date().toISOString(),
+        })),
       );
       setUnread(0);
     });
   }
 
+  const hasUnread = unread > 0;
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="icon-sm"
-          className="relative"
+          className={cn(
+            "notification-bell relative inline-flex size-9 shrink-0 items-center justify-center",
+            "rounded-[3px] border border-sidebar-border bg-raised/40 text-muted-foreground",
+            "transition-[color,background-color,border-color,transform] duration-150",
+            "hover:border-control hover:bg-raised hover:text-ink",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/25",
+            "data-[state=open]:border-ink data-[state=open]:bg-active data-[state=open]:text-ink",
+            hasUnread && "border-signal/35 text-ink",
+            className,
+          )}
           aria-label={t("bellAria", { count: unread })}
         >
-          <Bell className="size-4" aria-hidden />
-          {unread > 0 ? (
-            <span className="absolute top-0.5 right-0.5 flex size-4 items-center justify-center rounded-[3px] bg-negative text-[9px] font-semibold text-white">
+          <Bell className="size-4" strokeWidth={1.6} aria-hidden />
+          {hasUnread ? (
+            <span
+              className={cn(
+                "absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center",
+                "rounded-[3px] border border-sidebar bg-signal px-1",
+                "text-[9px] font-bold leading-none tracking-tight text-ground",
+              )}
+              aria-hidden
+            >
               {unread > 9 ? "9+" : unread}
             </span>
-          ) : null}
-        </Button>
+          ) : (
+            <span
+              className="absolute top-1.5 right-1.5 size-1.5 rounded-[1px] bg-faint/50"
+              aria-hidden
+            />
+          )}
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[min(100vw-2rem,22rem)] p-0">
-        <div className="flex items-center justify-between gap-2 px-3 py-2">
-          <DropdownMenuLabel className="p-0">{t("title")}</DropdownMenuLabel>
-          {unread > 0 ? (
+
+      <DropdownMenuContent
+        align={align}
+        side="bottom"
+        sideOffset={8}
+        collisionPadding={12}
+        className={cn(
+          "notification-tray z-[80] w-[min(100vw-1.5rem,22.5rem)] min-w-[18rem] overflow-hidden p-0",
+          "rounded-[4px] border border-border bg-popover text-popover-foreground",
+          "shadow-[0_16px_48px_-12px_rgba(0,0,0,0.55)] ring-1 ring-foreground/10",
+        )}
+      >
+        <header className="flex items-start justify-between gap-3 border-b border-rule px-3.5 py-3">
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold tracking-tight text-ink">
+              {t("title")}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {hasUnread
+                ? t("unreadCount", { count: unread })
+                : t("allCaughtUp")}
+            </p>
+          </div>
+          {hasUnread ? (
             <button
               type="button"
-              className="text-[12px] text-muted-foreground hover:text-ink"
+              className={cn(
+                "shrink-0 rounded-[3px] px-2 py-1 text-[11px] font-medium",
+                "text-signal hover:bg-signal/10 disabled:opacity-50",
+              )}
               disabled={pending}
               onClick={markAll}
             >
               {t("markAllRead")}
             </button>
           ) : null}
-        </div>
-        <DropdownMenuSeparator className="m-0" />
+        </header>
+
         {items.length === 0 ? (
-          <p className="px-3 py-6 text-[13px] text-muted-foreground">{t("empty")}</p>
+          <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+            <span
+              className="grid size-10 place-items-center rounded-[4px] border border-dashed border-border text-faint"
+              aria-hidden
+            >
+              <BellOff className="size-4" strokeWidth={1.5} />
+            </span>
+            <p className="text-[13px] font-medium text-ink">{t("empty")}</p>
+            <p className="max-w-[16rem] text-[12px] text-muted-foreground">
+              {t("emptyHint")}
+            </p>
+          </div>
         ) : (
-          <ul className="max-h-80 overflow-y-auto py-1">
+          <ul className="max-h-[min(22rem,55vh)] overflow-y-auto overscroll-contain py-1">
             {items.map((n) => (
               <li key={n.id}>
                 <DropdownMenuItem
                   className={cn(
-                    "flex cursor-pointer flex-col items-start gap-0.5 rounded-none px-3 py-2.5",
-                    !n.isRead && "bg-raised/50",
+                    "group relative flex cursor-pointer flex-col items-stretch gap-1 rounded-none px-3.5 py-2.5",
+                    "border-l-2 border-l-transparent outline-none",
+                    "focus:bg-raised/70 data-[highlighted]:bg-raised/70",
+                    !n.isRead && "border-l-signal bg-signal/[0.04]",
                   )}
                   onSelect={(e) => {
                     e.preventDefault();
                     openItem(n);
                   }}
                 >
-                  <span className="text-[13px] font-medium text-ink">{n.title}</span>
-                  <span className="line-clamp-2 text-[12px] text-muted-foreground">
-                    {n.body}
-                  </span>
-                  <span className="data-num text-[11px] text-faint">
-                    {formatDateTime(n.createdAt, locale)}
-                  </span>
+                  <div className="flex items-start gap-2">
+                    {!n.isRead ? (
+                      <span
+                        className="mt-1.5 size-1.5 shrink-0 rounded-[1px] bg-signal"
+                        aria-hidden
+                      />
+                    ) : (
+                      <span className="mt-1.5 size-1.5 shrink-0" aria-hidden />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <span
+                        className={cn(
+                          "block text-[13px] leading-snug text-ink",
+                          !n.isRead ? "font-semibold" : "font-medium",
+                        )}
+                      >
+                        {n.title}
+                      </span>
+                      <span className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-muted-foreground">
+                        {n.body}
+                      </span>
+                      <span className="data-num mt-1.5 block text-[10px] tracking-wide text-faint uppercase">
+                        {formatDateTime(n.createdAt, locale)}
+                      </span>
+                    </div>
+                  </div>
                 </DropdownMenuItem>
               </li>
             ))}
           </ul>
         )}
+
         <DropdownMenuSeparator className="m-0" />
-        <div className="px-2 py-1.5">
-          <Button asChild variant="ghost" size="sm" className="w-full justify-start">
-            <Link href="/settings/notifications">{t("settings")}</Link>
+        <div className="bg-raised/30 px-2 py-1.5">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 w-full justify-start gap-2 text-[12px] text-muted-foreground hover:text-ink"
+          >
+            <Link href="/settings/notifications" onClick={() => setOpen(false)}>
+              <Settings2 className="size-3.5 opacity-70" aria-hidden />
+              {t("settings")}
+            </Link>
           </Button>
         </div>
       </DropdownMenuContent>

@@ -3,11 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { getCompanySummary } from "@/features/company/api/company";
 import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
 import { listInvoices } from "@/features/invoices/api/invoices";
+import { newDocumentHref } from "@/features/invoices/lib/document-href";
 import { DocumentsAreaNav } from "@/features/invoices/ui/documents-area-nav";
-import {
-  DocumentTypeNav,
-  newDocumentHref,
-} from "@/features/invoices/ui/document-type-nav";
+import { DocumentTypeNav } from "@/features/invoices/ui/document-type-nav";
 import {
   InvoiceFilters,
   InvoiceLifecycleHint,
