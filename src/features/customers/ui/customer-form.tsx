@@ -12,9 +12,15 @@ import {
   updateCustomerAction,
 } from "@/features/customers/api/customers";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
+import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
-import type { Customer, RegistryCompany } from "@/shared/api/types";
+import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
+import type {
+  Customer,
+  RegistryCompany,
+  RegistrySearchHit,
+} from "@/shared/api/types";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
 import {
   customerSchema,
@@ -86,6 +92,9 @@ export function CustomerForm({
 
   const country = watch("country");
   const ico = watch("ico");
+  const icDph = watch("icDph");
+  const name = watch("name");
+  const tr = useTranslations("Registry");
 
   const applyRegistry = useCallback(
     (data: RegistryCompany) => {
@@ -110,9 +119,23 @@ export function CustomerForm({
     messages: {
       needIco: t("lookupNeedIco"),
       filledRpo: t("lookupFilledRpo"),
+      filledOrsf: t("lookupFilledOrsf"),
       filledAres: t("lookupFilledAres"),
     },
   });
+
+  const applySearchHit = useCallback(
+    (hit: RegistrySearchHit) => {
+      const opts = { shouldDirty: true, shouldValidate: true } as const;
+      setValue("name", hit.name, opts);
+      setValue("ico", hit.ico, opts);
+      setValue("country", "SK", opts);
+      if (hit.city) setValue("city", hit.city, opts);
+      if (hit.icDph) setValue("icDph", hit.icDph, opts);
+      lookup("manual", { ico: hit.ico, country: "SK" });
+    },
+    [setValue, lookup],
+  );
 
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
@@ -159,12 +182,20 @@ export function CustomerForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={cn(fieldClass, "sm:col-span-2")}>
           <Label htmlFor="customer-name">{t("name")}</Label>
-          <Input
+          <CompanySearchField
             id="customer-name"
-            {...register("name")}
+            value={name ?? ""}
+            country={country}
             aria-invalid={!!errors.name}
+            onChange={(v) =>
+              setValue("name", v, { shouldDirty: true, shouldValidate: true })
+            }
+            onPick={applySearchHit}
           />
           <FieldError message={errors.name?.message} />
+          {(country ?? "").toUpperCase() === "SK" ? (
+            <p className="text-[11px] text-muted-foreground">{tr("searchHint")}</p>
+          ) : null}
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-ico">IČO</Label>
@@ -189,7 +220,14 @@ export function CustomerForm({
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-icDph">IČ DPH</Label>
-          <Input id="customer-icDph" {...register("icDph")} />
+          <div className="flex gap-2">
+            <Input
+              id="customer-icDph"
+              className="min-w-0 flex-1"
+              {...register("icDph")}
+            />
+            <ViesVerifyButton vat={icDph} />
+          </div>
           <FieldError message={errors.icDph?.message} />
         </div>
         <div className={fieldClass}>

@@ -1103,7 +1103,23 @@
     "lookupSearching": "Searching",
     "lookupNeedIco": "Enter a valid 8-digit company ID.",
     "lookupFilledRpo": "Details filled from RPO",
+    "lookupFilledOrsf": "Details filled from ORSF",
     "lookupFilledAres": "Details filled from ARES"
+  },
+  "Registry": {
+    "searching": "Searching registry…",
+    "searchHint": "Start typing a company name — we'll fill IČO from ORSF.",
+    "viesVerify": "Verify VIES",
+    "viesChecking": "Checking…",
+    "viesOk": "Valid",
+    "viesBad": "Invalid",
+    "viesNeedVat": "Enter a VAT ID (e.g. SK2121585004).",
+    "viesValid": "VAT ID is valid in VIES.",
+    "viesValidNamed": "VIES OK · {name}",
+    "viesInvalid": "VAT ID is not registered in VIES.",
+    "viesFailed": "VIES verification failed.",
+    "fxHint": "1 {base} = {rate} {quote} (ECB {date})",
+    "fxLoading": "Loading rate…"
   },
   "Offline": {
     "titleOffline": "You're offline",

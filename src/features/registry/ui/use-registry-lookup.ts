@@ -17,6 +17,7 @@ export type RegistryLookupMessages = {
   needIco: string;
   filledRpo: string;
   filledAres: string;
+  filledOrsf?: string;
 };
 
 export function useRegistryLookup(opts: {
@@ -51,9 +52,12 @@ export function useRegistryLookup(opts: {
   const ico = normalizeIco(opts.ico ?? "");
   const canLookup = Boolean(registryCountry && isValidIco(ico));
 
-  const lookup = useCallback((mode: "auto" | "manual" = "manual") => {
-    const country = normalizeCountry(countryRef.current);
-    const value = normalizeIco(icoRef.current ?? "");
+  const lookup = useCallback((
+    mode: "auto" | "manual" = "manual",
+    override?: { ico?: string; country?: string },
+  ) => {
+    const country = normalizeCountry(override?.country ?? countryRef.current);
+    const value = normalizeIco(override?.ico ?? icoRef.current ?? "");
     const messages = messagesRef.current;
     if (!country || !isValidIco(value)) {
       if (mode === "manual") {
@@ -83,10 +87,13 @@ export function useRegistryLookup(opts: {
         }
         lastKeyRef.current = key;
         onFoundRef.current(result.data);
+        const source = result.data.source?.toLowerCase() ?? "";
         toast.success(
           country === "CZ"
             ? (messages?.filledAres ?? "Údaje doplnené z ARES")
-            : (messages?.filledRpo ?? "Údaje doplnené z RPO"),
+            : source.includes("orsf")
+              ? (messages?.filledOrsf ?? "Údaje doplnené z ORSF")
+              : (messages?.filledRpo ?? "Údaje doplnené z RPO"),
         );
       } finally {
         inFlightRef.current = false;

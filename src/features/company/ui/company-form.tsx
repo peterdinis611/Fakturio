@@ -9,6 +9,7 @@ import { updateCompanyAction } from "@/features/company/api/company";
 import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
+import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
 import { actionErrorMessage, toFieldErrors } from "@/shared/lib/action-utils";
 import type { CompanySettings, RegistryCompany } from "@/shared/api/types";
@@ -199,6 +200,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   const isVatPayer = watch("isVatPayer");
   const country = watch("country");
   const ico = watch("ico");
+  const icDph = watch("icDph");
 
   const applyRegistry = useCallback(
     (data: RegistryCompany) => {
@@ -320,7 +322,8 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           {registrySupported ? (
             <p className="text-[11px] text-muted-foreground">
               {t("icoLookupHint", {
-                source: country?.toUpperCase() === "CZ" ? "ARES" : "RPO / FS",
+                source:
+                  country?.toUpperCase() === "CZ" ? "ARES" : "ORSF / RPO",
               })}
             </p>
           ) : null}
@@ -340,11 +343,15 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Label htmlFor="icDph">
             {t("icDph")} {isVatPayer ? <RequiredMark /> : null}
           </Label>
-          <Input
-            id="icDph"
-            {...register("icDph")}
-            aria-invalid={!!errors.icDph}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="icDph"
+              className="min-w-0 flex-1"
+              {...register("icDph")}
+              aria-invalid={!!errors.icDph}
+            />
+            <ViesVerifyButton vat={icDph} />
+          </div>
           <FieldError message={errors.icDph?.message} />
           <p className="text-[11px] text-muted-foreground">
             {isVatPayer ? t("vatRequired") : t("vatOptional")}

@@ -1103,7 +1103,23 @@
     "lookupSearching": "Hľadám",
     "lookupNeedIco": "Zadaj platné 8-miestne IČO.",
     "lookupFilledRpo": "Údaje doplnené z RPO",
+    "lookupFilledOrsf": "Údaje doplnené z ORSF",
     "lookupFilledAres": "Údaje doplnené z ARES"
+  },
+  "Registry": {
+    "searching": "Hľadám v registri…",
+    "searchHint": "Začni písať názov firmy — doplníme IČO z ORSF.",
+    "viesVerify": "Overiť VIES",
+    "viesChecking": "Overujem…",
+    "viesOk": "Platné",
+    "viesBad": "Neplatné",
+    "viesNeedVat": "Zadaj IČ DPH (napr. SK2121585004).",
+    "viesValid": "IČ DPH je platné vo VIES.",
+    "viesValidNamed": "VIES OK · {name}",
+    "viesInvalid": "IČ DPH nie je evidované vo VIES.",
+    "viesFailed": "Overenie VIES zlyhalo.",
+    "fxHint": "1 {base} = {rate} {quote} (ECB {date})",
+    "fxLoading": "Načítavam kurz…"
   },
   "Offline": {
     "titleOffline": "Ste offline",

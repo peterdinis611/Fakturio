@@ -482,7 +482,7 @@ export type ApiProblem = {
   instance?: string;
 };
 
-/** Normalized company from ARES (CZ) or RPO + FS (SK). */
+/** Normalized company from ARES (CZ) or ORSF / RPO + FS (SK). */
 export type RegistryCompany = {
   country: string;
   source: string;
@@ -497,6 +497,38 @@ export type RegistryCompany = {
   countryCode: string;
   isVatPayer: boolean | null;
   commercialRegister: string | null;
+};
+
+export type RegistrySearchHit = {
+  ico: string;
+  name: string;
+  city: string | null;
+  icDph: string | null;
+  isVatPayer: boolean | null;
+  legalForm: string | null;
+  source: string;
+};
+
+export type RegistrySearchResponse = {
+  query: string;
+  hits: RegistrySearchHit[];
+};
+
+export type VatVerification = {
+  isValid: boolean;
+  countryCode: string;
+  vatNumber: string;
+  name: string | null;
+  address: string | null;
+  source: string;
+  userError: string | null;
+};
+
+export type FxRates = {
+  base: string;
+  date: string;
+  rates: Record<string, number>;
+  source: string;
 };
 
 export type OverdueJobSettings = {

@@ -35,6 +35,7 @@ import {
 import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 import { Button } from "@/shared/ui/button";
+import { FxRateHint } from "@/features/fx/ui/fx-rate-hint";
 import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
@@ -552,6 +553,7 @@ export function InvoiceForm({
               )}
             />
             <FieldError message={errors.currency?.message} />
+            <FxRateHint currency={currency} base="EUR" />
           </div>
         </div>
       </section>
