@@ -10,6 +10,9 @@ import {
 
 const DEFAULT_BASE = "http://localhost:5148";
 
+/** Grace period so soft-nav remounts don't tear down a still-needed hub. */
+const RELEASE_GRACE_MS = 1500;
+
 function apiBaseUrl() {
   return (
     process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
@@ -33,6 +36,8 @@ const quietLogger: ILogger = {
 
 let connection: HubConnection | null = null;
 let startPromise: Promise<HubConnection | null> | null = null;
+let subscribers = 0;
+let releaseTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function fetchHubToken(): Promise<string> {
   const res = await fetch("/api/notifications/hub-token", {
@@ -56,7 +61,7 @@ function buildConnection(): HubConnection {
     .build();
 }
 
-export async function startSignalHub(): Promise<HubConnection | null> {
+async function startSignalHub(): Promise<HubConnection | null> {
   if (connection?.state === HubConnectionState.Connected) {
     return connection;
   }
@@ -85,7 +90,7 @@ export async function startSignalHub(): Promise<HubConnection | null> {
   return startPromise;
 }
 
-export async function stopSignalHub(): Promise<void> {
+async function stopSignalHub(): Promise<void> {
   startPromise = null;
   if (!connection) return;
   const hub = connection;
@@ -97,4 +102,28 @@ export async function stopSignalHub(): Promise<void> {
   } catch {
     // ignore teardown errors
   }
+}
+
+/** Acquire a shared hub connection (refcount). */
+export async function acquireSignalHub(): Promise<HubConnection | null> {
+  subscribers += 1;
+  if (releaseTimer) {
+    clearTimeout(releaseTimer);
+    releaseTimer = null;
+  }
+  return startSignalHub();
+}
+
+/** Release a subscriber; stops the hub only after grace when count hits 0. */
+export function releaseSignalHub(): void {
+  subscribers = Math.max(0, subscribers - 1);
+  if (subscribers > 0) return;
+
+  if (releaseTimer) clearTimeout(releaseTimer);
+  releaseTimer = setTimeout(() => {
+    releaseTimer = null;
+    if (subscribers === 0) {
+      void stopSignalHub();
+    }
+  }, RELEASE_GRACE_MS);
 }

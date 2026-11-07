@@ -76,7 +76,7 @@ export function DocumentTypeNav({
       aria-label={t("navAria")}
       className="document-type-nav -mx-1 overflow-x-auto"
     >
-      <ul className="flex min-w-max items-stretch gap-0 rounded-b-[4px] bg-ink px-1">
+      <ul className="flex min-w-max items-stretch gap-0 border-b border-border bg-surface px-1">
         {tabs.map((tab) => {
           const active = onRecurring
             ? tab.key === "Recurring"
@@ -94,8 +94,8 @@ export function DocumentTypeNav({
                 className={cn(
                   "relative block px-3.5 py-2.5 text-[13px] whitespace-nowrap transition-colors",
                   active
-                    ? "font-semibold text-primary-foreground"
-                    : "text-primary-foreground/55 hover:text-primary-foreground/90",
+                    ? "font-semibold text-ink"
+                    : "text-muted-foreground hover:text-ink",
                 )}
                 aria-current={active ? "page" : undefined}
               >
@@ -105,7 +105,7 @@ export function DocumentTypeNav({
                 {active ? (
                   <span
                     aria-hidden
-                    className="absolute bottom-0 left-1/2 size-0 -translate-x-1/2 translate-y-[1px] border-x-[6px] border-b-[6px] border-x-transparent border-b-surface"
+                    className="absolute inset-x-3 bottom-0 h-0.5 bg-ink"
                   />
                 ) : null}
               </Link>
@@ -116,4 +116,3 @@ export function DocumentTypeNav({
     </nav>
   );
 }
-

@@ -88,7 +88,14 @@ function NavLinks({
   );
 }
 
-function BrandHeader({ companyName }: { companyName?: string }) {
+function BrandHeader({
+  companyName,
+  showBell = true,
+}: {
+  companyName?: string;
+  /** False in the mobile drawer — sticky header already has a bell. */
+  showBell?: boolean;
+}) {
   return (
     <div className="border-b border-sidebar-border px-3 py-3.5">
       <div className="flex items-start gap-2">
@@ -110,7 +117,7 @@ function BrandHeader({ companyName }: { companyName?: string }) {
             </p>
           ) : null}
         </Link>
-        <NotificationBell className="mt-0.5" />
+        {showBell ? <NotificationBell className="mt-0.5" /> : null}
       </div>
     </div>
   );
@@ -173,7 +180,7 @@ export function AppSidebar({
               exit={{ x: -20 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
-              <BrandHeader companyName={companyName} />
+              <BrandHeader companyName={companyName} showBell={false} />
               <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
               <div className="mt-auto">
                 <SidebarAccount email={userEmail} />

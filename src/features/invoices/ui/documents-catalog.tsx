@@ -21,7 +21,8 @@ import type {
 } from "@/shared/api/types";
 import { invoicesExportHref } from "@/shared/lib/exports";
 
-const CATALOG_SIZE = 500;
+/** Client fuzzy search window — keep payload small for faster RSC. */
+const CATALOG_SIZE = 100;
 
 type Props = {
   flow: DocumentFlow;

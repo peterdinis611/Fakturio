@@ -7,12 +7,15 @@ import { getFxRatesAction } from "@/features/fx/api/fx";
 type Props = {
   currency: string;
   base?: string;
+  /** ISO date yyyy-MM-dd — historical ECB/CNB fixing. */
+  date?: string | null;
 };
 
-export function FxRateHint({ currency, base = "EUR" }: Props) {
+export function FxRateHint({ currency, base = "EUR", date }: Props) {
   const t = useTranslations("Registry");
   const code = currency.trim().toUpperCase();
   const baseCode = base.trim().toUpperCase();
+  const onDate = date?.trim() || undefined;
   const [pending, startTransition] = useTransition();
   const [line, setLine] = useState<string | null>(null);
 
@@ -26,12 +29,14 @@ export function FxRateHint({ currency, base = "EUR" }: Props) {
       const result = await getFxRatesAction({
         base: baseCode,
         symbols: code,
+        date: onDate,
       });
       if (!result?.data?.rates?.[code]) {
         setLine(null);
         return;
       }
       const rate = result.data.rates[code];
+      const source = (result.data.source || "ecb").toUpperCase();
       setLine(
         t("fxHint", {
           base: baseCode,
@@ -40,10 +45,11 @@ export function FxRateHint({ currency, base = "EUR" }: Props) {
             maximumFractionDigits: 4,
           }),
           date: result.data.date,
+          source,
         }),
       );
     });
-  }, [code, baseCode, t]);
+  }, [code, baseCode, onDate, t]);
 
   if (!line && !pending) return null;
 

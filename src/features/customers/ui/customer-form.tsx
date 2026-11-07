@@ -12,6 +12,9 @@ import {
   updateCustomerAction,
 } from "@/features/customers/api/customers";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
+import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
+import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
+import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
 import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -94,6 +97,8 @@ export function CustomerForm({
   const ico = watch("ico");
   const icDph = watch("icDph");
   const name = watch("name");
+  const street = watch("street");
+  const city = watch("city");
   const tr = useTranslations("Registry");
 
   const applyRegistry = useCallback(
@@ -220,15 +225,26 @@ export function CustomerForm({
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-icDph">IČ DPH</Label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Input
               id="customer-icDph"
               className="min-w-0 flex-1"
               {...register("icDph")}
             />
             <ViesVerifyButton vat={icDph} />
+            <FsVatButton
+              ico={ico}
+              onFound={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                if (data.dic) setValue("dic", data.dic, opts);
+                if (data.icDph) setValue("icDph", data.icDph, opts);
+              }}
+            />
           </div>
           <FieldError message={errors.icDph?.message} />
+          <div className="pt-1">
+            <OrsrLookupButton ico={ico} />
+          </div>
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-email">E-mail</Label>
@@ -252,7 +268,20 @@ export function CustomerForm({
           <FieldError message={errors.phone?.message} />
         </div>
         <div className={cn(fieldClass, "sm:col-span-2")}>
-          <Label htmlFor="customer-street">Ulica</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="customer-street">Ulica</Label>
+            <AddressNormalizeButton
+              query={[street, city].filter(Boolean).join(", ")}
+              country={country}
+              onNormalized={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                if (data.street) setValue("street", data.street, opts);
+                if (data.city) setValue("city", data.city, opts);
+                if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                if (data.country) setValue("country", data.country, opts);
+              }}
+            />
+          </div>
           <Input id="customer-street" {...register("street")} />
           <FieldError message={errors.street?.message} />
         </div>

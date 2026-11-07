@@ -14,6 +14,11 @@ const ratesSchema = z.object({
     .optional()
     .default("EUR"),
   symbols: z.string().trim().optional(),
+  date: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Neplatný dátum")
+    .optional(),
 });
 
 export const getFxRatesAction = actionClient
@@ -24,8 +29,9 @@ export const getFxRatesAction = actionClient
         searchParams: {
           base: parsedInput.base,
           symbols: parsedInput.symbols,
+          date: parsedInput.date,
         },
-        next: { revalidate: 3600, tags: ["fx"] },
+        next: { revalidate: parsedInput.date ? 86_400 : 3600, tags: ["fx"] },
       });
     } catch (error) {
       if (isApiError(error)) {

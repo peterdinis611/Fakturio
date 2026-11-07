@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { returnValidationErrors } from "next-safe-action";
+import { cache } from "react";
 import { z } from "zod";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
@@ -64,11 +65,11 @@ export async function listInvoices(params?: {
   });
 }
 
-export async function getInvoice(id: string): Promise<Invoice> {
+export const getInvoice = cache(async (id: string): Promise<Invoice> => {
   return apiFetch<Invoice>(`/api/invoices/${id}`, {
     next: { tags: [`invoice-${id}`, "invoices"], revalidate: 10 },
   });
-}
+});
 
 export async function getInvoiceStats(): Promise<InvoiceStats> {
   return apiFetch<InvoiceStats>("/api/invoices/stats", {

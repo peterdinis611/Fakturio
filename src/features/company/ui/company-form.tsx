@@ -8,6 +8,10 @@ import { toast } from "@/shared/toast";
 import { updateCompanyAction } from "@/features/company/api/company";
 import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
+import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
+import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
+import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
+import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -201,6 +205,9 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   const country = watch("country");
   const ico = watch("ico");
   const icDph = watch("icDph");
+  const bankIban = watch("bankIban");
+  const street = watch("street");
+  const city = watch("city");
 
   const applyRegistry = useCallback(
     (data: RegistryCompany) => {
@@ -343,7 +350,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Label htmlFor="icDph">
             {t("icDph")} {isVatPayer ? <RequiredMark /> : null}
           </Label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Input
               id="icDph"
               className="min-w-0 flex-1"
@@ -351,11 +358,23 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
               aria-invalid={!!errors.icDph}
             />
             <ViesVerifyButton vat={icDph} />
+            <FsVatButton
+              ico={ico}
+              onFound={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                setValue("isVatPayer", data.isVatPayer, opts);
+                if (data.dic) setValue("dic", data.dic, opts);
+                if (data.icDph) setValue("icDph", data.icDph, opts);
+              }}
+            />
           </div>
           <FieldError message={errors.icDph?.message} />
           <p className="text-[11px] text-muted-foreground">
             {isVatPayer ? t("vatRequired") : t("vatOptional")}
           </p>
+          <div className="pt-1">
+            <OrsrLookupButton ico={ico} />
+          </div>
         </Field>
         <Field className="sm:col-span-2">
           <div className="flex items-center justify-between gap-3 rounded-[4px] border border-border bg-raised/40 px-3 py-2.5">
@@ -433,9 +452,22 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
 
       <Section index="02" title={t("address")} quiet={mode === "settings"}>
         <Field className="sm:col-span-2">
-          <Label htmlFor="street">
-            {t("street")} <RequiredMark />
-          </Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="street">
+              {t("street")} <RequiredMark />
+            </Label>
+            <AddressNormalizeButton
+              query={[street, city].filter(Boolean).join(", ")}
+              country={country}
+              onNormalized={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                if (data.street) setValue("street", data.street, opts);
+                if (data.city) setValue("city", data.city, opts);
+                if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                if (data.country) setValue("country", data.country, opts);
+              }}
+            />
+          </div>
           <Input
             id="street"
             {...register("street")}
@@ -490,11 +522,17 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <Label htmlFor="bankIban">
             {t("iban")} <RequiredMark />
           </Label>
-          <Input
+          <IbanLookupField
             id="bankIban"
-            className="data-num"
-            {...register("bankIban")}
+            register={register("bankIban")}
+            value={bankIban ?? ""}
             aria-invalid={!!errors.bankIban}
+            onResolved={(data) => {
+              const opts = { shouldDirty: true, shouldValidate: true } as const;
+              setValue("bankIban", data.iban, opts);
+              if (data.bankName) setValue("bankName", data.bankName, opts);
+              if (data.bic) setValue("bankBic", data.bic, opts);
+            }}
           />
           <FieldError message={errors.bankIban?.message} />
         </Field>

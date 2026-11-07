@@ -33,12 +33,18 @@ export function DocumentsAreaNav() {
                 className={cn(
                   "relative block px-4 py-2.5 text-[12px] font-semibold tracking-[0.12em] uppercase transition-colors",
                   active
-                    ? "bg-surface text-signal"
-                    : "bg-raised/60 text-muted-foreground hover:text-ink",
+                    ? "bg-surface text-ink"
+                    : "bg-transparent text-muted-foreground hover:bg-raised/50 hover:text-ink",
                 )}
                 aria-current={active ? "page" : undefined}
               >
                 {t(area.key)}
+                {active ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-3 bottom-0 h-0.5 bg-ink"
+                  />
+                ) : null}
               </Link>
             </li>
           );

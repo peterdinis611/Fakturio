@@ -46,20 +46,20 @@ export default async function CustomerDetailPage({
   const ti = await getTranslations("Invoices");
   const locale = (await getLocale()) as AppLocale;
   let customer;
+  let company;
+  let invoices;
   try {
-    customer = await getCustomer(id);
+    [customer, company, invoices] = await Promise.all([
+      getCustomer(id),
+      getCompanySummary().catch(() => null),
+      listInvoices({ customerId: id, pageSize: 20 }),
+    ]);
   } catch (e) {
     if (isApiError(e) && e.status === 404) notFound();
     throw e;
   }
 
-  const company = await getCompanySummary().catch(() => null);
   const ready = company?.isReadyToInvoice ?? false;
-
-  const invoices = await listInvoices({
-    customerId: id,
-    pageSize: 20,
-  });
 
   return (
     <div>

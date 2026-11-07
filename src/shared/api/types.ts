@@ -529,6 +529,56 @@ export type FxRates = {
   date: string;
   rates: Record<string, number>;
   source: string;
+  requestedDate?: string | null;
+};
+
+export type IbanLookup = {
+  isValid: boolean;
+  iban: string;
+  countryCode: string | null;
+  bankCode: string | null;
+  bankName: string | null;
+  bic: string | null;
+  city: string | null;
+  source: string;
+};
+
+export type FsVatPayer = {
+  isVatPayer: boolean;
+  ico: string;
+  dic: string | null;
+  icDph: string | null;
+  name: string | null;
+  source: string;
+};
+
+export type AddressNormalize = {
+  displayName: string;
+  street: string | null;
+  city: string | null;
+  postalCode: string | null;
+  countryCode: string | null;
+  lat: number | null;
+  lon: number | null;
+  source: string;
+};
+
+export type OrsrDocument = {
+  title: string | null;
+  submittedAt: string | null;
+  type: string | null;
+};
+
+export type OrsrCompanySummary = {
+  ico: string;
+  name: string;
+  fileReference: string | null;
+  courtName: string | null;
+  street: string | null;
+  cityPostal: string | null;
+  documentsCount: number;
+  documents: OrsrDocument[];
+  source: string;
 };
 
 export type OverdueJobSettings = {

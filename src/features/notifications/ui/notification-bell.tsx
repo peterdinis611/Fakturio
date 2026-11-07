@@ -2,17 +2,19 @@
 
 import { Bell, BellOff, Settings2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import {
-  listNotifications,
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/features/notifications/api/notifications";
 import {
-  startSignalHub,
-  stopSignalHub,
+  acquireSignalHub,
+  releaseSignalHub,
 } from "@/features/notifications/lib/signal-hub";
-import type { AppNotification } from "@/features/notifications/model/types";
+import type {
+  AppNotification,
+  NotificationList,
+} from "@/features/notifications/model/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { formatDateTime } from "@/shared/lib/format";
 import type { AppLocale } from "@/i18n/routing";
@@ -25,6 +27,14 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
+
+async function fetchInbox(take = 20): Promise<NotificationList> {
+  const res = await fetch(`/api/notifications/inbox?take=${take}`, {
+    credentials: "same-origin",
+  });
+  if (!res.ok) throw new Error(`inbox_${res.status}`);
+  return (await res.json()) as NotificationList;
+}
 
 export function NotificationBell({
   className,
@@ -40,11 +50,12 @@ export function NotificationBell({
   const [unread, setUnread] = useState(0);
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const loadedOnce = useRef(false);
 
   const refresh = useCallback(() => {
     startTransition(async () => {
       try {
-        const data = await listNotifications(20);
+        const data = await fetchInbox(20);
         setItems(data.items);
         setUnread(data.unreadCount);
       } catch {
@@ -54,27 +65,41 @@ export function NotificationBell({
   }, []);
 
   useEffect(() => {
-    refresh();
+    if (!loadedOnce.current) {
+      loadedOnce.current = true;
+      refresh();
+    }
+
     let cancelled = false;
+    let hub: Awaited<ReturnType<typeof acquireSignalHub>> = null;
+
+    const onNotification = (n: AppNotification) => {
+      setItems((prev) => [n, ...prev].slice(0, 20));
+      setUnread((c) => c + 1);
+    };
+    const onUnread = (count: number) => {
+      setUnread(count);
+    };
 
     void (async () => {
-      const hub = await startSignalHub();
+      hub = await acquireSignalHub();
       if (cancelled || !hub) return;
-
-      hub.on("notification", (n: AppNotification) => {
-        setItems((prev) => [n, ...prev].slice(0, 20));
-        setUnread((c) => c + 1);
-      });
-      hub.on("unreadCount", (count: number) => {
-        setUnread(count);
-      });
+      hub.on("notification", onNotification);
+      hub.on("unreadCount", onUnread);
     })();
 
     return () => {
       cancelled = true;
-      void stopSignalHub();
+      hub?.off("notification", onNotification);
+      hub?.off("unreadCount", onUnread);
+      releaseSignalHub();
     };
   }, [refresh]);
+
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (next) refresh();
+  }
 
   function openItem(n: AppNotification) {
     startTransition(async () => {
@@ -113,7 +138,7 @@ export function NotificationBell({
   const hasUnread = unread > 0;
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"

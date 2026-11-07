@@ -36,6 +36,7 @@ import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 import { Button } from "@/shared/ui/button";
 import { FxRateHint } from "@/features/fx/ui/fx-rate-hint";
+import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
 import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
 import { Input } from "@/shared/ui/input";
@@ -213,6 +214,8 @@ export function InvoiceForm({
 
   const watchedItems = watch("items");
   const currency = watch("currency") || "EUR";
+  const issueDate = watch("issueDate");
+  const bankIban = watch("bankIban");
 
   const grandTotal = useMemo(() => {
     return (watchedItems ?? []).reduce(
@@ -553,7 +556,11 @@ export function InvoiceForm({
               )}
             />
             <FieldError message={errors.currency?.message} />
-            <FxRateHint currency={currency} base="EUR" />
+            <FxRateHint
+              currency={currency}
+              base="EUR"
+              date={issueDate || undefined}
+            />
           </div>
         </div>
       </section>
@@ -609,11 +616,17 @@ export function InvoiceForm({
           </div>
           <div className={cn(fieldClass, "sm:col-span-2")}>
             <Label htmlFor="bankIban">IBAN</Label>
-            <Input
+            <IbanLookupField
               id="bankIban"
-              className="data-num text-sm"
+              register={register("bankIban")}
+              value={bankIban ?? ""}
               disabled={readOnly || pending}
-              {...register("bankIban")}
+              aria-invalid={!!errors.bankIban}
+              onResolved={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                setValue("bankIban", data.iban, opts);
+                if (data.bic) setValue("bankBic", data.bic, opts);
+              }}
             />
             <FieldError message={errors.bankIban?.message} />
           </div>

@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { returnValidationErrors } from "next-safe-action";
+import { cache } from "react";
 import { z } from "zod";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
@@ -43,11 +44,11 @@ export async function lookupCustomers(params?: {
   });
 }
 
-export async function getCustomer(id: string): Promise<Customer> {
+export const getCustomer = cache(async (id: string): Promise<Customer> => {
   return apiFetch<Customer>(`/api/customers/${id}`, {
     next: { tags: [`customer-${id}`, "customers"], revalidate: 20 },
   });
-}
+});
 
 export async function getCustomerByIco(ico: string): Promise<Customer> {
   return apiFetch<Customer>(`/api/customers/by-ico/${encodeURIComponent(ico)}`, {

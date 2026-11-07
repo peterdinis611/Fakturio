@@ -1,5 +1,4 @@
 import { getLocale } from "next-intl/server";
-import { Suspense } from "react";
 import { getCompanyStatus, getCompanySummary } from "@/features/company/api/company";
 import { getCurrentUser } from "@/features/auth/api/auth";
 import { AppSidebar } from "@/widgets/app-shell/app-sidebar";
@@ -14,7 +13,16 @@ import { isOnboardingSkipped } from "@/shared/lib/onboarding";
 import { redirect } from "@/i18n/navigation";
 import { AppHotkeysProvider } from "@/shared/hotkeys/app-hotkeys-provider";
 
-async function AppShell({ children }: { children: React.ReactNode }) {
+/**
+ * Async layout without an inner Suspense(null) — wrapping the shell in
+ * `fallback={null}` remounted sidebar/bell/SignalR on every soft navigation.
+ * Page segments still stream via sibling `loading.tsx` files.
+ */
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const locale = await getLocale();
 
   const [user, summary, status, skipped] = await Promise.all([
@@ -53,17 +61,5 @@ async function AppShell({ children }: { children: React.ReactNode }) {
         <ScrollToTopButton />
       </div>
     </AppHotkeysProvider>
-  );
-}
-
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <Suspense fallback={null}>
-      <AppShell>{children}</AppShell>
-    </Suspense>
   );
 }

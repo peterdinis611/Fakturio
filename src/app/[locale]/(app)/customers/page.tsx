@@ -10,7 +10,7 @@ export async function generateMetadata() {
   return { title: t("title") };
 }
 
-const CATALOG_SIZE = 500;
+const CATALOG_SIZE = 100;
 
 export default async function CustomersPage({
   searchParams,
