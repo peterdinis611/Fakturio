@@ -37,15 +37,19 @@ export class ActionError extends Error {
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
     if (e instanceof ActionError) {
-      logActionFailure("safe-action", e, {
-        status: e.causeStatus ?? null,
-        code: e.causeCode ?? null,
-        detail: e.causeDetail ?? null,
-      });
+      // API-backed ActionErrors were already logged in apiFetch — skip duplicate.
+      const fromApi = e.causeStatus !== undefined;
+      if (!fromApi) {
+        logActionFailure("safe-action", e, {
+          status: e.causeStatus ?? null,
+          code: e.causeCode ?? null,
+          detail: e.causeDetail ?? null,
+        });
+      }
       return toUserFacingError(e.message, e.causeCode);
     }
     if (isApiError(e)) {
-      logActionFailure("safe-action", e);
+      if (!e.wasLogged) logActionFailure("safe-action", e);
       return toUserFacingError(e.message, e.problem.code);
     }
     logActionFailure("safe-action", e);

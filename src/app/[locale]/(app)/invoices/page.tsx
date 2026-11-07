@@ -1,5 +1,8 @@
 import { getTranslations } from "next-intl/server";
-import { DocumentsCatalog } from "@/features/invoices/ui/documents-catalog";
+import {
+  DocumentsCatalog,
+  loadDocumentsCatalog,
+} from "@/features/invoices/ui/documents-catalog";
 
 export async function generateMetadata() {
   const t = await getTranslations("Invoices");
@@ -17,5 +20,12 @@ export default async function InvoicesPage({
   }>;
 }) {
   const sp = await searchParams;
-  return <DocumentsCatalog flow="Issued" searchParams={sp} />;
+  const dataPromise = loadDocumentsCatalog("Issued", sp);
+  return (
+    <DocumentsCatalog
+      flow="Issued"
+      searchParams={sp}
+      dataPromise={dataPromise}
+    />
+  );
 }

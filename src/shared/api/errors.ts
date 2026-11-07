@@ -4,6 +4,8 @@ import { localizeFieldError, toUserFacingError } from "@/shared/lib/user-error";
 export class ApiError extends Error {
   status: number;
   problem: ApiProblem;
+  /** Set after logApiFailure so safe-action does not double-log. */
+  wasLogged = false;
 
   constructor(status: number, problem: ApiProblem) {
     super(
@@ -15,6 +17,11 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = status;
     this.problem = problem;
+  }
+
+  markLogged(): this {
+    this.wasLogged = true;
+    return this;
   }
 
   fieldErrors(): Record<string, string> {

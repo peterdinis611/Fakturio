@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { IBM_Plex_Sans } from "next/font/google";
+import { logger } from "@/shared/lib/logger";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({
@@ -17,7 +18,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    logger.clientError("global-error", error);
   }, [error]);
 
   return (

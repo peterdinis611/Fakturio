@@ -1,4 +1,5 @@
 import { Download } from "lucide-react";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { getCompanySummary } from "@/features/company/api/company";
 import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
@@ -14,31 +15,36 @@ import { InvoicesFuzzyTable } from "@/features/invoices/ui/invoices-fuzzy-table"
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
 import { Button } from "@/shared/ui/button";
+import { SectionLoader } from "@/shared/ui/spinner";
 import type {
+  CompanySummary,
   DocumentFlow,
   InvoiceDocumentType,
+  InvoiceListItem,
   InvoiceStatus,
+  PagedResponse,
 } from "@/shared/api/types";
 import { invoicesExportHref } from "@/shared/lib/exports";
 
 /** Client fuzzy search window — keep payload small for faster RSC. */
 const CATALOG_SIZE = 100;
 
-type Props = {
-  flow: DocumentFlow;
-  searchParams: {
-    status?: string;
-    type?: string;
-    q?: string;
-    overdue?: string;
-  };
+export type DocumentsCatalogSearchParams = {
+  status?: string;
+  type?: string;
+  q?: string;
+  overdue?: string;
 };
 
-export async function DocumentsCatalog({ flow, searchParams }: Props) {
-  const t = await getTranslations("Invoices");
-  const td = await getTranslations("Documents");
-  const tc = await getTranslations("Common");
+export type DocumentsCatalogData = {
+  data: PagedResponse<InvoiceListItem>;
+  company: CompanySummary | null;
+};
 
+function parseFilters(
+  flow: DocumentFlow,
+  searchParams: DocumentsCatalogSearchParams,
+) {
   const status =
     searchParams.status && searchParams.status !== "all"
       ? (searchParams.status as InvoiceStatus)
@@ -49,8 +55,16 @@ export async function DocumentsCatalog({ flow, searchParams }: Props) {
       : undefined;
   const search = searchParams.q?.trim() || "";
   const overdueOnly = searchParams.overdue === "1" && flow === "Issued";
+  return { status, documentType, search, overdueOnly };
+}
 
-  const [data, company] = await Promise.all([
+/** Kick off catalog fetches before Suspense (safe to call from the page). */
+export function loadDocumentsCatalog(
+  flow: DocumentFlow,
+  searchParams: DocumentsCatalogSearchParams,
+): Promise<DocumentsCatalogData> {
+  const { status, documentType, overdueOnly } = parseFilters(flow, searchParams);
+  return Promise.all([
     listInvoices({
       page: 1,
       pageSize: CATALOG_SIZE,
@@ -60,7 +74,24 @@ export async function DocumentsCatalog({ flow, searchParams }: Props) {
       flow,
     }),
     getCompanySummary().catch(() => null),
-  ]);
+  ]).then(([data, company]) => ({ data, company }));
+}
+
+type Props = {
+  flow: DocumentFlow;
+  searchParams: DocumentsCatalogSearchParams;
+  dataPromise: Promise<DocumentsCatalogData>;
+};
+
+async function DocumentsCatalogBody({ flow, searchParams, dataPromise }: Props) {
+  const t = await getTranslations("Invoices");
+  const td = await getTranslations("Documents");
+  const tc = await getTranslations("Common");
+  const { status, documentType, search, overdueOnly } = parseFilters(
+    flow,
+    searchParams,
+  );
+  const { data, company } = await dataPromise;
   const ready = company?.isReadyToInvoice ?? false;
   const create = newDocumentHref(flow, documentType, status);
 
@@ -86,14 +117,7 @@ export async function DocumentsCatalog({ flow, searchParams }: Props) {
           : t("title");
 
   return (
-    <div>
-      <DocumentsAreaNav />
-      <DocumentTypeNav
-        flow={flow}
-        activeType={documentType}
-        activeStatus={status}
-      />
-
+    <>
       <div className="mt-5">
         <PageHeader
           title={title}
@@ -148,6 +172,46 @@ export async function DocumentsCatalog({ flow, searchParams }: Props) {
         canCreate={ready && Boolean(create)}
         newHref={create?.href}
       />
+    </>
+  );
+}
+
+/** Shell + Suspense body — preload via `loadDocumentsCatalog` on the page. */
+export async function DocumentsCatalog({
+  flow,
+  searchParams,
+  dataPromise,
+}: Props) {
+  const tl = await getTranslations("Loading");
+
+  return (
+    <div>
+      <DocumentsAreaNav />
+      <DocumentTypeNav
+        flow={flow}
+        activeType={
+          searchParams.type && searchParams.type !== "all"
+            ? (searchParams.type as InvoiceDocumentType)
+            : undefined
+        }
+        activeStatus={
+          searchParams.status && searchParams.status !== "all"
+            ? (searchParams.status as InvoiceStatus)
+            : undefined
+        }
+      />
+
+      <Suspense
+        fallback={
+          <SectionLoader label={tl("invoices")} rows={8} className="mt-5" />
+        }
+      >
+        <DocumentsCatalogBody
+          flow={flow}
+          searchParams={searchParams}
+          dataPromise={dataPromise}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -56,6 +56,7 @@ export const companySchema = z
     defaultConstantSymbol: optionalString,
     defaultInvoiceNotes: optionalString,
     invoiceFooter: optionalString,
+    invoicePdfTemplate: z.enum(["classic", "modern", "compact"]).default("classic"),
     logoUrl: optionalString,
     notes: optionalString,
   })
@@ -80,4 +81,11 @@ export const companyDefaultsSchema = z.object({
   defaultConstantSymbol: optionalString,
   defaultInvoiceNotes: optionalString,
   invoiceFooter: optionalString,
+  invoicePdfTemplate: z.enum(["classic", "modern", "compact"]).optional(),
 });
+
+export const INVOICE_PDF_TEMPLATES = [
+  { value: "classic" as const, labelKey: "pdfTemplateClassic", bodyKey: "pdfTemplateClassicBody" },
+  { value: "modern" as const, labelKey: "pdfTemplateModern", bodyKey: "pdfTemplateModernBody" },
+  { value: "compact" as const, labelKey: "pdfTemplateCompact", bodyKey: "pdfTemplateCompactBody" },
+];

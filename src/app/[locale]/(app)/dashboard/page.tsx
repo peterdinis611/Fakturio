@@ -1,14 +1,11 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import { getCompanySummary } from "@/features/company/api/company";
-import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
-import { getReminders, listInvoices } from "@/features/invoices/api/invoices";
-import { getMonthlyRevenue, getReportOverview } from "@/features/reports/api/reports";
-import { DashboardEmpty } from "@/widgets/dashboard/dashboard-empty";
-import { DashboardSections } from "@/widgets/dashboard/dashboard-sections";
+import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
+import {
+  DashboardBody,
+  loadDashboard,
+} from "@/widgets/dashboard/dashboard-body";
 import { PageHeader } from "@/widgets/app-shell/page-header";
-import { MotionItem } from "@/shared/ui/motion/page-motion";
-import { formatDate, formatMoney } from "@/shared/lib/format";
-import type { AppLocale } from "@/i18n/routing";
+import { SectionLoader } from "@/shared/ui/spinner";
 
 export async function generateMetadata() {
   const t = await getTranslations("Dashboard");
@@ -16,68 +13,22 @@ export async function generateMetadata() {
 }
 
 export default async function DashboardPage() {
+  // Preload before awaiting i18n so API work overlaps with the shell render.
+  const dataPromise = loadDashboard();
   const t = await getTranslations("Dashboard");
-  const locale = (await getLocale()) as AppLocale;
-  const year = new Date().getFullYear();
-  const [overview, recent, reminders, monthly, draftsPage, company] =
-    await Promise.all([
-      getReportOverview(),
-      listInvoices({ page: 1, pageSize: 8 }),
-      getReminders({ withinDays: 14 }),
-      getMonthlyRevenue(year),
-      listInvoices({ page: 1, pageSize: 5, status: "Draft" }),
-      getCompanySummary().catch(() => null),
-    ]);
-
-  const isEmpty = overview.totalInvoices === 0;
-  const ready = company?.isReadyToInvoice ?? false;
-
-  const finding = isEmpty
-    ? t("emptyFinding")
-    : overview.overdueCount > 0
-      ? t("overdueFinding", {
-          count: overview.overdueCount,
-          amount: formatMoney(
-            overview.overdueAmount,
-            overview.currency,
-            locale,
-          ),
-        })
-      : reminders.length > 0
-        ? t("remindersFinding", { count: reminders.length })
-        : t("defaultFinding", {
-            date: formatDate(overview.asOf, locale),
-            count: overview.totalInvoices,
-          });
+  const tl = await getTranslations("Loading");
 
   return (
-    <>
-      <PageHeader
-        title={t("title")}
-        description={finding}
-        actions={
-          isEmpty ? undefined : (
-            <InvoiceReadyLink href="/invoices/new" ready={ready}>
-              {t("newInvoice")}
-            </InvoiceReadyLink>
-          )
+    <div>
+      <PageHeader title={t("title")} />
+
+      <Suspense
+        fallback={
+          <SectionLoader label={tl("dashboard")} rows={8} className="mt-2" />
         }
-      />
-
-      {isEmpty ? (
-        <MotionItem>
-          <DashboardEmpty />
-        </MotionItem>
-      ) : null}
-
-      <DashboardSections
-        overview={overview}
-        reminders={reminders}
-        drafts={draftsPage.items}
-        recent={recent.items}
-        monthly={monthly}
-        showSectionLabel={isEmpty}
-      />
-    </>
+      >
+        <DashboardBody dataPromise={dataPromise} />
+      </Suspense>
+    </div>
   );
 }

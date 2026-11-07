@@ -17,7 +17,7 @@ export const invoiceItemSchema = z.object({
 });
 
 export const invoiceSchema = z.object({
-  customerId: z.string().uuid("Vyber zákazníka"),
+  customerId: z.uuid("Vyber zákazníka"),
   issueDate: optionalString,
   dueDate: optionalString,
   deliveryDate: optionalString,

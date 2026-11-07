@@ -20,6 +20,7 @@ import type { CompanySettings, RegistryCompany } from "@/shared/api/types";
 import type { z } from "zod";
 import {
   companySchema,
+  INVOICE_PDF_TEMPLATES,
   type CompanyFormValues,
 } from "@/entities/company/model/schema";
 import { cn } from "@/shared/lib/utils";
@@ -100,6 +101,7 @@ function toFormValues(initial: CompanySettings): CompanyFormInput {
     defaultConstantSymbol: initial.defaultConstantSymbol ?? "",
     defaultInvoiceNotes: initial.defaultInvoiceNotes ?? "",
     invoiceFooter: initial.invoiceFooter ?? "",
+    invoicePdfTemplate: initial.invoicePdfTemplate ?? "classic",
     logoUrl: initial.logoUrl ?? "",
     notes: initial.notes ?? "",
   };
@@ -614,6 +616,43 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             id="defaultConstantSymbol"
             className="data-num"
             {...register("defaultConstantSymbol")}
+          />
+        </Field>
+        <Field className="sm:col-span-2">
+          <Label>{t("pdfTemplate")}</Label>
+          <p className="mb-2 text-[12px] text-muted-foreground">
+            {t("pdfTemplateHint")}
+          </p>
+          <Controller
+            control={control}
+            name="invoicePdfTemplate"
+            render={({ field }) => (
+              <div className="grid gap-2 sm:grid-cols-3">
+                {INVOICE_PDF_TEMPLATES.map((tpl) => {
+                  const selected = field.value === tpl.value;
+                  return (
+                    <button
+                      key={tpl.value}
+                      type="button"
+                      onClick={() => field.onChange(tpl.value)}
+                      className={cn(
+                        "rounded-[6px] border px-3 py-3 text-left transition-colors",
+                        selected
+                          ? "border-ink bg-raised ring-1 ring-ink"
+                          : "border-rule bg-surface hover:border-ink/40",
+                      )}
+                    >
+                      <span className="block text-[13px] font-medium text-ink">
+                        {t(tpl.labelKey)}
+                      </span>
+                      <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">
+                        {t(tpl.bodyKey)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           />
         </Field>
         <Field className="sm:col-span-2">

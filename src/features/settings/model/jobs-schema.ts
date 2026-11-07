@@ -28,9 +28,17 @@ export const reminderJobSchema = z.object({
   markAsSent: z.boolean(),
 });
 
+export const recurringJobSchema = z.object({
+  enabled: z.boolean(),
+  intervalHours: intField(1, 24),
+  startupDelaySeconds: intField(0, 3600),
+  disabledRecheckHours: intField(1, 168),
+});
+
 export const jobSettingsSchema = z.object({
   overdueSync: overdueJobSchema,
   reminderJob: reminderJobSchema,
+  recurringInvoices: recurringJobSchema,
 });
 
 export type JobSettingsFormValues = z.output<typeof jobSettingsSchema>;

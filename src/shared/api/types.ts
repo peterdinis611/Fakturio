@@ -150,6 +150,7 @@ export type CompanySettings = {
   defaultConstantSymbol: string | null;
   defaultInvoiceNotes: string | null;
   invoiceFooter: string | null;
+  invoicePdfTemplate: "classic" | "modern" | "compact";
   logoUrl: string | null;
   notes: string | null;
   createdAt: string;
@@ -603,9 +604,25 @@ export type ReminderJobSettings = {
   markAsSent: boolean;
 };
 
+export type RecurringJobSettings = {
+  enabled: boolean;
+  intervalHours: number;
+  startupDelaySeconds: number;
+  disabledRecheckHours: number;
+};
+
+export type JobRunStatus = {
+  lastRunAtUtc: string | null;
+  lastMessage: string | null;
+};
+
 export type JobSettings = {
   overdueSync: OverdueJobSettings;
   reminderJob: ReminderJobSettings;
+  recurringInvoices: RecurringJobSettings;
+  overdueSyncRun: JobRunStatus;
+  reminderJobRun: JobRunStatus;
+  recurringInvoicesRun: JobRunStatus;
 };
 
 export type ServiceCatalogItem = {

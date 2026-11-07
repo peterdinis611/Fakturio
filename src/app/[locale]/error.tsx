@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { logger } from "@/shared/lib/logger";
 import { ErrorScreen } from "@/shared/ui/error-screen";
 import { Button } from "@/shared/ui/button";
 
@@ -15,7 +16,7 @@ export default function ErrorPage({
   const t = useTranslations("Errors");
 
   useEffect(() => {
-    console.error(error);
+    logger.clientError("locale-error", error);
   }, [error]);
 
   return (

@@ -52,11 +52,13 @@ export async function ReportsDashboard(props: {
   from?: string;
   to?: string;
   top: number;
+  /** Preloaded from the page so fetches overlap the shell render. */
+  dataPromise?: Promise<ReportsDashboardData>;
 }) {
   const t = await getTranslations("Reports");
   const locale = (await getLocale()) as AppLocale;
   const { overview, monthly, aging, topCustomers, vat, from, to, top } =
-    await loadReportsDashboard(props);
+    await (props.dataPromise ?? loadReportsDashboard(props));
 
   return (
     <div>

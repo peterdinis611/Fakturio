@@ -2,7 +2,10 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ReportExportLinks } from "@/features/reports/ui/export-links";
-import { ReportsDashboard } from "@/widgets/reports/reports-dashboard";
+import {
+  loadReportsDashboard,
+  ReportsDashboard,
+} from "@/widgets/reports/reports-dashboard";
 import { ReportsFilters } from "@/features/reports/ui/reports-filters";
 import { SectionLoader } from "@/shared/ui/spinner";
 
@@ -36,14 +39,17 @@ export default async function ReportsPage({
     top?: string;
   }>;
 }) {
-  const t = await getTranslations("Reports");
-  const tc = await getTranslations("Common");
   const sp = await searchParams;
   const currentYear = new Date().getFullYear();
   const year = parseYear(sp.year, currentYear);
   const from = parseDate(sp.from);
   const to = parseDate(sp.to);
   const top = parseTop(sp.top);
+
+  // Preload before i18n so API work overlaps the shell.
+  const dataPromise = loadReportsDashboard({ year, from, to, top });
+  const t = await getTranslations("Reports");
+  const tc = await getTranslations("Common");
 
   return (
     <div>
@@ -60,7 +66,13 @@ export default async function ReportsPage({
           <SectionLoader label={tc("loading")} rows={8} className="mt-2" />
         }
       >
-        <ReportsDashboard year={year} from={from} to={to} top={top} />
+        <ReportsDashboard
+          year={year}
+          from={from}
+          to={to}
+          top={top}
+          dataPromise={dataPromise}
+        />
       </Suspense>
     </div>
   );

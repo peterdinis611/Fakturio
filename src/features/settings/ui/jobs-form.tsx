@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { updateJobSettingsAction } from "@/features/settings/api/jobs";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
-import type { JobSettings } from "@/shared/api/types";
+import type { JobRunStatus, JobSettings } from "@/shared/api/types";
 import {
   jobSettingsSchema,
   type JobSettingsFormInput,
@@ -93,6 +93,30 @@ function BoolField({
   );
 }
 
+function LastRun({
+  label,
+  status,
+  neverLabel,
+}: {
+  label: string;
+  status: JobRunStatus;
+  neverLabel: string;
+}) {
+  const when = status.lastRunAtUtc
+    ? new Date(status.lastRunAtUtc).toLocaleString()
+    : neverLabel;
+  return (
+    <p className="rounded-[4px] border border-rule bg-raised/40 px-3 py-2 text-[12px] text-muted-foreground">
+      <span className="font-medium text-ink">{label}:</span> {when}
+      {status.lastMessage ? (
+        <span className="mt-0.5 block font-mono text-[11px] text-faint">
+          {status.lastMessage}
+        </span>
+      ) : null}
+    </p>
+  );
+}
+
 export function JobsForm({ initial }: { initial: JobSettings }) {
   const t = useTranslations("Settings");
   const [pending, startTransition] = useTransition();
@@ -103,7 +127,11 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
     formState: { errors, isDirty },
   } = useForm<JobSettingsFormInput, unknown, JobSettingsFormValues>({
     resolver: zodResolver(jobSettingsSchema),
-    defaultValues: initial,
+    defaultValues: {
+      overdueSync: initial.overdueSync,
+      reminderJob: initial.reminderJob,
+      recurringInvoices: initial.recurringInvoices,
+    },
   });
 
   function onSubmit(values: JobSettingsFormValues) {
@@ -134,6 +162,12 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
             {t("overdueJobBody")}
           </p>
         </div>
+
+        <LastRun
+          label={t("lastRun")}
+          status={initial.overdueSyncRun}
+          neverLabel={t("lastRunNever")}
+        />
 
         <Controller
           control={control}
@@ -198,6 +232,12 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
             {t("remindersJobBody")}
           </p>
         </div>
+
+        <LastRun
+          label={t("lastRun")}
+          status={initial.reminderJobRun}
+          neverLabel={t("lastRunNever")}
+        />
 
         <Controller
           control={control}
@@ -294,6 +334,56 @@ export function JobsForm({ initial }: { initial: JobSettings }) {
             disabled={pending}
             error={errors.reminderJob?.startupDelaySeconds?.message}
             {...register("reminderJob.startupDelaySeconds")}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-4 border-t border-rule pt-5">
+        <div>
+          <h2 className="text-[15px] font-medium text-ink">
+            {t("recurringSection")}
+          </h2>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            {t("recurringJobBody")}
+          </p>
+        </div>
+
+        <LastRun
+          label={t("lastRun")}
+          status={initial.recurringInvoicesRun}
+          neverLabel={t("lastRunNever")}
+        />
+
+        <Controller
+          control={control}
+          name="recurringInvoices.enabled"
+          render={({ field }) => (
+            <BoolField
+              id="recurring-enabled"
+              label={t("recurringEnable")}
+              checked={field.value}
+              disabled={pending}
+              onCheckedChange={field.onChange}
+            />
+          )}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <NumberField
+            id="recurring-interval"
+            label={t("intervalHours")}
+            hint={t("intervalHoursHint")}
+            disabled={pending}
+            error={errors.recurringInvoices?.intervalHours?.message}
+            {...register("recurringInvoices.intervalHours")}
+          />
+          <NumberField
+            id="recurring-delay"
+            label={t("startupDelay")}
+            hint={t("startupDelayHint")}
+            disabled={pending}
+            error={errors.recurringInvoices?.startupDelaySeconds?.message}
+            {...register("recurringInvoices.startupDelaySeconds")}
           />
         </div>
       </section>

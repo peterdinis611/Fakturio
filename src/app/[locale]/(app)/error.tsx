@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { logger } from "@/shared/lib/logger";
 import { ErrorScreen } from "@/shared/ui/error-screen";
 import { Button } from "@/shared/ui/button";
 
@@ -27,8 +28,8 @@ export default function AppErrorPage({
   const offline = isUnreachable(error);
 
   useEffect(() => {
-    console.error(error);
-  }, [error]);
+    logger.clientError("app-error", error, { offline });
+  }, [error, offline]);
 
   return (
     <ErrorScreen

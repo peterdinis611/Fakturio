@@ -7,6 +7,11 @@ import {
   LogLevel,
   type ILogger,
 } from "@microsoft/signalr";
+import {
+  CORRELATION_HEADER,
+  createCorrelationId,
+  logger,
+} from "@/shared/lib/logger";
 
 const DEFAULT_BASE = "http://localhost:5148";
 
@@ -23,14 +28,16 @@ function apiBaseUrl() {
 
 /**
  * SignalR's default logger uses console.error, which Next.js turns into a
- * fullscreen overlay even when start() is caught. Keep noise in debug.
+ * fullscreen overlay even when start() is caught. Keep noise in debug/warn.
  */
 const quietLogger: ILogger = {
   log(logLevel, message) {
     if (logLevel < LogLevel.Warning) return;
-    if (process.env.NODE_ENV === "development") {
-      console.debug(`[signal-hub] ${message}`);
+    if (logLevel >= LogLevel.Error) {
+      logger.warn("signal-hub", message);
+      return;
     }
+    logger.debug("signal-hub", message);
   },
 };
 
@@ -51,10 +58,13 @@ async function fetchHubToken(): Promise<string> {
 }
 
 function buildConnection(): HubConnection {
+  const correlationId = createCorrelationId();
   return new HubConnectionBuilder()
     .withUrl(`${apiBaseUrl()}/hubs/signal`, {
       accessTokenFactory: fetchHubToken,
       withCredentials: true,
+      // Sent on negotiate / long-poll HTTP; WebSocket frames cannot carry headers.
+      headers: { [CORRELATION_HEADER]: correlationId },
     })
     .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
     .configureLogging(quietLogger)
@@ -79,7 +89,9 @@ async function startSignalHub(): Promise<HubConnection | null> {
 
       return connection;
     } catch (err) {
-      console.debug("[signal-hub] start failed — inbox falls back to REST", err);
+      logger.debug("signal-hub", "start failed — inbox falls back to REST", {
+        error: err,
+      });
       connection = null;
       return null;
     } finally {

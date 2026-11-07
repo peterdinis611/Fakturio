@@ -1,4 +1,8 @@
 import { getAccessToken } from "@/shared/auth/session";
+import {
+  CORRELATION_HEADER,
+  createCorrelationId,
+} from "@/shared/lib/logger";
 import { ApiError } from "./errors";
 import { logApiFailure } from "./log";
 import type { ApiProblem } from "./types";
@@ -76,6 +80,7 @@ export async function apiFetch<T>(
     skipAuth,
   } = options;
   const authHeader = skipAuth ? {} : await getAuthHeader();
+  const correlationId = createCorrelationId();
   let res: Response;
   try {
     res = await fetch(buildUrl(path, searchParams), {
@@ -83,6 +88,7 @@ export async function apiFetch<T>(
       headers: {
         Accept: "application/json",
         ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        [CORRELATION_HEADER]: correlationId,
         ...authHeader,
         ...headers,
       },
@@ -97,8 +103,8 @@ export async function apiFetch<T>(
       status: 0,
       code: "server_unreachable",
     };
-    logApiFailure({ method, path, status: 0, problem, cause });
-    throw new ApiError(0, problem);
+    logApiFailure({ method, path, status: 0, problem, cause, correlationId });
+    throw new ApiError(0, problem).markLogged();
   }
 
   if (res.status === 204) {
@@ -107,8 +113,14 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     const problem = await parseProblem(res);
-    logApiFailure({ method, path, status: res.status, problem });
-    throw new ApiError(res.status, problem);
+    logApiFailure({
+      method,
+      path,
+      status: res.status,
+      problem,
+      correlationId: res.headers.get(CORRELATION_HEADER) ?? correlationId,
+    });
+    throw new ApiError(res.status, problem).markLogged();
   }
 
   if (res.headers.get("content-type")?.includes("application/json")) {
@@ -127,12 +139,14 @@ export async function apiFetchFormData<T>(
   const { method = "POST", searchParams, headers, cache, next, skipAuth } =
     options;
   const authHeader = skipAuth ? {} : await getAuthHeader();
+  const correlationId = createCorrelationId();
   let res: Response;
   try {
     res = await fetch(buildUrl(path, searchParams), {
       method,
       headers: {
         Accept: "application/json",
+        [CORRELATION_HEADER]: correlationId,
         ...authHeader,
         ...headers,
       },
@@ -147,8 +161,8 @@ export async function apiFetchFormData<T>(
       status: 0,
       code: "server_unreachable",
     };
-    logApiFailure({ method, path, status: 0, problem, cause });
-    throw new ApiError(0, problem);
+    logApiFailure({ method, path, status: 0, problem, cause, correlationId });
+    throw new ApiError(0, problem).markLogged();
   }
 
   if (res.status === 204) {
@@ -157,8 +171,14 @@ export async function apiFetchFormData<T>(
 
   if (!res.ok) {
     const problem = await parseProblem(res);
-    logApiFailure({ method, path, status: res.status, problem });
-    throw new ApiError(res.status, problem);
+    logApiFailure({
+      method,
+      path,
+      status: res.status,
+      problem,
+      correlationId: res.headers.get(CORRELATION_HEADER) ?? correlationId,
+    });
+    throw new ApiError(res.status, problem).markLogged();
   }
 
   if (res.headers.get("content-type")?.includes("application/json")) {
@@ -174,10 +194,15 @@ export async function apiFetchBlob(
   accept = "application/pdf, text/csv, */*",
 ): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
   const authHeader = await getAuthHeader();
+  const correlationId = createCorrelationId();
   let res: Response;
   try {
     res = await fetch(buildUrl(path, searchParams), {
-      headers: { Accept: accept, ...authHeader },
+      headers: {
+        Accept: accept,
+        [CORRELATION_HEADER]: correlationId,
+        ...authHeader,
+      },
       cache: "no-store",
     });
   } catch (cause) {
@@ -187,14 +212,27 @@ export async function apiFetchBlob(
       status: 0,
       code: "server_unreachable",
     };
-    logApiFailure({ method: "GET", path, status: 0, problem, cause });
-    throw new ApiError(0, problem);
+    logApiFailure({
+      method: "GET",
+      path,
+      status: 0,
+      problem,
+      cause,
+      correlationId,
+    });
+    throw new ApiError(0, problem).markLogged();
   }
 
   if (!res.ok) {
     const problem = await parseProblem(res);
-    logApiFailure({ method: "GET", path, status: res.status, problem });
-    throw new ApiError(res.status, problem);
+    logApiFailure({
+      method: "GET",
+      path,
+      status: res.status,
+      problem,
+      correlationId: res.headers.get(CORRELATION_HEADER) ?? correlationId,
+    });
+    throw new ApiError(res.status, problem).markLogged();
   }
 
   const disposition = res.headers.get("content-disposition");

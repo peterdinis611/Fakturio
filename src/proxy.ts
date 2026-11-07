@@ -1,6 +1,11 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { AUTH_COOKIE } from "@/shared/auth/constants";
+import {
+  CORRELATION_HEADER,
+  createCorrelationId,
+  logger,
+} from "@/shared/lib/logger";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -31,9 +36,23 @@ function isPublicPath(path: string) {
   );
 }
 
+function withCorrelation(req: NextRequest, res: NextResponse) {
+  const incoming = req.headers.get(CORRELATION_HEADER)?.trim();
+  const correlationId =
+    incoming && incoming.length > 0 ? incoming : createCorrelationId();
+  res.headers.set(CORRELATION_HEADER, correlationId);
+
+  const path = req.nextUrl.pathname;
+  if (!path.startsWith("/_next") && path !== "/api/health") {
+    logger.debug("http", `${req.method} ${path}`, { correlationId });
+  }
+
+  return res;
+}
+
 export default function middleware(req: NextRequest) {
   if (isApiOrTrpc(req.nextUrl.pathname)) {
-    return NextResponse.next();
+    return withCorrelation(req, NextResponse.next());
   }
 
   const path = stripLocale(req.nextUrl.pathname);
@@ -48,7 +67,7 @@ export default function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = signIn;
     url.searchParams.set("next", path);
-    return NextResponse.redirect(url);
+    return withCorrelation(req, NextResponse.redirect(url));
   }
 
   if (
@@ -62,10 +81,10 @@ export default function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = dash;
     url.search = "";
-    return NextResponse.redirect(url);
+    return withCorrelation(req, NextResponse.redirect(url));
   }
 
-  return intlMiddleware(req);
+  return withCorrelation(req, intlMiddleware(req));
 }
 
 export const config = {
