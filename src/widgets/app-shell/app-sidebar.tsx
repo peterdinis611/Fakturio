@@ -66,6 +66,7 @@ function NavLinks({
             href={item.href}
             onClick={onNavigate}
             active={active}
+            data-tour={`nav-${item.key}`}
             className={cn(
               "flex h-9 items-center gap-2.5 px-2.5 text-[14px] transition-colors duration-150",
               active
@@ -97,7 +98,7 @@ function BrandHeader({
   showBell?: boolean;
 }) {
   return (
-    <div className="border-b border-sidebar-border px-3 py-3.5">
+    <div className="border-b border-sidebar-border px-3 py-3.5" data-tour="brand">
       <div className="flex items-start gap-2">
         <Link
           href="/dashboard"

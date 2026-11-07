@@ -12,6 +12,7 @@ import { PageMotion } from "@/shared/ui/motion/page-motion";
 import { isOnboardingSkipped } from "@/shared/lib/onboarding";
 import { redirect } from "@/i18n/navigation";
 import { AppHotkeysProvider } from "@/shared/hotkeys/app-hotkeys-provider";
+import { ProductTourProvider } from "@/features/product-tour/product-tour-provider";
 
 /**
  * Async layout without an inner Suspense(null) — wrapping the shell in
@@ -43,6 +44,7 @@ export default async function AppLayout({
 
   return (
     <AppHotkeysProvider userId={user!.id}>
+      <ProductTourProvider userId={user!.id} />
       <div className="flex min-h-full flex-col md:flex-row">
         <ScrollRestoration />
         <AppSidebar

@@ -142,6 +142,7 @@ export function NotificationBell({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
+          data-tour="notifications"
           className={cn(
             "notification-bell relative inline-flex size-9 shrink-0 items-center justify-center",
             "rounded-[3px] border border-sidebar-border bg-raised/40 text-muted-foreground",

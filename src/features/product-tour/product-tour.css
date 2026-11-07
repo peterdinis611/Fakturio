@@ -1,0 +1,67 @@
+/* Fakturio-themed Driver.js popover — ledger face, not default purple glow. */
+.fakturio-tour-popover.driver-popover {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+  max-width: min(22rem, calc(100vw - 2rem));
+  font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+}
+
+.fakturio-tour-popover .driver-popover-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.fakturio-tour-popover .driver-popover-description {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.fakturio-tour-popover .driver-popover-progress-text {
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.fakturio-tour-popover .driver-popover-navigation-btns {
+  gap: 0.35rem;
+}
+
+.fakturio-tour-popover .driver-popover-prev-btn,
+.fakturio-tour-popover .driver-popover-next-btn {
+  text-shadow: none;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--ground);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+}
+
+.fakturio-tour-popover .driver-popover-next-btn {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+
+.fakturio-tour-popover .driver-popover-prev-btn:hover,
+.fakturio-tour-popover .driver-popover-next-btn:hover {
+  filter: brightness(1.05);
+}
+
+.fakturio-tour-popover .driver-popover-close-btn {
+  color: var(--muted);
+}
+
+.fakturio-tour-popover .driver-popover-arrow-side-left,
+.fakturio-tour-popover .driver-popover-arrow-side-right,
+.fakturio-tour-popover .driver-popover-arrow-side-top,
+.fakturio-tour-popover .driver-popover-arrow-side-bottom {
+  border-color: var(--surface);
+}

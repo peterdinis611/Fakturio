@@ -16,7 +16,7 @@ export function PageHeader({
 }) {
   return (
     <FadeIn className="mb-5">
-      <header>
+      <header data-tour="page-header">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-[22px] font-semibold leading-tight text-ink">

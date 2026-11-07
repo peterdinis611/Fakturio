@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AppearanceForm } from "@/features/settings/ui/appearance-form";
+import { TourRestartCard } from "@/features/product-tour/tour-restart-card";
 import {
   Card,
   CardContent,
@@ -17,14 +18,17 @@ export default async function AppearanceSettingsPage() {
   const t = await getTranslations("Settings");
 
   return (
-    <Card size="sm" className="rounded-[6px] bg-surface ring-border">
-      <CardHeader className="border-b border-rule pb-3">
-        <CardTitle className="text-[15px]">{t("theme")}</CardTitle>
-        <CardDescription>{t("appearanceDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <AppearanceForm />
-      </CardContent>
-    </Card>
+    <>
+      <Card size="sm" className="rounded-[6px] bg-surface ring-border">
+        <CardHeader className="border-b border-rule pb-3">
+          <CardTitle className="text-[15px]">{t("theme")}</CardTitle>
+          <CardDescription>{t("appearanceDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <AppearanceForm />
+        </CardContent>
+      </Card>
+      <TourRestartCard />
+    </>
   );
 }

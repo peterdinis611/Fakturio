@@ -69,24 +69,29 @@ export async function DashboardSections({
 
       <div className="mb-10 grid gap-10 lg:grid-cols-2">
         <MotionItem>
-          <TodayActions
-            title={t("todayTitle")}
-            actions={buildTodayActions({
-              overview,
-              reminders,
-              drafts,
-              locale,
-              t,
-            })}
-          />
+          <div data-tour="dashboard-today">
+            <TodayActions
+              title={t("todayTitle")}
+              actions={buildTodayActions({
+                overview,
+                reminders,
+                drafts,
+                locale,
+                t,
+              })}
+            />
+          </div>
         </MotionItem>
         <MotionItem>
-          <CashflowTrend
-            currency={monthly.currency}
-            months={monthly.months}
-            yearPaidTotal={monthly.yearPaidTotal}
-            yearIssuedTotal={monthly.yearIssuedTotal}
-          />
+          <div data-tour="dashboard-cashflow">
+            <CashflowTrend
+              year={monthly.year}
+              currency={monthly.currency}
+              months={monthly.months}
+              yearPaidTotal={monthly.yearPaidTotal}
+              yearIssuedTotal={monthly.yearIssuedTotal}
+            />
+          </div>
         </MotionItem>
       </div>
 
