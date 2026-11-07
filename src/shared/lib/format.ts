@@ -94,6 +94,37 @@ export function emptyDash(value: string | number | null | undefined) {
   return String(value);
 }
 
+const paymentMethodLabelSk: Record<string, string> = {
+  bank_transfer: "Bankový prevod",
+  cash: "Hotovosť",
+  card: "Karta",
+  other: "Iné",
+};
+
+const paymentMethodLabelEn: Record<string, string> = {
+  bank_transfer: "Bank transfer",
+  cash: "Cash",
+  card: "Card",
+  other: "Other",
+};
+
+export function paymentMethodLabel(
+  method: string | null | undefined,
+  locale: FormatLocale = "sk",
+) {
+  if (!method) return "—";
+  const map = locale === "en" ? paymentMethodLabelEn : paymentMethodLabelSk;
+  return map[method] ?? method;
+}
+
+/** Group IBAN into 4-char blocks for display. */
+export function formatIban(iban: string | null | undefined) {
+  if (!iban) return "—";
+  const clean = iban.replace(/\s+/g, "").toUpperCase();
+  if (!clean) return "—";
+  return clean.replace(/(.{4})/g, "$1 ").trim();
+}
+
 const documentTypeLabelSk: Record<InvoiceDocumentType, string> = {
   Invoice: "Faktúra",
   Proforma: "Zálohová",
