@@ -25,8 +25,10 @@ const BY_CODE: Record<string, string> = {
   invalid_date_range: "Neplatný rozsah dátumov.",
   date_range_too_large: "Rozsah dátumov je príliš veľký.",
   invalid_search_query: "Neplatný vyhľadávací výraz.",
-  invalid_invoice_total: "Neplatná suma faktúry.",
+  invalid_invoice_total: "Suma faktúry musí byť väčšia ako 0 — doplň cenu položky.",
   invalid_invoice_items: "Neplatné položky faktúry.",
+  company_not_ready:
+    "Firma nie je pripravená na fakturáciu — doplň povinné údaje vo Firma.",
   empty_guid: "Neplatný identifikátor.",
   invalid_ico: "Neplatné IČO (8 číslic + kontrolná cifra).",
   unsupported_country: "Doplnenie z registra je dostupné pre SK a CZ.",

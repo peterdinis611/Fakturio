@@ -28,7 +28,8 @@ export function logApiFailure(ctx: ApiLogContext): void {
     cause: serializeCause(ctx.cause) ?? null,
   };
 
-  console.error(
+  // console.warn — Next.js overlays console.error from Server Components.
+  console.warn(
     `[api] ${payload.method} ${payload.path} → ${payload.status}` +
       (payload.code ? ` (${payload.code})` : "") +
       (payload.detail ? `: ${payload.detail}` : ""),

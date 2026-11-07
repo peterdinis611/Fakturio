@@ -19,7 +19,16 @@ export default async function NewInvoicePage({
 }) {
   const t = await getTranslations("InvoiceDetail");
   const sp = await searchParams;
-  const documentType = sp.type === "Proforma" ? "Proforma" : "Invoice";
+  const allowedTypes = new Set([
+    "Invoice",
+    "Proforma",
+    "Quote",
+    "DeliveryNote",
+    "SalesOrder",
+  ]);
+  const documentType = allowedTypes.has(sp.type ?? "")
+    ? (sp.type as "Invoice" | "Proforma" | "Quote" | "DeliveryNote" | "SalesOrder")
+    : "Invoice";
   const [customers, company, services] = await Promise.all([
     listCustomers({ pageSize: 100 }),
     getCompany(),
@@ -48,12 +57,22 @@ export default async function NewInvoicePage({
     <div>
       <PageHeader
         title={
-          documentType === "Proforma" ? t("newProforma") : t("newTitle")
+          documentType === "Proforma"
+            ? t("newProforma")
+            : documentType === "Quote"
+              ? t("newQuote")
+              : documentType === "DeliveryNote"
+                ? t("newDeliveryNote")
+                : documentType === "SalesOrder"
+                  ? t("newSalesOrder")
+                  : t("newTitle")
         }
         description={
           documentType === "Proforma"
             ? "Zálohová (ZF…) nie je daňový doklad — neskôr ju môžeš finalizovať."
-            : "Koncept môžeš vystaviť neskôr; PDF až po uložení."
+            : documentType === "Invoice"
+              ? "Koncept môžeš vystaviť neskôr; PDF až po uložení."
+              : "Doklad má vlastnú číselnú sériu; PDF po uložení."
         }
         ledger={
           <>

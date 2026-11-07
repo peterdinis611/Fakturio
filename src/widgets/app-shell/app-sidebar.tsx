@@ -9,6 +9,7 @@ import {
   Menu,
   Bell,
   NotebookPen,
+  Receipt,
   Repeat,
   ScrollText,
   Search,
@@ -29,6 +30,7 @@ import { cn } from "@/shared/lib/utils";
 const navKeys = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
   { href: "/invoices", key: "invoices", icon: FileText },
+  { href: "/expenses", key: "expenses", icon: Receipt },
   { href: "/customers", key: "customers", icon: Users },
   { href: "/services", key: "services", icon: BookOpen },
   { href: "/recurring", key: "recurring", icon: Repeat },

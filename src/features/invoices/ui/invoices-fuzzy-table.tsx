@@ -37,6 +37,7 @@ type Props = {
   overdueOnly?: boolean;
   truncated?: boolean;
   canCreate?: boolean;
+  newHref?: string;
 };
 
 export function InvoicesFuzzyTable({
@@ -47,6 +48,7 @@ export function InvoicesFuzzyTable({
   overdueOnly = false,
   truncated = false,
   canCreate = true,
+  newHref = "/invoices/new",
 }: Props) {
   const t = useTranslations("Invoices");
   const tc = useTranslations("Common");
@@ -56,11 +58,14 @@ export function InvoicesFuzzyTable({
     keys: fuzzyKeys.invoice,
     threshold: 0.36,
   });
+  const searchPath = newHref.startsWith("/expenses")
+    ? "/expenses"
+    : "/invoices";
 
   return (
     <>
       <FuzzySearchField
-        path="/invoices"
+        path={searchPath}
         value={query}
         onValueChange={setQuery}
         placeholder={t("placeholder")}
@@ -87,7 +92,7 @@ export function InvoicesFuzzyTable({
             query.trim() || !canCreate ? undefined : t("new")
           }
           actionHref={
-            query.trim() || !canCreate ? undefined : "/invoices/new"
+            query.trim() || !canCreate ? undefined : newHref
           }
         />
       ) : (

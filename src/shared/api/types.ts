@@ -5,7 +5,15 @@ export type InvoiceStatus =
   | "Cancelled"
   | "Overdue";
 
-export type InvoiceDocumentType = "Invoice" | "Proforma" | "CreditNote";
+export type InvoiceDocumentType =
+  | "Invoice"
+  | "Proforma"
+  | "CreditNote"
+  | "Quote"
+  | "DeliveryNote"
+  | "SalesOrder";
+
+export type DocumentFlow = "Issued" | "Received";
 
 export type AuditAction =
   | "Created"
@@ -199,6 +207,7 @@ export type InvoiceListItem = {
   id: string;
   number: string;
   documentType: InvoiceDocumentType;
+  flow: DocumentFlow;
   status: InvoiceStatus;
   customerId: string;
   customerName: string;
@@ -218,6 +227,7 @@ export type Invoice = {
   id: string;
   number: string;
   documentType: InvoiceDocumentType;
+  flow: DocumentFlow;
   status: InvoiceStatus;
   customerId: string;
   customer: InvoiceParty;
@@ -274,6 +284,7 @@ export type CreateInvoiceInput = {
   notes?: string | null;
   status?: InvoiceStatus | null;
   documentType?: InvoiceDocumentType | null;
+  flow?: DocumentFlow | null;
   items: InvoiceItemInput[];
 };
 

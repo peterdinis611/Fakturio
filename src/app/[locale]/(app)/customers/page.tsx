@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { listCustomers } from "@/features/customers/api/customers";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
 import { CustomersFuzzyTable } from "@/features/customers/ui/customers-fuzzy-table";
+import { DocumentsAreaNav } from "@/features/invoices/ui/documents-area-nav";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 
 export async function generateMetadata() {
@@ -23,6 +24,7 @@ export default async function CustomersPage({
 
   return (
     <div>
+      <DocumentsAreaNav />
       <PageHeader
         title={t("title")}
         description={t("description", { count: data.totalCount })}

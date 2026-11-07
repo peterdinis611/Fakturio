@@ -1,18 +1,9 @@
 import Link from "next/link";
-import {
-  AlertTriangle,
-  FileText,
-  Files,
-  ReceiptText,
-  ScrollText,
-} from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/shared/ui/badge";
 import type { InvoiceDocumentType, InvoiceStatus } from "@/shared/api/types";
-import {
-  documentTypeLabel,
-  statusLabelFor,
-} from "@/shared/lib/format";
+import { statusLabelFor } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -25,37 +16,30 @@ const statuses: (InvoiceStatus | "all")[] = [
   "Cancelled",
 ];
 
-const documentTypes: {
-  key: InvoiceDocumentType | "all";
-  icon: typeof Files;
-}[] = [
-  { key: "all", icon: Files },
-  { key: "Invoice", icon: FileText },
-  { key: "Proforma", icon: ScrollText },
-  { key: "CreditNote", icon: ReceiptText },
-];
-
 type InvoiceFiltersProps = {
   status?: InvoiceStatus;
   documentType?: InvoiceDocumentType;
   overdueOnly: boolean;
+  basePath?: "/invoices" | "/expenses";
 };
 
 function buildHref({
   status,
   type,
   overdue,
+  basePath = "/invoices",
 }: {
   status?: InvoiceStatus;
   type?: InvoiceDocumentType;
   overdue?: boolean;
+  basePath?: string;
 }) {
   const params = new URLSearchParams();
   if (status) params.set("status", status);
   if (type) params.set("type", type);
   if (overdue) params.set("overdue", "1");
   const qs = params.toString();
-  return qs ? `/invoices?${qs}` : "/invoices";
+  return qs ? `${basePath}?${qs}` : basePath;
 }
 
 export async function InvoiceLifecycleHint({
@@ -105,81 +89,53 @@ export async function InvoiceFilters({
   status,
   documentType,
   overdueOnly,
+  basePath = "/invoices",
 }: InvoiceFiltersProps) {
   const t = await getTranslations("Common");
   const ti = await getTranslations("Invoices");
   const locale = (await getLocale()) as AppLocale;
+  const showOverdue = basePath === "/invoices";
 
   return (
-    <div className="mb-4 space-y-3">
+    <div className="mb-4 flex flex-wrap items-center gap-2">
       <div
         role="tablist"
-        aria-label={ti("colType")}
-        className="grid grid-cols-2 gap-1 rounded-[6px] border border-border bg-raised/35 p-1 sm:grid-cols-4"
+        aria-label={ti("colStatus")}
+        className="flex min-w-0 flex-1 flex-wrap gap-1"
       >
-        {documentTypes.map(({ key, icon: Icon }) => {
-          const active =
-            (key === "all" && !documentType) || documentType === key;
+        {statuses.map((s) => {
+          const active = (s === "all" && !status) || status === s;
           return (
             <Link
-              key={key}
+              key={s}
               href={buildHref({
-                status,
-                type: key === "all" ? undefined : key,
+                status: s === "all" ? undefined : s,
+                type: documentType,
                 overdue: overdueOnly,
+                basePath,
               })}
               role="tab"
               aria-selected={active}
               className={cn(
-                "inline-flex items-center justify-center gap-1.5 rounded-[4px] px-2.5 py-2 text-[12px] font-medium transition-colors",
+                "rounded-full border px-2.5 py-1 text-[12px] font-medium transition-colors",
                 active
-                  ? "bg-ground text-ink shadow-sm ring-1 ring-border"
-                  : "text-muted-foreground hover:bg-surface/70 hover:text-ink",
+                  ? "border-ink bg-ink text-ground"
+                  : "border-border bg-surface text-muted-foreground hover:border-control hover:text-ink",
               )}
             >
-              <Icon className="size-3.5 opacity-70" aria-hidden />
-              {key === "all" ? t("all") : documentTypeLabel(key, locale)}
+              {s === "all" ? t("allStatuses") : statusLabelFor(s, locale)}
             </Link>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div
-          role="tablist"
-          aria-label={ti("colStatus")}
-          className="flex min-w-0 flex-1 flex-wrap gap-1"
-        >
-          {statuses.map((s) => {
-            const active = (s === "all" && !status) || status === s;
-            return (
-              <Link
-                key={s}
-                href={buildHref({
-                  status: s === "all" ? undefined : s,
-                  type: documentType,
-                  overdue: overdueOnly,
-                })}
-                role="tab"
-                aria-selected={active}
-                className={cn(
-                  "rounded-full border px-2.5 py-1 text-[12px] font-medium transition-colors",
-                  active
-                    ? "border-ink bg-ink text-ground"
-                    : "border-border bg-surface text-muted-foreground hover:border-control hover:text-ink",
-                )}
-              >
-                {s === "all" ? t("allStatuses") : statusLabelFor(s, locale)}
-              </Link>
-            );
-          })}
-        </div>
-
+      {showOverdue ? (
         <Link
           href={buildHref({
             status,
             type: documentType,
             overdue: !overdueOnly,
+            basePath,
           })}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium transition-colors",
@@ -191,7 +147,7 @@ export async function InvoiceFilters({
           <AlertTriangle className="size-3.5" aria-hidden />
           {statusLabelFor("Overdue", locale)}
         </Link>
-      </div>
+      ) : null}
     </div>
   );
 }

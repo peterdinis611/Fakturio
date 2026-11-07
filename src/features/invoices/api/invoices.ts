@@ -29,6 +29,7 @@ function revalidateInvoices(id?: string) {
   revalidateTag("invoices", "max");
   revalidateTag("reports", "max");
   revalidatePath("/invoices");
+  revalidatePath("/expenses");
   revalidatePath("/");
   revalidatePath("/reminders");
   revalidatePath("/reports");
@@ -46,6 +47,7 @@ export async function listInvoices(params?: {
   customerId?: string;
   search?: string;
   overdueOnly?: boolean;
+  flow?: import("@/shared/api/types").DocumentFlow;
 }): Promise<PagedResponse<InvoiceListItem>> {
   return apiFetch<PagedResponse<InvoiceListItem>>("/api/invoices", {
     searchParams: {
@@ -56,6 +58,7 @@ export async function listInvoices(params?: {
       customerId: params?.customerId,
       search: params?.search,
       overdueOnly: params?.overdueOnly,
+      flow: params?.flow,
     },
     next: { tags: ["invoices"], revalidate: 30 },
   });
@@ -89,7 +92,17 @@ export async function getReminders(params?: {
 const createInvoiceSchema = invoiceSchema.and(
   z.object({
     status: z.enum(["Draft", "Issued"]).optional().default("Draft"),
-    documentType: z.enum(["Invoice", "Proforma"]).optional().default("Invoice"),
+    documentType: z
+      .enum([
+        "Invoice",
+        "Proforma",
+        "Quote",
+        "DeliveryNote",
+        "SalesOrder",
+      ])
+      .optional()
+      .default("Invoice"),
+    flow: z.enum(["Issued", "Received"]).optional().default("Issued"),
   }),
 );
 

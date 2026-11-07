@@ -21,6 +21,7 @@ import { CatalogPicker } from "@/features/invoices/ui/catalog-picker";
 import { LineTemplatesMenu } from "@/features/invoices/ui/line-templates";
 import type {
   Invoice,
+  DocumentFlow,
   InvoiceDocumentType,
   ServiceCatalogItem,
 } from "@/shared/api/types";
@@ -66,6 +67,7 @@ type InvoiceFormProps = {
   companyDefaults?: CompanyDefaults;
   defaultCustomerId?: string;
   defaultDocumentType?: InvoiceDocumentType;
+  defaultFlow?: DocumentFlow;
   catalogItems?: ServiceCatalogItem[];
 };
 
@@ -159,6 +161,7 @@ export function InvoiceForm({
   companyDefaults,
   defaultCustomerId,
   defaultDocumentType = "Invoice",
+  defaultFlow = "Issued",
   catalogItems = [],
 }: InvoiceFormProps) {
   const t = useTranslations("InvoiceDetail");
@@ -167,11 +170,22 @@ export function InvoiceForm({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [customerOptions, setCustomerOptions] = useState(customers);
-  const [documentType, setDocumentType] = useState<InvoiceDocumentType>(
-    initial?.documentType === "Proforma" || defaultDocumentType === "Proforma"
-      ? "Proforma"
-      : "Invoice",
-  );
+  const [documentType, setDocumentType] = useState<InvoiceDocumentType>(() => {
+    const fromInitial = initial?.documentType;
+    if (
+      fromInitial &&
+      fromInitial !== "CreditNote"
+    ) {
+      return fromInitial;
+    }
+    if (
+      defaultDocumentType &&
+      defaultDocumentType !== "CreditNote"
+    ) {
+      return defaultDocumentType;
+    }
+    return "Invoice";
+  });
   const isEdit = Boolean(initial?.id);
   const readOnly = isEdit && initial!.status !== "Draft";
   const isVatPayer = companyDefaults?.isVatPayer !== false;
@@ -241,8 +255,11 @@ export function InvoiceForm({
     [
       {
         hotkey: hotkeys["invoice.save"],
-        callback: () => {
-          void handleSubmit((values) => submit(values))();
+          callback: () => {
+          void handleSubmit(
+            (values) => submit(values),
+            onInvalid,
+          )();
         },
       },
       {
@@ -281,6 +298,47 @@ export function InvoiceForm({
     }
   }
 
+  function onInvalid(formErrors: typeof errors) {
+    const messages: string[] = [];
+    if (formErrors.customerId?.message) {
+      messages.push(formErrors.customerId.message);
+    }
+    if (formErrors.items?.message || formErrors.items?.root?.message) {
+      messages.push(
+        formErrors.items.message ?? formErrors.items.root?.message ?? "",
+      );
+    }
+    const itemErrors = formErrors.items;
+    if (itemErrors && Array.isArray(itemErrors)) {
+      for (const [index, item] of itemErrors.entries()) {
+        if (!item || typeof item !== "object") continue;
+        const parts = [
+          item.description?.message,
+          item.quantity?.message,
+          item.unitPrice?.message,
+          item.vatRate?.message,
+        ].filter(Boolean);
+        if (parts.length > 0) {
+          messages.push(`Položka ${index + 1}: ${parts.join(", ")}`);
+        }
+      }
+    }
+    if (formErrors.bankIban?.message) messages.push(formErrors.bankIban.message);
+    if (formErrors.bankBic?.message) messages.push(formErrors.bankBic.message);
+
+    toast.error(
+      messages.filter(Boolean)[0] ??
+        "Doplň povinné polia — odberateľ, popis a cenu položky.",
+    );
+
+    // Scroll first invalid field into view
+    const first =
+      document.querySelector<HTMLElement>("[aria-invalid=true]") ??
+      document.querySelector<HTMLElement>("#items-0-description");
+    first?.scrollIntoView({ behavior: "smooth", block: "center" });
+    first?.focus?.();
+  }
+
   function submit(values: InvoiceFormValues, status?: "Draft" | "Issued") {
     const payload = {
       ...values,
@@ -297,7 +355,8 @@ export function InvoiceForm({
             ...payload,
             status: status ?? "Draft",
             documentType:
-              documentType === "Proforma" ? "Proforma" : "Invoice",
+              documentType === "CreditNote" ? "Invoice" : documentType,
+            flow: defaultFlow,
           });
 
       if (!result?.data) {
@@ -342,23 +401,30 @@ export function InvoiceForm({
               <Select
                 value={documentType}
                 onValueChange={(v) =>
-                  setDocumentType(v as "Invoice" | "Proforma")
+                  setDocumentType(v as InvoiceDocumentType)
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Invoice">
-                    {documentTypeLabel("Invoice", locale)}
-                  </SelectItem>
-                  <SelectItem value="Proforma">
-                    {documentTypeLabel("Proforma", locale)}
-                  </SelectItem>
+                  {(
+                    [
+                      "Invoice",
+                      "Proforma",
+                      "Quote",
+                      "DeliveryNote",
+                      "SalesOrder",
+                    ] as const
+                  ).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {documentTypeLabel(type, locale)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <p className="text-[12px] text-muted-foreground">
-                Zálohové majú sériu ZF…; daňový doklad FA / bez prefixu.
+                FA · ZF · CP · DL · OB — každá séria má vlastné číslovanie.
               </p>
             </div>
           ) : (
@@ -641,7 +707,11 @@ export function InvoiceForm({
               <div className={cn(fieldClass, "sm:col-span-5")}>
                 <Label htmlFor={`items.${index}.description`}>Popis</Label>
                 <Input
-                  id={`items.${index}.description`}
+                  id={
+                    index === 0
+                      ? "items-0-description"
+                      : `items.${index}.description`
+                  }
                   disabled={readOnly || pending}
                   {...register(`items.${index}.description`)}
                 />
@@ -758,7 +828,7 @@ export function InvoiceForm({
             <Button
               type="button"
               disabled={pending}
-              onClick={handleSubmit((values) => submit(values))}
+              onClick={handleSubmit((values) => submit(values), onInvalid)}
             >
               Uložiť koncept
             </Button>
@@ -768,14 +838,20 @@ export function InvoiceForm({
                 type="button"
                 variant="outline"
                 disabled={pending}
-                onClick={handleSubmit((values) => submit(values, "Draft"))}
+                onClick={handleSubmit(
+                  (values) => submit(values, "Draft"),
+                  onInvalid,
+                )}
               >
                 Uložiť koncept
               </Button>
               <Button
                 type="button"
                 disabled={pending}
-                onClick={handleSubmit((values) => submit(values, "Issued"))}
+                onClick={handleSubmit(
+                  (values) => submit(values, "Issued"),
+                  onInvalid,
+                )}
               >
                 {t("createAndIssue")}
               </Button>

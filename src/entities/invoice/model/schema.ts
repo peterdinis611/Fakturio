@@ -12,7 +12,7 @@ export const invoiceItemSchema = z.object({
   description: z.string().trim().min(1, "Popis položky je povinný").max(500),
   unit: z.string().trim().min(1).max(20).default("ks"),
   quantity: z.coerce.number().positive("Množstvo musí byť > 0"),
-  unitPrice: z.coerce.number().min(0, "Cena nemôže byť záporná"),
+  unitPrice: z.coerce.number().positive("Cena musí byť väčšia ako 0"),
   vatRate: optionalVatRate,
 });
 

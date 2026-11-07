@@ -98,12 +98,18 @@ const documentTypeLabelSk: Record<InvoiceDocumentType, string> = {
   Invoice: "Faktúra",
   Proforma: "Zálohová",
   CreditNote: "Dobropis",
+  Quote: "Cenová ponuka",
+  DeliveryNote: "Dodací list",
+  SalesOrder: "Objednávka",
 };
 
 const documentTypeLabelEn: Record<InvoiceDocumentType, string> = {
   Invoice: "Invoice",
   Proforma: "Proforma",
   CreditNote: "Credit note",
+  Quote: "Quote",
+  DeliveryNote: "Delivery note",
+  SalesOrder: "Sales order",
 };
 
 export function documentTypeLabel(

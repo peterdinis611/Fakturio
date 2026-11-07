@@ -35,14 +35,13 @@ export function InvoiceReadyLink({
 
   return (
     <Button
-      type="button"
+      asChild
       variant={variant}
       size={size}
       className={className}
-      disabled
       title={t("notReadyTooltip")}
     >
-      {children}
+      <Link href="/settings/company">{children}</Link>
     </Button>
   );
 }

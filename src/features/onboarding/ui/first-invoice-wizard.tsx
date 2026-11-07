@@ -84,26 +84,31 @@ export function FirstInvoiceWizard({
       toast.error(t("fillRequired"));
       return;
     }
+    if (quantity <= 0 || unitPrice <= 0) {
+      toast.error(t("fillPrice"));
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
     startTransition(async () => {
       const result = await createInvoiceAction({
         customerId,
-        issueDate: undefined,
-        dueDate: undefined,
-        deliveryDate: undefined,
+        issueDate: today,
+        dueDate: today,
+        deliveryDate: null,
         currency: defaultCurrency,
-        variableSymbol: undefined,
-        constantSymbol: undefined,
-        specificSymbol: undefined,
-        paymentMethod: undefined,
-        bankIban: undefined,
-        bankBic: undefined,
-        notes: undefined,
+        variableSymbol: null,
+        constantSymbol: null,
+        specificSymbol: null,
+        paymentMethod: null,
+        bankIban: null,
+        bankBic: null,
+        notes: null,
         status: "Issued",
         documentType: "Invoice",
         items: [
           {
             description: description.trim(),
-            unit,
+            unit: unit.trim() || "ks",
             quantity,
             unitPrice,
             vatRate: isVatPayer ? vatRate : 0,
@@ -366,7 +371,12 @@ export function FirstInvoiceWizard({
             </Button>
             <Button
               type="button"
-              disabled={pending || !description.trim() || quantity <= 0}
+              disabled={
+                pending ||
+                !description.trim() ||
+                quantity <= 0 ||
+                unitPrice <= 0
+              }
               onClick={issue}
             >
               {pending ? t("issuing") : t("issue")}

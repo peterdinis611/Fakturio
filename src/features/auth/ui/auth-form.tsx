@@ -229,6 +229,53 @@ export function AuthForm({ mode }: AuthFormProps) {
           t("signUpSubmit")
         )}
       </Button>
+
+      {mode === "sign-in" ? (
+        <div className="space-y-2">
+          <div className="relative flex items-center gap-3 py-0.5">
+            <span className="h-px flex-1 bg-border" aria-hidden />
+            <span className="text-[11px] tracking-wide text-faint uppercase">
+              {t("demoDivider")}
+            </span>
+            <span className="h-px flex-1 bg-border" aria-hidden />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={pending}
+            onClick={() => {
+              setError(null);
+              setEmail("demo@fakturio.sk");
+              setPassword("Demo123!");
+              startTransition(async () => {
+                const result = await loginAction({
+                  email: "demo@fakturio.sk",
+                  password: "Demo123!",
+                });
+                if (!result?.data) {
+                  const message =
+                    actionErrorMessage(result ?? {}) ?? t("authFailed");
+                  setError(message);
+                  toast.error(message);
+                  return;
+                }
+                toast.success(t("demoSignedIn"));
+                router.replace("/dashboard");
+                router.refresh();
+              });
+            }}
+          >
+            {pending ? (
+              <Spinner size="sm" label={t("submitting")} />
+            ) : null}
+            {t("demoLogin")}
+          </Button>
+          <p className="text-center text-[11px] text-muted-foreground">
+            {t("demoHint")}
+          </p>
+        </div>
+      ) : null}
     </form>
   );
 }
