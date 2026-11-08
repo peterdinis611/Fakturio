@@ -47,8 +47,8 @@ export function TopCustomersChart({
   const data = customers.slice(0, 8).map((c) => ({
     id: c.customerId,
     name:
-      c.customerName.length > 18
-        ? `${c.customerName.slice(0, 16)}…`
+      c.customerName.length > 22
+        ? `${c.customerName.slice(0, 21)}…`
         : c.customerName,
     fullName: c.customerName,
     total: c.totalAmount,
@@ -85,7 +85,7 @@ export function TopCustomersChart({
           type="category"
           tickLine={false}
           axisLine={false}
-          width={100}
+          width={132}
           tick={{ fill: "var(--muted)", fontSize: 11 }}
         />
         <XAxis

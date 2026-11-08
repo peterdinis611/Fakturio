@@ -108,9 +108,8 @@ export function DashboardCharts({
       <p className="mb-4 text-[11px] font-medium tracking-[0.14em] text-faint uppercase">
         {t("chartsTitle")}
       </p>
-      <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
         <ChartFrame
-          className="xl:col-span-3"
           title={t("chartAging")}
           expandLabel={expandLabel}
           description={`${t("unpaid")} ${formatMoney(aging.totalOutstanding, aging.currency, locale)}`}
@@ -136,7 +135,6 @@ export function DashboardCharts({
         />
 
         <ChartFrame
-          className="xl:col-span-3"
           title={t("chartStatus")}
           expandLabel={expandLabel}
           description={`${reports("invoices")} · ${formatPercent(overview.collectionRatePercent, locale)}`}
@@ -164,7 +162,6 @@ export function DashboardCharts({
 
         <ChartFrame
           wide
-          className="sm:col-span-2 xl:col-span-4"
           title={t("chartCustomers")}
           expandLabel={expandLabel}
           description={`${reports("topCustomers")} · ${topCustomers.customers.length}`}
@@ -190,7 +187,6 @@ export function DashboardCharts({
         />
 
         <ChartFrame
-          className="sm:col-span-2 xl:col-span-2"
           title={t("chartVat")}
           expandLabel={expandLabel}
           description={`${t("chartVat")} ${formatMoney(vat.vatTotal, vat.currency, locale)}`}

@@ -1093,7 +1093,12 @@
     "paid": "Bezahlt",
     "issued": "Ausgestellt",
     "monthly": "Monatsumsatz",
-    "aging": "Altersstruktur"
+    "aging": "Altersstruktur",
+    "agingCurrent": "Aktuell",
+    "aging1_30": "1–30 Tage",
+    "aging31_60": "31–60 Tage",
+    "aging61_90": "61–90 Tage",
+    "aging90_plus": "90+ Tage"
   },
   "Services": {
     "title": "Leistungskatalog",

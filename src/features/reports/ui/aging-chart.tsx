@@ -22,11 +22,40 @@ import type { AppLocale } from "@/i18n/routing";
 
 const bucketFill: Record<string, string> = {
   current: "var(--text)",
+  "1_30": "var(--chart-3)",
   "1-30": "var(--chart-3)",
+  "31_60": "var(--warning)",
   "31-60": "var(--warning)",
+  "61_90": "var(--negative)",
   "61-90": "var(--negative)",
+  "90_plus": "var(--negative)",
   "90+": "var(--negative)",
 };
+
+function agingLabel(
+  t: (key: "agingCurrent" | "aging1_30" | "aging31_60" | "aging61_90" | "aging90_plus") => string,
+  key: string,
+  fallback: string,
+) {
+  switch (key) {
+    case "current":
+      return t("agingCurrent");
+    case "1_30":
+    case "1-30":
+      return t("aging1_30");
+    case "31_60":
+    case "31-60":
+      return t("aging31_60");
+    case "61_90":
+    case "61-90":
+      return t("aging61_90");
+    case "90_plus":
+    case "90+":
+      return t("aging90_plus");
+    default:
+      return fallback;
+  }
+}
 
 export function AgingChart({
   currency,
@@ -50,7 +79,7 @@ export function AgingChart({
 
   const data = buckets.map((b) => ({
     key: b.key,
-    label: b.label,
+    label: agingLabel(t, b.key, b.label),
     amount: b.amount,
     count: b.count,
     fill: bucketFill[b.key] ?? "var(--chart-3)",

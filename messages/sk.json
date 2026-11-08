@@ -1093,7 +1093,12 @@
     "paid": "Zaplatené",
     "issued": "Vystavené",
     "monthly": "Mesačný obrat",
-    "aging": "Aging"
+    "aging": "Aging",
+    "agingCurrent": "V splatnosti",
+    "aging1_30": "1–30 dní",
+    "aging31_60": "31–60 dní",
+    "aging61_90": "61–90 dní",
+    "aging90_plus": "90+ dní"
   },
   "Services": {
     "title": "Katalóg služieb",

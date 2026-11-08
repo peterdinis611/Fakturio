@@ -1093,7 +1093,12 @@
     "paid": "Paid",
     "issued": "Issued",
     "monthly": "Monthly revenue",
-    "aging": "Aging"
+    "aging": "Aging",
+    "agingCurrent": "Current",
+    "aging1_30": "1–30 days",
+    "aging31_60": "31–60 days",
+    "aging61_90": "61–90 days",
+    "aging90_plus": "90+ days"
   },
   "Services": {
     "title": "Service catalog",
