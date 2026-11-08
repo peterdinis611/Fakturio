@@ -728,6 +728,54 @@ export type JobSettings = {
   recurringInvoicesRun: JobRunStatus;
 };
 
+export type AdminHealth = {
+  status: string;
+  database: string;
+  utc: string;
+};
+
+export type AdminCounts = {
+  users: number;
+  companies: number;
+  customers: number;
+  invoices: number;
+  recurringTemplates: number;
+  notes: number;
+  catalogItems: number;
+  auditLogs: number;
+};
+
+export type AdminInvoices = {
+  draft: number;
+  issued: number;
+  paid: number;
+  overdue: number;
+  cancelled: number;
+  openAmount: number;
+  paidAmount: number;
+  currency: string;
+};
+
+export type AdminUserSummary = {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  createdAt: string;
+  lastSeenAt: string | null;
+  isAdmin: boolean;
+  companyName: string | null;
+};
+
+export type AdminOverview = {
+  health: AdminHealth;
+  counts: AdminCounts;
+  invoices: AdminInvoices;
+  recentUsers: AdminUserSummary[];
+  jobs: JobSettings;
+  generatedAtUtc: string;
+};
+
 export type ServiceCatalogItem = {
   id: string;
   description: string;
@@ -749,6 +797,7 @@ export type AppUser = {
   createdAt: string;
   updatedAt: string;
   lastSeenAt: string | null;
+  isAdmin?: boolean;
 };
 
 export type Note = {

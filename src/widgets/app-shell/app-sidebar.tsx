@@ -14,6 +14,7 @@ import {
   ScrollText,
   Search,
   Settings,
+  Shield,
   UserRound,
   Users,
   Wallet,
@@ -47,15 +48,24 @@ const navKeys = [
 function NavLinks({
   pathname,
   onNavigate,
+  isAdmin,
 }: {
   pathname: string;
   onNavigate?: () => void;
+  isAdmin?: boolean;
 }) {
   const t = useTranslations("Nav");
+  const items = isAdmin
+    ? [
+        ...navKeys.slice(0, 1),
+        { href: "/admin" as const, key: "admin" as const, icon: Shield },
+        ...navKeys.slice(1),
+      ]
+    : [...navKeys];
 
   return (
     <nav className="flex flex-1 flex-col gap-px px-2">
-      {navKeys.map((item) => {
+      {items.map((item) => {
         const active =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
@@ -127,9 +137,11 @@ function BrandHeader({
 export function AppSidebar({
   companyName,
   userEmail,
+  isAdmin,
 }: {
   companyName?: string;
   userEmail?: string | null;
+  isAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const tc = useTranslations("Common");
@@ -182,7 +194,11 @@ export function AppSidebar({
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             >
               <BrandHeader companyName={companyName} showBell={false} />
-              <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
+              <NavLinks
+                pathname={pathname}
+                onNavigate={() => setOpen(false)}
+                isAdmin={isAdmin}
+              />
               <div className="mt-auto">
                 <SidebarAccount email={userEmail} />
               </div>
@@ -193,7 +209,7 @@ export function AppSidebar({
 
       <aside className="sticky top-0 hidden h-svh w-[var(--sidebar-width)] shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <BrandHeader companyName={companyName} />
-        <NavLinks pathname={pathname} />
+        <NavLinks pathname={pathname} isAdmin={isAdmin} />
         <div className="mt-auto">
           <SidebarAccount email={userEmail} />
         </div>

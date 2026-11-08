@@ -50,6 +50,7 @@ export default async function AppLayout({
         <AppSidebar
           companyName={summary?.name || undefined}
           userEmail={user!.email}
+          isAdmin={Boolean(user!.isAdmin)}
         />
         <div className="flex min-w-0 flex-1 flex-col">
           <ConnectivityBanner />
