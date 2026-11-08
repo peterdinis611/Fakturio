@@ -83,7 +83,7 @@ export function SidebarAccount({ email }: { email?: string | null }) {
             className={cn(
               "flex w-full items-center gap-2.5 rounded-[4px] px-2 py-2 text-left transition-colors",
               "hover:bg-raised/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/15",
-              "data-[state=open]:bg-raised/80",
+              "data-popup-open:bg-raised/80",
             )}
           >
             <Avatar aria-hidden size="default">
@@ -111,7 +111,7 @@ export function SidebarAccount({ email }: { email?: string | null }) {
           side="top"
           align="start"
           sideOffset={8}
-          className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-0 rounded-[6px] p-1.5"
+          className="w-(--anchor-width) min-w-0 rounded-[6px] p-1.5"
         >
           <div className="px-2 py-2">
             <p className="truncate text-[13px] font-medium text-ink">{displayName}</p>

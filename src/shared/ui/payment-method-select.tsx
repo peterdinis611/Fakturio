@@ -123,9 +123,9 @@ export function PaymentMethodSelect({
         <SelectValue placeholder={resolvedPlaceholder} />
       </SelectTrigger>
       <SelectContent
-        position="popper"
+        alignItemWithTrigger={false}
         align="start"
-        className="min-w-[var(--radix-select-trigger-width)]"
+        className="min-w-(--anchor-width)"
       >
         {METHODS.map(({ value: method, labelKey, hintKey, Icon }) => (
           <SelectItem

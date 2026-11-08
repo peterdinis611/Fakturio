@@ -78,7 +78,7 @@ export function CurrencySelect({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="min-w-[var(--radix-select-trigger-width)]">
+      <SelectContent className="min-w-(--anchor-width)">
         {CURRENCIES.map((opt) => (
           <SelectItem
             key={opt.code}

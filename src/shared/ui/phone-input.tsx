@@ -132,10 +132,7 @@ export function PhoneInput({
         <PopoverContent
           align="start"
           className="w-[min(100vw-2rem,20rem)] overflow-hidden p-0"
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-            searchRef.current?.focus();
-          }}
+          initialFocus={searchRef}
         >
           <div className="flex items-center gap-2 border-b border-border px-2.5 py-2">
             <SearchIcon className="size-3.5 shrink-0 text-faint" aria-hidden />

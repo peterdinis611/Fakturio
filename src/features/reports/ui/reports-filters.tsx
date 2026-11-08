@@ -153,7 +153,7 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent position="popper" align="start">
+            <SelectContent alignItemWithTrigger={false} align="start">
               {years.map((y) => (
                 <SelectItem key={y} value={String(y)}>
                   {y}
@@ -174,7 +174,7 @@ export function ReportsFilters({ values }: { values: ReportsFilterValues }) {
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent position="popper" align="start">
+            <SelectContent alignItemWithTrigger={false} align="start">
               {[5, 8, 10, 15, 20].map((n) => (
                 <SelectItem key={n} value={String(n)}>
                   {n}

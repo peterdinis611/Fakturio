@@ -149,7 +149,7 @@ export function NotificationBell({
             "transition-[color,background-color,border-color,transform] duration-150",
             "hover:border-control hover:bg-raised hover:text-ink",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/25",
-            "data-[state=open]:border-ink data-[state=open]:bg-active data-[state=open]:text-ink",
+            "data-popup-open:border-ink data-popup-open:bg-active data-popup-open:text-ink",
             hasUnread && "border-signal/35 text-ink",
             className,
           )}
