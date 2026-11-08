@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
+import { BrandMark } from "@/shared/brand/brand-mark";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 import { Link } from "@/i18n/navigation";
@@ -57,12 +58,7 @@ export function DashboardEmpty() {
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-end lg:gap-12">
         <div>
           <div className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="inline-flex size-11 items-center justify-center rounded-[4px] border border-ink bg-ink text-primary-foreground"
-            >
-              <span className="text-[13px] font-bold tracking-wide">F</span>
-            </span>
+            <BrandMark size={44} variant="solid" />
             <p className="text-[11px] font-medium tracking-[0.16em] text-faint uppercase">
               {t("emptyLedgerMark")}
             </p>

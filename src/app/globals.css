@@ -249,6 +249,23 @@
   }
 }
 
+/* App mark — perforation holes punch through to page ground / landing surface */
+.brand-mark--solid {
+  --brand-mark-cut: var(--ground);
+  color: var(--ink, var(--text));
+}
+
+.brand-mark--outline {
+  color: var(--ink, var(--text));
+}
+
+.landing .brand-mark--solid,
+.auth-shell .brand-mark--solid,
+.onboarding-shell .brand-mark--solid {
+  --brand-mark-cut: var(--lp-surface, var(--ground));
+  color: var(--lp-ink, var(--ink, var(--text)));
+}
+
 .locale-switcher {
   display: inline-flex;
   align-items: center;
@@ -469,6 +486,38 @@
   padding: 0.15em 0 0.15em 0.75rem;
   border-left: 2px solid var(--ink, var(--text));
   color: var(--muted);
+}
+
+.note-editor-content aside.note-callout,
+.note-body aside.note-callout {
+  margin: 0.65em 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--raised) 80%, transparent);
+}
+
+.note-editor-content aside.note-callout > *:last-child,
+.note-body aside.note-callout > *:last-child {
+  margin-bottom: 0;
+}
+
+.note-editor-content aside.note-callout[data-variant="info"],
+.note-body aside.note-callout[data-variant="info"] {
+  border-color: color-mix(in oklab, #2563eb 45%, var(--border));
+  background: color-mix(in oklab, #2563eb 10%, var(--ground));
+}
+
+.note-editor-content aside.note-callout[data-variant="warn"],
+.note-body aside.note-callout[data-variant="warn"] {
+  border-color: color-mix(in oklab, #ea580c 45%, var(--border));
+  background: color-mix(in oklab, #ea580c 10%, var(--ground));
+}
+
+.note-editor-content aside.note-callout[data-variant="tip"],
+.note-body aside.note-callout[data-variant="tip"] {
+  border-color: color-mix(in oklab, #16a34a 45%, var(--border));
+  background: color-mix(in oklab, #16a34a 10%, var(--ground));
 }
 
 .note-editor-content hr,

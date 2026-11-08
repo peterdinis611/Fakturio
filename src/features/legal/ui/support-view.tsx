@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 import { getSiteLegal } from "@/shared/legal/site-legal";
 import {
   LegalSection,

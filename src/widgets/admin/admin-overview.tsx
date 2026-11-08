@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 import { formatDate, formatMoney } from "@/shared/lib/format";
 import type { AppLocale } from "@/i18n/routing";
 import type { AdminOverview } from "@/shared/api/types";

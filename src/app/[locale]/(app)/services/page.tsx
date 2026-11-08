@@ -4,7 +4,7 @@ import { listServices } from "@/features/services/api/services";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { ServiceCatalogTable } from "@/features/services/ui/service-catalog-table";
 import { Button } from "@/shared/ui/button";
-import { Link } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 
 export async function generateMetadata() {
   const t = await getTranslations("Services");

@@ -65,16 +65,8 @@
   text-decoration: none;
 }
 
-.onboarding-brand span {
-  display: grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 3px;
-  background: var(--text);
-  color: var(--ground);
-  font-size: 0.75rem;
-  font-weight: 700;
+.onboarding-brand .brand-wordmark {
+  color: inherit;
 }
 
 .onboarding-aside-copy h1 {

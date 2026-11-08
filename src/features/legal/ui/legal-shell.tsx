@@ -1,4 +1,5 @@
-import { Link } from "@/i18n/navigation";
+import { BrandLockup } from "@/shared/brand/brand-lockup";
+import { ServerLink as Link } from "@/i18n/server-link";
 import { intlLocale } from "@/i18n/locales";
 import { LocaleSwitcher } from "@/shared/i18n/ui/locale-switcher";
 import { AuthThemeSlot } from "@/widgets/landing/auth-theme-slot";
@@ -37,11 +38,15 @@ export function LegalShell({
     <article className="legal-doc">
       <div className="legal-doc__top">
         <Link href="/" className="legal-doc__brand">
-          <span aria-hidden>F</span>
-          {brand}
+          <BrandLockup
+            markSize="sm"
+            markVariant="outline"
+            wordmarkClassName="text-[14px]"
+          />
+          <span className="sr-only">{brand}</span>
         </Link>
         <div className="legal-doc__actions">
-          <LocaleSwitcher compact />
+          <LocaleSwitcher align="end" />
           <AuthThemeSlot />
         </div>
       </div>

@@ -255,15 +255,14 @@ html {
 }
 
 .landing-mark {
-  display: inline-grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.65rem;
-  background: var(--lp-ink);
-  color: var(--lp-surface);
-  font-size: 0.75rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lp-ink);
+}
+
+.landing-wordmark .brand-wordmark {
+  color: inherit;
 }
 
 .landing-pill-nav {
@@ -1837,16 +1836,8 @@ html {
   width: fit-content;
 }
 
-.auth-shell-brand span {
-  display: inline-grid;
-  place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.55rem;
-  background: var(--lp-ink);
-  color: var(--lp-surface);
-  font-size: 0.7rem;
-  font-weight: 700;
+.auth-shell-brand .brand-wordmark {
+  color: inherit;
 }
 
 .auth-shell-brand-mobile {

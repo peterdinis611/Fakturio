@@ -42,6 +42,8 @@ import {
   LandingPreview,
 } from "@/widgets/landing/landing-preview";
 import { LandingThemeToggle } from "@/widgets/landing/landing-theme-toggle";
+import { BrandLockup } from "@/shared/brand/brand-lockup";
+import { BrandMark } from "@/shared/brand/brand-mark";
 import { LocaleSwitcher } from "@/shared/i18n/ui/locale-switcher";
 
 function useActiveSection(ids: readonly string[]) {
@@ -337,10 +339,11 @@ export function LandingShell() {
 
       <header className={`landing-top${scrolled ? " is-scrolled" : ""}`}>
         <Link href="/" className="landing-wordmark">
-          <span className="landing-mark" aria-hidden>
-            F
-          </span>
-          Fakturio
+          <BrandLockup
+            markSize="lg"
+            markVariant="solid"
+            wordmarkClassName="text-[1.05rem] font-semibold tracking-[-0.02em]"
+          />
         </Link>
 
         <nav className="landing-pill-nav" aria-label={t("footProduct")}>
@@ -357,7 +360,7 @@ export function LandingShell() {
         </nav>
 
         <div className="landing-top-right">
-          <LocaleSwitcher compact className="landing-locale" />
+          <LocaleSwitcher align="end" className="landing-locale" />
           <LandingThemeToggle />
           <LandingNavActions />
           <button
@@ -693,9 +696,7 @@ export function LandingShell() {
 
       <footer className="landing-foot">
         <div className="landing-foot-brand">
-          <span className="landing-mark" aria-hidden>
-            F
-          </span>
+          <BrandMark size="lg" variant="solid" />
           <div>
             <strong>Fakturio</strong>
             <p>{t("footTagline")}</p>

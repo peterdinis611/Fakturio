@@ -30,7 +30,8 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { emptyDash, formatDateTime } from "@/shared/lib/format";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 import type { AppLocale } from "@/i18n/routing";
 
 export async function generateMetadata() {

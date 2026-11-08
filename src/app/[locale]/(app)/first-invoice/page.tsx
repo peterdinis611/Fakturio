@@ -6,7 +6,8 @@ import { listInvoices } from "@/features/invoices/api/invoices";
 import { listServices } from "@/features/services/api/services";
 import { FirstInvoiceWizard } from "@/features/onboarding/ui/first-invoice-wizard";
 import { PageHeader } from "@/widgets/app-shell/page-header";
-import { Link, redirect } from "@/i18n/navigation";
+import { redirect } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 import { getLocale } from "next-intl/server";
 import { Button } from "@/shared/ui/button";
 

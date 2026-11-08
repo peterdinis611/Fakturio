@@ -175,6 +175,9 @@
     "colCity": "Město",
     "colEmail": "E-mail",
     "colInvoices": "Faktury",
+    "filterName": "Filtrovat název…",
+    "filterIco": "IČO…",
+    "filterCity": "Město…",
     "fuzzyHint": "Fuzzy filtruje načtených {count} zákazníků."
   },
   "Documents": {
@@ -212,6 +215,8 @@
     "csvTitle": "Náhled — faktury CSV",
     "csvFiltered": "Export filtrovaný podle stavu {status}.",
     "csvAll": "Všechny faktury v CSV (oddělovač ;).",
+    "xmlTitle": "Náhled — Money S3 XML",
+    "xmlAll": "Vystavené faktury ve formátu Money S3 (SeznamFaktVyd).",
     "colNumber": "Číslo",
     "colType": "Typ",
     "colCustomer": "Zákazník",
@@ -219,9 +224,26 @@
     "colIssued": "Vystaveno",
     "colDue": "Splatnost",
     "colAmount": "Částka",
+    "filterCustomer": "Filtrovat zákazníka…",
     "fuzzyHint": "Fuzzy filtruje načtených {count} faktur (aktuální filtr).",
     "overdueOnlyHint": "Jen po splatnosti: označit úhradu nebo poslat upomínku.",
     "lifecycleHint": "Číslo a VS jsou v detailu."
+  },
+  "DataTable": {
+    "columns": "Sloupce",
+    "toggleColumns": "Zobrazit sloupce",
+    "clearFilters": "Zrušit filtry",
+    "rowsPerPage": "Řádků",
+    "pageOf": "Strana {page} / {pages}",
+    "first": "První strana",
+    "previous": "Předchozí",
+    "next": "Další",
+    "last": "Poslední strana",
+    "selected": "{count} vybraných",
+    "selectAll": "Vybrat vše na stránce",
+    "selectRow": "Vybrat řádek",
+    "showing": "{shown} z {total}",
+    "reset": "Reset"
   },
   "Logs": {
     "title": "Logy",
@@ -1079,10 +1101,12 @@
     "allTime": "Celé období",
     "applyFilters": "Použít filtry",
     "csvPreview": "Náhled — faktury CSV",
+    "xmlPreviewTitle": "Náhled — Money S3 XML",
     "invoices": "Faktury",
     "accountantPack": "Balíček pro účetní",
     "accountantPackHint": "ZIP: CSV faktury + DPH + Money S3 XML",
     "moneyXml": "Money S3 XML",
+    "moneyXmlHint": "Money S3 SeznamFaktVyd — vystavené faktury v období.",
     "invoicesCsvHint": "Doklady s režimem DPH, IČ DPH a VS — Excel (;).",
     "vatCsvHint": "Řádky DPH podle sazeb, vhodné ke kontrole přiznání.",
     "noInvoicesPeriod": "Žádné faktury v období",
@@ -1470,6 +1494,14 @@
     "generated": "Vytvořen koncept {number}",
     "generateFailed": "Generování selhalo",
     "lastInvoice": "Poslední"
+  },
+  "XmlViewer": {
+    "open": "Náhled XML",
+    "copy": "Kopírovat",
+    "copied": "Zkopírováno",
+    "download": "Stáhnout",
+    "loading": "Načítám XML…",
+    "loadError": "XML se nepodařilo načíst."
   },
   "CsvViewer": {
     "open": "Náhled CSV",

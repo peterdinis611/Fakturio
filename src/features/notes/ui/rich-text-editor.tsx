@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -26,6 +26,7 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
+  CalendarDays,
   Code,
   Eraser,
   Heading1,
@@ -33,12 +34,19 @@ import {
   Heading3,
   Highlighter,
   ImageIcon,
+  IndentDecrease,
+  IndentIncrease,
+  Info,
   Italic,
+  Lightbulb,
   Link2,
   List,
   ListOrdered,
   ListTodo,
+  Maximize2,
+  Minimize2,
   Minus,
+  Pilcrow,
   Quote,
   Redo2,
   RemoveFormatting,
@@ -47,11 +55,18 @@ import {
   Subscript as SubscriptIcon,
   Superscript as SuperscriptIcon,
   TableIcon,
+  TriangleAlert,
   Underline as UnderlineIcon,
   Undo2,
   Unlink,
+  WrapText,
 } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
+import {
+  Callout,
+  FONT_SIZES,
+  FontSize,
+} from "@/features/notes/ui/note-editor-extensions";
 
 const BODY_LIMIT = 16000;
 
@@ -190,6 +205,35 @@ function insertTable(editor: Editor) {
     .run();
 }
 
+function insertToday(editor: Editor) {
+  const stamp = new Intl.DateTimeFormat("sk-SK", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+  editor.chain().focus().insertContent(stamp).run();
+}
+
+function indentList(editor: Editor) {
+  if (editor.can().sinkListItem("listItem")) {
+    editor.chain().focus().sinkListItem("listItem").run();
+    return;
+  }
+  if (editor.can().sinkListItem("taskItem")) {
+    editor.chain().focus().sinkListItem("taskItem").run();
+  }
+}
+
+function outdentList(editor: Editor) {
+  if (editor.can().liftListItem("listItem")) {
+    editor.chain().focus().liftListItem("listItem").run();
+    return;
+  }
+  if (editor.can().liftListItem("taskItem")) {
+    editor.chain().focus().liftListItem("taskItem").run();
+  }
+}
+
 export function RichTextEditor({
   value,
   onChange,
@@ -198,6 +242,8 @@ export function RichTextEditor({
   id,
   className,
 }: Props) {
+  const [fullscreen, setFullscreen] = useState(false);
+
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: true,
@@ -208,11 +254,13 @@ export function RichTextEditor({
         underline: false,
       }),
       TextStyle,
+      FontSize,
       Color,
       Underline,
       Subscript,
       Superscript,
       Typography,
+      Callout,
       Image.configure({
         allowBase64: false,
         HTMLAttributes: { class: "note-image" },
@@ -245,10 +293,8 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         id: id ?? "note-body",
-        class: cn(
-          "note-editor-content min-h-[12rem] max-h-[24rem] overflow-y-auto px-3 py-2.5 text-[14px] leading-relaxed text-ink outline-none",
-          "focus-visible:outline-none",
-        ),
+        class:
+          "note-editor-content min-h-[12rem] px-3 py-2.5 text-[14px] leading-relaxed text-ink outline-none focus-visible:outline-none",
       },
     },
     onUpdate: ({ editor: ed }) => {
@@ -268,6 +314,20 @@ export function RichTextEditor({
     editor.commands.setContent(value || "", { emitUpdate: false });
   }, [value, editor]);
 
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [fullscreen]);
+
   const off = disabled || !editor;
   const htmlLen = value?.length ?? 0;
   const plainLen = useMemo(() => noteBodyPlain(value).length, [value]);
@@ -276,14 +336,23 @@ export function RichTextEditor({
     (editor?.getAttributes("textStyle").color as string | undefined) ?? "";
   const activeHighlight =
     (editor?.getAttributes("highlight").color as string | undefined) ?? "";
+  const activeFontSize =
+    (editor?.getAttributes("textStyle").fontSize as string | undefined) ?? "";
+  const inList =
+    Boolean(editor?.isActive("bulletList")) ||
+    Boolean(editor?.isActive("orderedList")) ||
+    Boolean(editor?.isActive("taskList"));
 
-  return (
+  const shell = (
     <div
       className={cn(
         "overflow-hidden rounded-[4px] border border-border bg-ground transition-colors",
         "focus-within:border-ink focus-within:ring-2 focus-within:ring-ink/15",
-        overLimit && "border-negative focus-within:border-negative focus-within:ring-negative/20",
+        overLimit &&
+          "border-negative focus-within:border-negative focus-within:ring-negative/20",
         disabled && "opacity-60",
+        fullscreen &&
+          "flex h-full max-h-none w-full flex-col rounded-none border-0 focus-within:ring-0",
         className,
       )}
     >
@@ -356,6 +425,53 @@ export function RichTextEditor({
 
         <ToolbarSep />
 
+        {FONT_SIZES.map((size) => (
+          <ToolbarButton
+            key={size.label}
+            label={
+              size.value
+                ? `Veľkosť písma ${size.label}`
+                : "Predvolená veľkosť"
+            }
+            active={
+              size.value
+                ? activeFontSize === size.value
+                : !activeFontSize
+            }
+            disabled={off}
+            onClick={() => {
+              if (!editor) return;
+              if (!size.value) {
+                editor.chain().focus().unsetFontSize().run();
+                return;
+              }
+              editor.chain().focus().setFontSize(size.value).run();
+            }}
+          >
+            <span
+              className={cn(
+                "font-semibold leading-none",
+                size.label === "S" && "text-[9px]",
+                size.label === "A" && "text-[11px]",
+                size.label === "L" && "text-[13px]",
+                size.label === "XL" && "text-[15px]",
+              )}
+            >
+              {size.label}
+            </span>
+          </ToolbarButton>
+        ))}
+
+        <ToolbarSep />
+
+        <ToolbarButton
+          label="Odstavec"
+          active={editor?.isActive("paragraph")}
+          disabled={off}
+          onClick={() => editor?.chain().focus().setParagraph().run()}
+        >
+          <Pilcrow className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
         <ToolbarButton
           label="Nadpis 1"
           active={editor?.isActive("heading", { level: 1 })}
@@ -409,6 +525,46 @@ export function RichTextEditor({
         >
           <Minus className="size-3.5" strokeWidth={2} />
         </ToolbarButton>
+        <ToolbarButton
+          label="Zalomenie riadku"
+          disabled={off}
+          onClick={() => editor?.chain().focus().setHardBreak().run()}
+        >
+          <WrapText className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+
+        <ToolbarSep />
+
+        <ToolbarButton
+          label="Info box"
+          active={editor?.isActive("callout", { variant: "info" })}
+          disabled={off}
+          onClick={() =>
+            editor?.chain().focus().toggleCallout("info").run()
+          }
+        >
+          <Info className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+        <ToolbarButton
+          label="Upozornenie"
+          active={editor?.isActive("callout", { variant: "warn" })}
+          disabled={off}
+          onClick={() =>
+            editor?.chain().focus().toggleCallout("warn").run()
+          }
+        >
+          <TriangleAlert className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+        <ToolbarButton
+          label="Tip"
+          active={editor?.isActive("callout", { variant: "tip" })}
+          disabled={off}
+          onClick={() =>
+            editor?.chain().focus().toggleCallout("tip").run()
+          }
+        >
+          <Lightbulb className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
 
         <ToolbarSep />
 
@@ -437,6 +593,20 @@ export function RichTextEditor({
           <ListTodo className="size-3.5" strokeWidth={2} />
         </ToolbarButton>
         <ToolbarButton
+          label="Zväčšiť odsadenie"
+          disabled={off || !inList}
+          onClick={() => editor && indentList(editor)}
+        >
+          <IndentIncrease className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+        <ToolbarButton
+          label="Zmenšiť odsadenie"
+          disabled={off || !inList}
+          onClick={() => editor && outdentList(editor)}
+        >
+          <IndentDecrease className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+        <ToolbarButton
           label="Tabuľka 3×3"
           active={editor?.isActive("table")}
           disabled={off}
@@ -459,6 +629,27 @@ export function RichTextEditor({
               onClick={() => editor?.chain().focus().addColumnAfter().run()}
             >
               <span className="text-[10px] font-semibold">+S</span>
+            </ToolbarButton>
+            <ToolbarButton
+              label="Zmazať riadok"
+              disabled={off}
+              onClick={() => editor?.chain().focus().deleteRow().run()}
+            >
+              <span className="text-[10px] font-semibold">−R</span>
+            </ToolbarButton>
+            <ToolbarButton
+              label="Zmazať stĺpec"
+              disabled={off}
+              onClick={() => editor?.chain().focus().deleteColumn().run()}
+            >
+              <span className="text-[10px] font-semibold">−S</span>
+            </ToolbarButton>
+            <ToolbarButton
+              label="Hlavičkový riadok"
+              disabled={off}
+              onClick={() => editor?.chain().focus().toggleHeaderRow().run()}
+            >
+              <span className="text-[10px] font-semibold">H</span>
             </ToolbarButton>
             <ToolbarButton
               label="Zmazať tabuľku"
@@ -529,6 +720,13 @@ export function RichTextEditor({
         >
           <ImageIcon className="size-3.5" strokeWidth={2} />
         </ToolbarButton>
+        <ToolbarButton
+          label="Vložiť dnešný dátum"
+          disabled={off}
+          onClick={() => editor && insertToday(editor)}
+        >
+          <CalendarDays className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
 
         <ToolbarSep />
 
@@ -545,6 +743,18 @@ export function RichTextEditor({
           onClick={() => editor?.chain().focus().redo().run()}
         >
           <Redo2 className="size-3.5" strokeWidth={2} />
+        </ToolbarButton>
+        <ToolbarButton
+          label={fullscreen ? "Ukončiť celú obrazovku" : "Celá obrazovka"}
+          disabled={Boolean(disabled)}
+          active={fullscreen}
+          onClick={() => setFullscreen((v) => !v)}
+        >
+          {fullscreen ? (
+            <Minimize2 className="size-3.5" strokeWidth={2} />
+          ) : (
+            <Maximize2 className="size-3.5" strokeWidth={2} />
+          )}
         </ToolbarButton>
       </div>
 
@@ -610,12 +820,21 @@ export function RichTextEditor({
         </div>
       </div>
 
-      <EditorContent editor={editor} />
+      <div
+        className={cn(
+          "overflow-y-auto",
+          fullscreen ? "min-h-0 flex-1" : "max-h-[24rem]",
+        )}
+      >
+        <EditorContent editor={editor} />
+      </div>
 
       <div className="flex items-center justify-between gap-3 border-t border-border bg-raised/20 px-2.5 py-1 text-[11px] tabular-nums text-muted-foreground">
         <span>
           {plainLen} znakov
           {editor?.isActive("table") ? " · tabuľka" : null}
+          {editor?.isActive("callout") ? " · box" : null}
+          {fullscreen ? " · Esc zatvorí" : null}
         </span>
         <span className={cn(overLimit && "font-medium text-negative")}>
           HTML {htmlLen}/{BODY_LIMIT}
@@ -623,6 +842,19 @@ export function RichTextEditor({
       </div>
     </div>
   );
+
+  if (fullscreen) {
+    return (
+      <>
+        <div className="h-[16rem] rounded-[4px] border border-dashed border-border bg-raised/20" aria-hidden />
+        <div className="fixed inset-0 z-50 flex flex-col bg-ground p-3 sm:p-5">
+          {shell}
+        </div>
+      </>
+    );
+  }
+
+  return shell;
 }
 
 /** Plain text from stored HTML/plain body for empty checks and previews. */
@@ -633,6 +865,8 @@ export function noteBodyPlain(html: string | null | undefined) {
     .replace(/<\/p>/gi, "\n")
     .replace(/<\/li>/gi, "\n")
     .replace(/<\/tr>/gi, "\n")
+    .replace(/<aside[^>]*>/gi, "")
+    .replace(/<\/aside>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")

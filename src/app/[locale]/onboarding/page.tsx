@@ -7,7 +7,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Badge } from "@/shared/ui/badge";
 import { Progress } from "@/shared/ui/progress";
 import { Separator } from "@/shared/ui/separator";
-import { Link } from "@/i18n/navigation";
+import { BrandLockup } from "@/shared/brand/brand-lockup";
+import { ServerLink as Link } from "@/i18n/server-link";
 import "./onboarding.css";
 
 export async function generateMetadata() {
@@ -26,8 +27,7 @@ export default async function OnboardingPage() {
       <div className="onboarding-frame">
         <aside className="onboarding-aside">
           <Link href="/" className="onboarding-brand">
-            <span aria-hidden>F</span>
-            Fakturio
+            <BrandLockup markSize="md" markVariant="solid" />
           </Link>
 
           <div className="onboarding-aside-copy">
@@ -91,8 +91,7 @@ export default async function OnboardingPage() {
         <main className="onboarding-main">
           <div className="onboarding-main-mobile-head">
             <Link href="/" className="onboarding-brand">
-              <span aria-hidden>F</span>
-              Fakturio
+              <BrandLockup markSize="md" markVariant="solid" />
             </Link>
             <h1>{t("title")}</h1>
             <p>

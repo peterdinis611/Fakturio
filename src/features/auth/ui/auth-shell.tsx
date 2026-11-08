@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { AuthForm } from "@/features/auth/ui/auth-form";
 import { AuthThemeSlot } from "@/widgets/landing/auth-theme-slot";
 import { LocaleSwitcher } from "@/shared/i18n/ui/locale-switcher";
+import { BrandLockup } from "@/shared/brand/brand-lockup";
 import { Link } from "@/i18n/navigation";
 
 type AuthShellProps = {
@@ -17,15 +18,18 @@ export function AuthShell({ mode }: AuthShellProps) {
     <div className="auth-shell">
       <div className="auth-shell-glow" aria-hidden />
       <div className="auth-shell-tools">
-        <LocaleSwitcher compact />
+        <LocaleSwitcher align="end" />
         <AuthThemeSlot />
       </div>
 
       <div className="auth-panel">
         <aside className="auth-panel-aside">
           <Link href="/" className="auth-shell-brand">
-            <span aria-hidden>F</span>
-            Fakturio
+            <BrandLockup
+              markSize="lg"
+              markVariant="solid"
+              wordmarkClassName="font-[family-name:var(--font-bricolage)] text-[17px]"
+            />
           </Link>
           <div className="auth-panel-copy">
             <p className="auth-panel-eyebrow">
@@ -45,8 +49,11 @@ export function AuthShell({ mode }: AuthShellProps) {
 
         <div className="auth-panel-main">
           <Link href="/" className="auth-shell-brand auth-shell-brand-mobile">
-            <span aria-hidden>F</span>
-            Fakturio
+            <BrandLockup
+              markSize="md"
+              markVariant="solid"
+              wordmarkClassName="font-[family-name:var(--font-bricolage)] text-[16px]"
+            />
           </Link>
           <div className="auth-shell-card">
             <AuthForm mode={mode} />

@@ -33,13 +33,17 @@ export function ScrollToTopButton() {
       aria-label="Nahor"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
-        "fixed right-4 bottom-4 z-40 inline-flex size-10 items-center justify-center rounded-[4px] border border-border bg-surface text-ink shadow-sm transition-all duration-200 hover:bg-raised md:right-6 md:bottom-6",
+        "fixed right-4 bottom-4 z-50 inline-flex size-11 items-center justify-center rounded-[4px]",
+        "border border-ink/20 bg-ink text-ground shadow-[0_8px_24px_rgba(0,0,0,0.28)]",
+        "transition-all duration-200 hover:bg-ink/90 hover:shadow-[0_10px_28px_rgba(0,0,0,0.34)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-2 focus-visible:ring-offset-ground",
+        "md:right-6 md:bottom-6",
         visible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-2 opacity-0",
       )}
     >
-      <ArrowUp className="size-4" strokeWidth={1.75} />
+      <ArrowUp className="size-5" strokeWidth={2.25} aria-hidden />
     </button>
   );
 }

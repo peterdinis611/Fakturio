@@ -316,6 +316,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
             description="Štruktúrovaný náhľad dokladu (Fakturio XML). Nie je oficiálny e-fakturačný formát."
             xml={xml}
             fileName={`${invoice.number}.xml`}
+            triggerVariant="ghost"
           />
         </>
       ) : null}

@@ -175,6 +175,9 @@
     "colCity": "City",
     "colEmail": "Email",
     "colInvoices": "Invoices",
+    "filterName": "Filter name…",
+    "filterIco": "Company ID…",
+    "filterCity": "City…",
     "fuzzyHint": "Fuzzy filtering {count} loaded customers."
   },
   "Documents": {
@@ -212,6 +215,8 @@
     "csvTitle": "Preview — invoices CSV",
     "csvFiltered": "Export filtered by status {status}.",
     "csvAll": "All invoices as CSV (delimiter ;).",
+    "xmlTitle": "Preview — Money S3 XML",
+    "xmlAll": "Issued invoices in Money S3 format (SeznamFaktVyd).",
     "colNumber": "Number",
     "colType": "Type",
     "colCustomer": "Customer",
@@ -219,9 +224,26 @@
     "colIssued": "Issued",
     "colDue": "Due",
     "colAmount": "Amount",
+    "filterCustomer": "Filter customer…",
     "fuzzyHint": "Fuzzy filtering {count} loaded invoices (current filter).",
     "overdueOnlyHint": "Overdue only: mark as paid or send a reminder.",
     "lifecycleHint": "Number and VS are on the detail."
+  },
+  "DataTable": {
+    "columns": "Columns",
+    "toggleColumns": "Toggle columns",
+    "clearFilters": "Clear filters",
+    "rowsPerPage": "Rows",
+    "pageOf": "Page {page} / {pages}",
+    "first": "First page",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last page",
+    "selected": "{count} selected",
+    "selectAll": "Select all on page",
+    "selectRow": "Select row",
+    "showing": "{shown} of {total}",
+    "reset": "Reset"
   },
   "Logs": {
     "title": "Logs",
@@ -1079,10 +1101,12 @@
     "allTime": "All time",
     "applyFilters": "Apply filters",
     "csvPreview": "Preview — invoices CSV",
+    "xmlPreviewTitle": "Preview — Money S3 XML",
     "invoices": "Invoices",
     "accountantPack": "Accountant pack",
     "accountantPackHint": "ZIP: invoice CSV + VAT + Money S3 XML",
     "moneyXml": "Money S3 XML",
+    "moneyXmlHint": "Money S3 SeznamFaktVyd — issued invoices in the period.",
     "invoicesCsvHint": "Documents with VAT regime, VAT IDs and VS — Excel (;).",
     "vatCsvHint": "VAT lines by rate, useful for return checks.",
     "noInvoicesPeriod": "No invoices in this period",
@@ -1470,6 +1494,14 @@
     "generated": "Draft {number} created",
     "generateFailed": "Could not generate",
     "lastInvoice": "Latest"
+  },
+  "XmlViewer": {
+    "open": "Preview XML",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "loading": "Loading XML…",
+    "loadError": "Could not load XML."
   },
   "CsvViewer": {
     "open": "Preview CSV",

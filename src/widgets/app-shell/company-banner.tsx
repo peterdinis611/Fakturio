@@ -4,7 +4,7 @@ import type { CompanyCompleteness } from "@/shared/api/types";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { Link } from "@/i18n/navigation";
+import { ServerLink as Link } from "@/i18n/server-link";
 
 export async function CompanyBanner({
   status,

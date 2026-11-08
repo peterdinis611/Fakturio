@@ -3,6 +3,7 @@
 import { Download, Package } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
+import { XmlPreview } from "@/widgets/preview/xml-preview";
 import { Button } from "@/shared/ui/button";
 import {
   accountantPackHref,
@@ -34,10 +35,18 @@ export function ReportExportLinks({
             {t("accountantPack")}
           </a>
         </Button>
-        <Button asChild variant="secondary" size="sm">
+        <XmlPreview
+          href={moneyHref}
+          title={t("xmlPreviewTitle")}
+          description={t("moneyXmlHint")}
+          fileName="money-s3.xml"
+          triggerLabel={t("moneyXml")}
+          triggerVariant="secondary"
+        />
+        <Button asChild variant="ghost" size="sm">
           <a href={moneyHref} download>
             <Download className="size-3.5" aria-hidden />
-            {t("moneyXml")}
+            XML
           </a>
         </Button>
         <p className="w-full text-[12px] text-muted-foreground sm:ml-1 sm:w-auto">

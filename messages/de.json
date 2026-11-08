@@ -175,6 +175,9 @@
     "colCity": "Stadt",
     "colEmail": "E-Mail",
     "colInvoices": "Rechnungen",
+    "filterName": "Name filtern…",
+    "filterIco": "IČO…",
+    "filterCity": "Stadt…",
     "fuzzyHint": "Unscharfe Filterung von {count} geladenen Kunden."
   },
   "Documents": {
@@ -212,6 +215,8 @@
     "csvTitle": "Vorschau — Rechnungen CSV",
     "csvFiltered": "Export gefiltert nach Status {status}.",
     "csvAll": "Alle Rechnungen als CSV (Trennzeichen ;).",
+    "xmlTitle": "Vorschau — Money S3 XML",
+    "xmlAll": "Ausgestellte Rechnungen im Money-S3-Format (SeznamFaktVyd).",
     "colNumber": "Nummer",
     "colType": "Typ",
     "colCustomer": "Kunde",
@@ -219,9 +224,26 @@
     "colIssued": "Ausgestellt",
     "colDue": "Fällig",
     "colAmount": "Betrag",
+    "filterCustomer": "Kunde filtern…",
     "fuzzyHint": "Unscharfe Filterung von {count} geladenen Rechnungen (aktueller Filter).",
     "overdueOnlyHint": "Nur überfällige: Zahlung vermerken oder Mahnung senden.",
     "lifecycleHint": "Nummer und VS findest du im Detail."
+  },
+  "DataTable": {
+    "columns": "Spalten",
+    "toggleColumns": "Spalten einblenden",
+    "clearFilters": "Filter zurücksetzen",
+    "rowsPerPage": "Zeilen",
+    "pageOf": "Seite {page} / {pages}",
+    "first": "Erste Seite",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "last": "Letzte Seite",
+    "selected": "{count} ausgewählt",
+    "selectAll": "Alles auf der Seite auswählen",
+    "selectRow": "Zeile auswählen",
+    "showing": "{shown} von {total}",
+    "reset": "Zurücksetzen"
   },
   "Logs": {
     "title": "Protokolle",
@@ -1079,10 +1101,12 @@
     "allTime": "Gesamter Zeitraum",
     "applyFilters": "Filter anwenden",
     "csvPreview": "Vorschau — Rechnungen CSV",
+    "xmlPreviewTitle": "Vorschau — Money S3 XML",
     "invoices": "Rechnungen",
     "accountantPack": "Paket für die Buchhaltung",
     "accountantPackHint": "ZIP: Rechnungs-CSV + USt. + Money S3 XML",
     "moneyXml": "Money S3 XML",
+    "moneyXmlHint": "Money S3 SeznamFaktVyd — ausgestellte Rechnungen im Zeitraum.",
     "invoicesCsvHint": "Belege mit USt.-Regime, USt-IdNr. und VS — Excel (;).",
     "vatCsvHint": "USt.-Zeilen nach Steuersätzen, geeignet zur Prüfung der Steuererklärung.",
     "noInvoicesPeriod": "Keine Rechnungen im Zeitraum",
@@ -1470,6 +1494,14 @@
     "generated": "Entwurf {number} erstellt",
     "generateFailed": "Erzeugen fehlgeschlagen",
     "lastInvoice": "Zuletzt"
+  },
+  "XmlViewer": {
+    "open": "XML-Vorschau",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "download": "Herunterladen",
+    "loading": "XML wird geladen…",
+    "loadError": "XML konnte nicht geladen werden."
   },
   "CsvViewer": {
     "open": "CSV-Vorschau",

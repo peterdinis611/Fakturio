@@ -25,6 +25,8 @@ import { useTranslations } from "next-intl";
 import { NotificationBell } from "@/features/notifications/ui/notification-bell";
 import { NavLink } from "@/widgets/app-shell/nav-link";
 import { SidebarAccount } from "@/widgets/app-shell/sidebar-account";
+import { BrandLockup } from "@/shared/brand/brand-lockup";
+import { LocaleSwitcher } from "@/shared/i18n/ui/locale-switcher";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/utils";
 
@@ -114,21 +116,17 @@ function BrandHeader({
           href="/dashboard"
           className="min-w-0 flex-1 rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-ink/25"
         >
-          <div className="flex items-center gap-2.5">
-            <span className="stamp" aria-hidden>
-              F
-            </span>
-            <span className="text-[16px] font-semibold tracking-tight text-ink">
-              Fakturio
-            </span>
-          </div>
+          <BrandLockup markSize="md" markVariant="solid" />
           {companyName ? (
-            <p className="mt-1.5 truncate pl-[1.875rem] text-[11px] leading-snug text-muted-foreground">
+            <p className="mt-1.5 truncate pl-[1.95rem] text-[11px] leading-snug text-muted-foreground">
               {companyName}
             </p>
           ) : null}
         </Link>
-        {showBell ? <NotificationBell className="mt-0.5" /> : null}
+        <div className="mt-0.5 flex shrink-0 items-center gap-1">
+          <LocaleSwitcher align="end" side="bottom" />
+          {showBell ? <NotificationBell /> : null}
+        </div>
       </div>
     </div>
   );
@@ -152,12 +150,14 @@ export function AppSidebar({
     <>
       <div className="sticky top-0 z-40 flex h-12 items-center justify-between gap-2 border-b border-sidebar-border bg-sidebar px-3 md:hidden">
         <Link href="/dashboard" className="flex min-w-0 items-center gap-2 text-ink">
-          <span className="stamp" aria-hidden>
-            F
-          </span>
-          <span className="truncate text-[15px] font-semibold">Fakturio</span>
+          <BrandLockup
+            markSize="sm"
+            markVariant="solid"
+            wordmarkClassName="truncate text-[15px]"
+          />
         </Link>
         <div className="flex shrink-0 items-center gap-1.5">
+          <LocaleSwitcher align="end" side="bottom" />
           <NotificationBell />
           <button
             type="button"

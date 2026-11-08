@@ -14,6 +14,7 @@ import {
 import { InvoicesFuzzyTable } from "@/features/invoices/ui/invoices-fuzzy-table";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
+import { XmlPreview } from "@/widgets/preview/xml-preview";
 import { Button } from "@/shared/ui/button";
 import { SectionLoader } from "@/shared/ui/spinner";
 import type {
@@ -24,7 +25,7 @@ import type {
   InvoiceStatus,
   PagedResponse,
 } from "@/shared/api/types";
-import { invoicesExportHref } from "@/shared/lib/exports";
+import { invoicesExportHref, moneyS3ExportHref } from "@/shared/lib/exports";
 
 /** Client fuzzy search window — keep payload small for faster RSC. */
 const CATALOG_SIZE = 100;
@@ -132,6 +133,12 @@ async function DocumentsCatalogBody({ flow, searchParams, dataPromise }: Props) 
                     description={
                       status ? t("csvFiltered", { status }) : t("csvAll")
                     }
+                  />
+                  <XmlPreview
+                    href={moneyS3ExportHref()}
+                    title={t("xmlTitle")}
+                    description={t("xmlAll")}
+                    fileName="money-s3.xml"
                   />
                   <Button asChild variant="ghost" size="sm">
                     <a href={invoicesExportHref({ status })} download>

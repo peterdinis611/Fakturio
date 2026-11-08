@@ -175,6 +175,9 @@
     "colCity": "Mesto",
     "colEmail": "Email",
     "colInvoices": "Faktúry",
+    "filterName": "Filtrovať názov…",
+    "filterIco": "IČO…",
+    "filterCity": "Mesto…",
     "fuzzyHint": "Fuzzy filtruje načítaných {count} zákazníkov."
   },
   "Documents": {
@@ -212,6 +215,8 @@
     "csvTitle": "Náhľad — faktúry CSV",
     "csvFiltered": "Export filtrovaný podľa stavu {status}.",
     "csvAll": "Všetky faktúry v CSV (oddeľovač ;).",
+    "xmlTitle": "Náhľad — Money S3 XML",
+    "xmlAll": "Vystavené faktúry vo formáte Money S3 (SeznamFaktVyd).",
     "colNumber": "Číslo",
     "colType": "Typ",
     "colCustomer": "Zákazník",
@@ -219,9 +224,26 @@
     "colIssued": "Vystavené",
     "colDue": "Splatnosť",
     "colAmount": "Suma",
+    "filterCustomer": "Filtrovať zákazníka…",
     "fuzzyHint": "Fuzzy filtruje načítaných {count} faktúr (aktuálny filter).",
     "overdueOnlyHint": "Len po splatnosti: označiť úhradu alebo poslať upomienku.",
     "lifecycleHint": "Číslo a VS sú v detaile."
+  },
+  "DataTable": {
+    "columns": "Stĺpce",
+    "toggleColumns": "Zobraziť stĺpce",
+    "clearFilters": "Zrušiť filtre",
+    "rowsPerPage": "Riadkov",
+    "pageOf": "Strana {page} / {pages}",
+    "first": "Prvá strana",
+    "previous": "Predchádzajúca",
+    "next": "Ďalšia",
+    "last": "Posledná strana",
+    "selected": "{count} vybraných",
+    "selectAll": "Vybrať všetko na stránke",
+    "selectRow": "Vybrať riadok",
+    "showing": "{shown} z {total}",
+    "reset": "Reset"
   },
   "Logs": {
     "title": "Logy",
@@ -1079,10 +1101,12 @@
     "allTime": "Celé obdobie",
     "applyFilters": "Použiť filtre",
     "csvPreview": "Náhľad — faktúry CSV",
+    "xmlPreviewTitle": "Náhľad — Money S3 XML",
     "invoices": "Faktúry",
     "accountantPack": "Balík pre účtovníka",
     "accountantPackHint": "ZIP: CSV faktúry + DPH + Money S3 XML",
     "moneyXml": "Money S3 XML",
+    "moneyXmlHint": "Money S3 SeznamFaktVyd — vystavené faktúry v období.",
     "invoicesCsvHint": "Doklady s režimom DPH, IČ DPH a VS — Excel (;).",
     "vatCsvHint": "Riadky DPH podľa sadzieb, vhodné na kontrolu priznania.",
     "noInvoicesPeriod": "Žiadne faktúry v období",
@@ -1470,6 +1494,14 @@
     "generated": "Vytvorený koncept {number}",
     "generateFailed": "Generovanie zlyhalo",
     "lastInvoice": "Posledná"
+  },
+  "XmlViewer": {
+    "open": "Náhľad XML",
+    "copy": "Kopírovať",
+    "copied": "Skopírované",
+    "download": "Stiahnuť",
+    "loading": "Načítavam XML…",
+    "loadError": "XML sa nepodarilo načítať."
   },
   "CsvViewer": {
     "open": "Náhľad CSV",
