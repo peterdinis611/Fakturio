@@ -15,12 +15,14 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 import { intlLocale } from "@/i18n/locales";
 import type { AppLocale } from "@/i18n/routing";
 
 export function TopCustomersChart({
   currency,
   customers,
+  className,
 }: {
   currency: string;
   customers: {
@@ -29,6 +31,7 @@ export function TopCustomersChart({
     totalAmount: number;
     shareOfRevenuePercent: number;
   }[];
+  className?: string;
 }) {
   const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
@@ -54,14 +57,22 @@ export function TopCustomersChart({
 
   if (data.length === 0) {
     return (
-      <div className="flex h-[240px] items-center justify-center text-[14px] text-muted-foreground">
+      <div
+        className={cn(
+          "flex h-[240px] items-center justify-center text-[14px] text-muted-foreground",
+          className,
+        )}
+      >
         {t("noInvoicesPeriod")}
       </div>
     );
   }
 
   return (
-    <ChartContainer config={config} className="aspect-auto h-[260px] w-full">
+    <ChartContainer
+      config={config}
+      className={cn("aspect-auto h-[260px] w-full", className)}
+    >
       <BarChart
         accessibilityLayer
         data={data}

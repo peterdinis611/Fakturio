@@ -16,6 +16,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 import { intlLocale } from "@/i18n/locales";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -30,9 +31,11 @@ const bucketFill: Record<string, string> = {
 export function AgingChart({
   currency,
   buckets,
+  className,
 }: {
   currency: string;
   buckets: { key: string; label: string; amount: number; count: number }[];
+  className?: string;
 }) {
   const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
@@ -54,7 +57,10 @@ export function AgingChart({
   }));
 
   return (
-    <ChartContainer config={config} className="aspect-auto h-[240px] w-full">
+    <ChartContainer
+      config={config}
+      className={cn("aspect-auto h-[240px] w-full", className)}
+    >
       <BarChart
         accessibilityLayer
         data={data}

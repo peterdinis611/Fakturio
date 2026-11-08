@@ -24,6 +24,9 @@ Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
 | [RegisterUZ / RÚZ](https://registeruz.sk/cruz-public/home/api) | SK účtovné jednotky + závierky | ✅ REST + tlačidlo (SK) |
 | SK/CZ kalendár (lokálne) | Pracovný deň / sviatky | ✅ tlačidlo pri splatnosti |
 | Pay by Square (lokálne) | QR platba na PDF | ✅ bez remote API |
+| [RPVS](https://rpvs.gov.sk/opendatav2/swagger) | SK partneri verejného sektora + KUV | ✅ tlačidlo (SK) |
+| [Registr smluv](https://smlouvy.gov.cz/) | CZ verejné zmluvy podľa IČO | ✅ tlačidlo (CZ) |
+| [GLEIF LEI](https://www.gleif.org/en/lei-data/gleif-api/) | Globálny LEI podľa IČO / LEI kódu | ✅ tlačidlo |
 
 ## Neskôr (vyžadujú kľúč / token — mimo scope)
 
@@ -53,6 +56,10 @@ Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
 - `GET /api/integrations/ares-vr/{ico}` — ARES VR statutári
 - `GET /api/integrations/postal?code=&country=SK[&city=]` — PSČ validácia SK/CZ
 - `GET /api/integrations/business-day?from=&addDays=&country=SK` — pracovný deň
+- `GET /api/integrations/rpvs?ico=` — RPVS zápis + koneční užívatelia výhod
+- `GET /api/integrations/registr-smluv?ico=` — počet + posledné CZ zmluvy
+- `GET /api/integrations/lei?ico=&jurisdiction=SK|CZ` — GLEIF LEI podľa IČO
+- `GET /api/integrations/lei/{lei}` — GLEIF LEI podľa kódu
 
 ## Poznámky
 
@@ -60,4 +67,5 @@ Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
 - Nominatim: max ~1 req/s, User-Agent povinný, výsledok v pamäťovej cache.
 - FX priorita: ČNB (CZK) → NBS (EUR base) → Frankfurter fill-in.
 - ADISREG / ISIR: SOAP cez named HttpClient, soft-fail pri odstávke.
-- Licencie: ORSF CC-BY 4.0, RPO/ARES = podmienky MV/ČR, ECB/ČNB/NBS kurzy voľné, OSM ODbL, RÚZ / ADISREG / ISIR = oficiálne open služby štátu.
+- Licencie: ORSF CC-BY 4.0, RPO/ARES = podmienky MV/ČR, ECB/ČNB/NBS kurzy voľné, OSM ODbL, RÚZ / ADISREG / ISIR / RPVS / Registr smluv = oficiálne open služby štátu, GLEIF LEI voľné na použitie.
+- Registr smluv nemá verejné JSON API — parsuje sa verejný HTML výsledok (`party_idnum`), soft-fail pri zmene layoutu.

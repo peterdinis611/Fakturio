@@ -11,6 +11,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 
 const palette = [
@@ -24,9 +25,13 @@ const palette = [
 export function VatChart({
   currency,
   rows,
+  className,
+  size = "regular",
 }: {
   currency: string;
   rows: { vatRate: number; vatAmount: number; taxBase: number }[];
+  className?: string;
+  size?: "compact" | "regular" | "large";
 }) {
   const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
@@ -48,16 +53,30 @@ export function VatChart({
     fill: palette[i % palette.length],
   }));
 
+  const height =
+    size === "compact" ? "h-[180px]" : size === "large" ? "h-[380px]" : "h-[220px]";
+  const innerRadius = size === "compact" ? 34 : size === "large" ? 78 : 52;
+  const outerRadius = size === "compact" ? 54 : size === "large" ? 118 : 78;
+
   if (data.length === 0 || data.every((d) => d.vat === 0 && d.taxBase === 0)) {
     return (
-      <div className="flex h-[220px] items-center justify-center text-[14px] text-muted-foreground">
+      <div
+        className={cn(
+          "flex items-center justify-center text-[14px] text-muted-foreground",
+          height,
+          className,
+        )}
+      >
         {t("noVatData")}
       </div>
     );
   }
 
   return (
-    <ChartContainer config={config} className="aspect-auto mx-auto h-[220px] w-full">
+    <ChartContainer
+      config={config}
+      className={cn("aspect-auto mx-auto w-full", height, className)}
+    >
       <PieChart>
         <ChartTooltip
           content={
@@ -88,8 +107,8 @@ export function VatChart({
           data={data}
           dataKey="vat"
           nameKey="key"
-          innerRadius={52}
-          outerRadius={78}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
           strokeWidth={2}
           stroke="var(--surface)"
         >
@@ -97,7 +116,9 @@ export function VatChart({
             <Cell key={entry.key} fill={entry.fill} />
           ))}
         </Pie>
-        <ChartLegend content={<ChartLegendContent nameKey="key" />} />
+        {size === "compact" ? null : (
+          <ChartLegend content={<ChartLegendContent nameKey="key" />} />
+        )}
       </PieChart>
     </ChartContainer>
   );

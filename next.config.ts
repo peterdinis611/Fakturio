@@ -8,6 +8,7 @@ const apiBase =
   process.env.API_BASE_URL?.replace(/\/$/, "") || "http://localhost:5148";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {
     root: path.join(__dirname),
     rules: {

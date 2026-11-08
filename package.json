@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:all": "concurrently -k -n api,web -c blue,green \"dotnet watch run --project ../backend/Fakturio.Api.csproj\" \"npm run dev\"",
     "dev:api": "dotnet watch run --project ../backend/Fakturio.Api.csproj",
+    "dev:redis": "docker compose -f ../docker-compose.dev.yml up -d",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

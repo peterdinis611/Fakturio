@@ -11,10 +11,13 @@ import type {
   FsVatPayer,
   IbanLookup,
   IsirStatus,
+  LeiLookup,
   OrsrCompanySummary,
   PostalValidate,
   RegisterUzStatements,
   RegisterUzUnit,
+  RegistrSmluvStatus,
+  RpvsStatus,
 } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
@@ -272,5 +275,76 @@ export const businessDayAction = actionClient
         throw new ActionError(error.message || "Výpočet pracovného dňa zlyhal.");
       }
       throw new ActionError("Výpočet pracovného dňa zlyhal.");
+    }
+  });
+
+export const lookupRpvsAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<RpvsStatus>("/api/integrations/rpvs", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "RPVS lookup zlyhal.");
+      throw new ActionError("RPVS lookup zlyhal.");
+    }
+  });
+
+export const lookupRegistrSmluvAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<RegistrSmluvStatus>("/api/integrations/registr-smluv", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) {
+        throw new ActionError(error.message || "Registr smluv lookup zlyhal.");
+      }
+      throw new ActionError("Registr smluv lookup zlyhal.");
+    }
+  });
+
+export const lookupLeiAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+      jurisdiction: z.string().trim().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<LeiLookup>("/api/integrations/lei", {
+        searchParams: {
+          ico: parsedInput.ico,
+          ...(parsedInput.jurisdiction
+            ? { jurisdiction: parsedInput.jurisdiction.toUpperCase() }
+            : {}),
+        },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "LEI lookup zlyhal.");
+      throw new ActionError("LEI lookup zlyhal.");
     }
   });

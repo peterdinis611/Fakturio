@@ -1,12 +1,16 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import type {
+  AgingReport,
   InvoiceListItem,
   InvoiceReminder,
   MonthlyRevenue,
   ReportOverview,
+  TopCustomersReport,
+  VatReport,
 } from "@/shared/api/types";
 import { MotionItem } from "@/shared/ui/motion/page-motion";
 import { CashflowTrend } from "@/widgets/dashboard/cashflow-trend";
+import { DashboardCharts } from "@/widgets/dashboard/dashboard-charts";
 import { LedgerLead } from "@/widgets/dashboard/ledger-lead";
 import { OverdueAlert } from "@/widgets/dashboard/overdue-alert";
 import { RecentInvoices } from "@/widgets/dashboard/recent-invoices";
@@ -24,6 +28,9 @@ type Props = {
   drafts: InvoiceListItem[];
   recent: InvoiceListItem[];
   monthly: MonthlyRevenue;
+  aging: AgingReport;
+  topCustomers: TopCustomersReport;
+  vat: VatReport;
   /** Show the Widgety section label (empty ledger onboarding). */
   showSectionLabel?: boolean;
 };
@@ -35,6 +42,9 @@ export async function DashboardSections({
   drafts,
   recent,
   monthly,
+  aging,
+  topCustomers,
+  vat,
   showSectionLabel = false,
 }: Props) {
   const t = await getTranslations("Dashboard");
@@ -94,6 +104,15 @@ export async function DashboardSections({
           </div>
         </MotionItem>
       </div>
+
+      <MotionItem>
+        <DashboardCharts
+          overview={overview}
+          aging={aging}
+          topCustomers={topCustomers}
+          vat={vat}
+        />
+      </MotionItem>
 
       <div className="grid gap-10 lg:grid-cols-2">
         <MotionItem>

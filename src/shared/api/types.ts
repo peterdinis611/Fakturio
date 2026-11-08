@@ -709,6 +709,74 @@ export type BusinessDay = {
   source: string;
 };
 
+export type RpvsOwner = {
+  name: string;
+  isPublicOfficial: boolean;
+  validFrom: string | null;
+  validTo: string | null;
+};
+
+export type RpvsRegistration = {
+  id: number;
+  name: string | null;
+  validFrom: string | null;
+  validTo: string | null;
+  isActive: boolean;
+  partnerId: number | null;
+  fileNumber: number | null;
+};
+
+export type RpvsStatus = {
+  ico: string;
+  isRegistered: boolean;
+  name: string | null;
+  partnerId: number | null;
+  fileNumber: number | null;
+  portalUrl: string | null;
+  registrations: RpvsRegistration[];
+  beneficialOwners: RpvsOwner[];
+  source: string;
+};
+
+export type RegistrSmluvContract = {
+  subjectName: string | null;
+  description: string | null;
+  publishedAt: string | null;
+  value: string | null;
+  partyName: string | null;
+  detailUrl: string | null;
+};
+
+export type RegistrSmluvStatus = {
+  ico: string;
+  found: boolean;
+  totalCount: number;
+  portalUrl: string;
+  recent: RegistrSmluvContract[];
+  source: string;
+};
+
+export type LeiRecord = {
+  lei: string;
+  legalName: string | null;
+  jurisdiction: string | null;
+  registeredAs: string | null;
+  entityStatus: string | null;
+  registrationStatus: string | null;
+  nextRenewalDate: string | null;
+  city: string | null;
+  country: string | null;
+  detailUrl: string | null;
+};
+
+export type LeiLookup = {
+  query: string;
+  found: boolean;
+  count: number;
+  records: LeiRecord[];
+  source: string;
+};
+
 export type OverdueJobSettings = {
   enabled: boolean;
   runAtHourUtc: number;

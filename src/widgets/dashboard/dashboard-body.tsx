@@ -3,8 +3,11 @@ import { getCompanySummary } from "@/features/company/api/company";
 import { InvoiceReadyLink } from "@/features/company/ui/invoice-ready-link";
 import { getReminders, listInvoices } from "@/features/invoices/api/invoices";
 import {
+  getAgingReport,
   getMonthlyRevenue,
   getReportOverview,
+  getTopCustomers,
+  getVatReport,
 } from "@/features/reports/api/reports";
 import { DashboardEmpty } from "@/widgets/dashboard/dashboard-empty";
 import { DashboardSections } from "@/widgets/dashboard/dashboard-sections";
@@ -23,14 +26,32 @@ export function loadDashboard(year = new Date().getFullYear()) {
     getMonthlyRevenue(year),
     listInvoices({ page: 1, pageSize: 5, status: "Draft" }),
     getCompanySummary().catch(() => null),
-  ]).then(([overview, recent, reminders, monthly, draftsPage, company]) => ({
-    overview,
-    recent,
-    reminders,
-    monthly,
-    drafts: draftsPage.items,
-    company,
-  }));
+    getAgingReport(8),
+    getTopCustomers({ limit: 8 }),
+    getVatReport(),
+  ]).then(
+    ([
+      overview,
+      recent,
+      reminders,
+      monthly,
+      draftsPage,
+      company,
+      aging,
+      topCustomers,
+      vat,
+    ]) => ({
+      overview,
+      recent,
+      reminders,
+      monthly,
+      drafts: draftsPage.items,
+      company,
+      aging,
+      topCustomers,
+      vat,
+    }),
+  );
 }
 
 export async function DashboardBody({
@@ -40,7 +61,7 @@ export async function DashboardBody({
 }) {
   const t = await getTranslations("Dashboard");
   const locale = (await getLocale()) as AppLocale;
-  const { overview, recent, reminders, monthly, drafts, company } =
+  const { overview, recent, reminders, monthly, drafts, company, aging, topCustomers, vat } =
     await dataPromise;
 
   const isEmpty = overview.totalInvoices === 0;
@@ -87,6 +108,9 @@ export async function DashboardBody({
         drafts={drafts}
         recent={recent.items}
         monthly={monthly}
+        aging={aging}
+        topCustomers={topCustomers}
+        vat={vat}
         showSectionLabel={isEmpty}
       />
     </>

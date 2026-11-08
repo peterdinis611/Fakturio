@@ -12,6 +12,7 @@ import {
 } from "@/shared/ui/chart";
 import type { InvoiceStatus } from "@/shared/api/types";
 import { formatMoney, statusLabelFor } from "@/shared/lib/format";
+import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 
 const statusColor: Record<InvoiceStatus, string> = {
@@ -25,9 +26,13 @@ const statusColor: Record<InvoiceStatus, string> = {
 export function StatusChart({
   currency,
   rows,
+  className,
+  size = "regular",
 }: {
   currency: string;
   rows: { status: InvoiceStatus; count: number; amount: number }[];
+  className?: string;
+  size?: "compact" | "regular" | "large";
 }) {
   const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
@@ -50,16 +55,30 @@ export function StatusChart({
       fill: statusColor[r.status],
     }));
 
+  const height =
+    size === "compact" ? "h-[180px]" : size === "large" ? "h-[380px]" : "h-[220px]";
+  const innerRadius = size === "compact" ? 34 : size === "large" ? 78 : 52;
+  const outerRadius = size === "compact" ? 54 : size === "large" ? 118 : 78;
+
   if (data.length === 0) {
     return (
-      <div className="flex h-[220px] items-center justify-center text-[14px] text-muted-foreground">
+      <div
+        className={cn(
+          "flex items-center justify-center text-[14px] text-muted-foreground",
+          height,
+          className,
+        )}
+      >
         {t("noInvoicesPeriod")}
       </div>
     );
   }
 
   return (
-    <ChartContainer config={config} className="aspect-auto mx-auto h-[220px] w-full">
+    <ChartContainer
+      config={config}
+      className={cn("aspect-auto mx-auto w-full", height, className)}
+    >
       <PieChart>
         <ChartTooltip
           content={
@@ -88,8 +107,8 @@ export function StatusChart({
           data={data}
           dataKey="amount"
           nameKey="status"
-          innerRadius={52}
-          outerRadius={78}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
           strokeWidth={2}
           stroke="var(--surface)"
         >
@@ -97,7 +116,9 @@ export function StatusChart({
             <Cell key={entry.status} fill={entry.fill} />
           ))}
         </Pie>
-        <ChartLegend content={<ChartLegendContent nameKey="status" />} />
+        {size === "compact" ? null : (
+          <ChartLegend content={<ChartLegendContent nameKey="status" />} />
+        )}
       </PieChart>
     </ChartContainer>
   );

@@ -17,9 +17,12 @@ import { AdisregButton } from "@/features/integrations/ui/adisreg-button";
 import { AresVrButton } from "@/features/integrations/ui/ares-vr-button";
 import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
 import { IsirButton } from "@/features/integrations/ui/isir-button";
+import { LeiButton } from "@/features/integrations/ui/lei-button";
 import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
 import { PostalValidateButton } from "@/features/integrations/ui/postal-validate-button";
+import { RegistrSmluvButton } from "@/features/integrations/ui/registr-smluv-button";
 import { RegisterUzButton } from "@/features/integrations/ui/register-uz-button";
+import { RpvsButton } from "@/features/integrations/ui/rpvs-button";
 import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -256,23 +259,28 @@ export function CustomerForm({
           <FieldError message={errors.icDph?.message} />
           <div className="flex flex-wrap gap-2 pt-1">
             <OrsrLookupButton ico={ico} />
+            <LeiButton ico={ico} country={country} />
             {(country ?? "").toUpperCase() === "SK" ? (
-              <RegisterUzButton
-                ico={ico}
-                onFound={(data) => {
-                  const opts = { shouldDirty: true, shouldValidate: true } as const;
-                  if (data.name) setValue("name", data.name, opts);
-                  if (data.dic) setValue("dic", data.dic, opts);
-                  if (data.street) setValue("street", data.street, opts);
-                  if (data.city) setValue("city", data.city, opts);
-                  if (data.postalCode) setValue("postalCode", data.postalCode, opts);
-                }}
-              />
+              <>
+                <RegisterUzButton
+                  ico={ico}
+                  onFound={(data) => {
+                    const opts = { shouldDirty: true, shouldValidate: true } as const;
+                    if (data.name) setValue("name", data.name, opts);
+                    if (data.dic) setValue("dic", data.dic, opts);
+                    if (data.street) setValue("street", data.street, opts);
+                    if (data.city) setValue("city", data.city, opts);
+                    if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                  }}
+                />
+                <RpvsButton ico={ico} />
+              </>
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
               <>
                 <IsirButton ico={ico} />
                 <AresVrButton ico={ico} />
+                <RegistrSmluvButton ico={ico} />
               </>
             ) : null}
           </div>
