@@ -582,6 +582,65 @@ export type OrsrCompanySummary = {
   source: string;
 };
 
+export type AdisregAccount = {
+  account: string;
+  bankCode: string | null;
+  publishedAt: string | null;
+  isStandard: boolean;
+};
+
+export type AdisregStatus = {
+  dic: string;
+  status: string;
+  isUnreliable: boolean;
+  found: boolean;
+  taxOfficeCode: string | null;
+  unreliablePublishedAt: string | null;
+  accounts: AdisregAccount[];
+  source: string;
+};
+
+export type IsirProceeding = {
+  name: string | null;
+  courtFile: string | null;
+  state: string | null;
+  city: string | null;
+  detailUrl: string | null;
+};
+
+export type IsirStatus = {
+  ico: string;
+  hasProceedings: boolean;
+  count: number;
+  proceedings: IsirProceeding[];
+  source: string;
+};
+
+export type RegisterUzUnit = {
+  ico: string;
+  dic: string | null;
+  name: string;
+  street: string | null;
+  city: string | null;
+  postalCode: string | null;
+  foundedAt: string | null;
+  cancelledAt: string | null;
+  statementsCount: number;
+  annualReportsCount: number;
+  source: string;
+};
+
+export type PostalValidate = {
+  isValid: boolean;
+  code: string;
+  country: string;
+  exists: boolean;
+  city: string | null;
+  displayName: string | null;
+  normalizedCode: string | null;
+  source: string;
+};
+
 export type OverdueJobSettings = {
   enabled: boolean;
   runAtHourUtc: number;

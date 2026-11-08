@@ -9,9 +9,13 @@ import { updateCompanyAction } from "@/features/company/api/company";
 import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
+import { AdisregButton } from "@/features/integrations/ui/adisreg-button";
 import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
 import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
+import { IsirButton } from "@/features/integrations/ui/isir-button";
 import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
+import { PostalValidateButton } from "@/features/integrations/ui/postal-validate-button";
+import { RegisterUzButton } from "@/features/integrations/ui/register-uz-button";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -206,10 +210,12 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   const isVatPayer = watch("isVatPayer");
   const country = watch("country");
   const ico = watch("ico");
+  const dic = watch("dic");
   const icDph = watch("icDph");
   const bankIban = watch("bankIban");
   const street = watch("street");
   const city = watch("city");
+  const postalCode = watch("postalCode");
 
   const applyRegistry = useCallback(
     (data: RegistryCompany) => {
@@ -347,6 +353,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           />
           <FieldError message={errors.dic?.message} />
           <p className="text-[11px] text-muted-foreground">{t("optional")}</p>
+          {(country ?? "").toUpperCase() === "CZ" ? (
+            <div className="pt-1">
+              <AdisregButton dic={dic || ico} />
+            </div>
+          ) : null}
         </Field>
         <Field>
           <Label htmlFor="icDph">
@@ -374,8 +385,23 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <p className="text-[11px] text-muted-foreground">
             {isVatPayer ? t("vatRequired") : t("vatOptional")}
           </p>
-          <div className="pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             <OrsrLookupButton ico={ico} />
+            {(country ?? "").toUpperCase() === "SK" ? (
+              <RegisterUzButton
+                ico={ico}
+                onFound={(data) => {
+                  const opts = { shouldDirty: true, shouldValidate: true } as const;
+                  if (data.dic) setValue("dic", data.dic, opts);
+                  if (data.street) setValue("street", data.street, opts);
+                  if (data.city) setValue("city", data.city, opts);
+                  if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                }}
+              />
+            ) : null}
+            {(country ?? "").toUpperCase() === "CZ" ? (
+              <IsirButton ico={ico} />
+            ) : null}
           </div>
         </Field>
         <Field className="sm:col-span-2">
@@ -485,9 +511,21 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
           <FieldError message={errors.city?.message} />
         </Field>
         <Field>
-          <Label htmlFor="postalCode">
-            {t("postalCode")} <RequiredMark />
-          </Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="postalCode">
+              {t("postalCode")} <RequiredMark />
+            </Label>
+            <PostalValidateButton
+              code={postalCode}
+              country={country}
+              city={city}
+              onValidated={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                if (data.city) setValue("city", data.city, opts);
+              }}
+            />
+          </div>
           <Input
             id="postalCode"
             className="data-num"

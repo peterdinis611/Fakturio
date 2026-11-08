@@ -5,9 +5,13 @@ import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
 import type {
   AddressNormalize,
+  AdisregStatus,
   FsVatPayer,
   IbanLookup,
+  IsirStatus,
   OrsrCompanySummary,
+  PostalValidate,
+  RegisterUzUnit,
 } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
@@ -94,5 +98,99 @@ export const lookupOrsrAction = actionClient
     } catch (error) {
       if (isApiError(error)) throw new ActionError(error.message || "ORSR lookup zlyhal.");
       throw new ActionError("ORSR lookup zlyhal.");
+    }
+  });
+
+export const lookupAdisregAction = actionClient
+  .inputSchema(
+    z.object({
+      dic: z
+        .string()
+        .trim()
+        .min(8, "Zadaj DIČ")
+        .transform((v) => v.replace(/^CZ/i, "").replace(/\D/g, ""))
+        .refine((v) => /^\d{8,10}$/.test(v), { message: "Neplatné DIČ (8–10 číslic)" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<AdisregStatus>(
+        `/api/integrations/adisreg/${parsedInput.dic}`,
+        { cache: "no-store" },
+      );
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "ADISREG lookup zlyhal.");
+      throw new ActionError("ADISREG lookup zlyhal.");
+    }
+  });
+
+export const lookupIsirAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<IsirStatus>("/api/integrations/isir", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "ISIR lookup zlyhal.");
+      throw new ActionError("ISIR lookup zlyhal.");
+    }
+  });
+
+export const lookupRegisterUzAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<RegisterUzUnit>("/api/integrations/register-uz", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "RegisterUZ lookup zlyhal.");
+      throw new ActionError("RegisterUZ lookup zlyhal.");
+    }
+  });
+
+export const validatePostalAction = actionClient
+  .inputSchema(
+    z.object({
+      code: z
+        .string()
+        .trim()
+        .min(5, "Zadaj PSČ")
+        .transform((v) => v.replace(/\D/g, ""))
+        .refine((v) => /^\d{5}$/.test(v), { message: "PSČ musí mať 5 číslic" }),
+      country: z.string().trim().optional().default("SK"),
+      city: z.string().trim().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<PostalValidate>("/api/integrations/postal", {
+        searchParams: {
+          code: parsedInput.code,
+          country: parsedInput.country,
+          ...(parsedInput.city ? { city: parsedInput.city } : {}),
+        },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "PSČ validácia zlyhala.");
+      throw new ActionError("PSČ validácia zlyhala.");
     }
   });

@@ -13,8 +13,12 @@ import {
 } from "@/features/customers/api/customers";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
+import { AdisregButton } from "@/features/integrations/ui/adisreg-button";
 import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
+import { IsirButton } from "@/features/integrations/ui/isir-button";
 import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
+import { PostalValidateButton } from "@/features/integrations/ui/postal-validate-button";
+import { RegisterUzButton } from "@/features/integrations/ui/register-uz-button";
 import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -95,10 +99,12 @@ export function CustomerForm({
 
   const country = watch("country");
   const ico = watch("ico");
+  const dic = watch("dic");
   const icDph = watch("icDph");
   const name = watch("name");
   const street = watch("street");
   const city = watch("city");
+  const postalCode = watch("postalCode");
   const tr = useTranslations("Registry");
 
   const applyRegistry = useCallback(
@@ -222,6 +228,11 @@ export function CustomerForm({
           <Label htmlFor="customer-dic">DIČ</Label>
           <Input id="customer-dic" className="data-num" {...register("dic")} />
           <FieldError message={errors.dic?.message} />
+          {(country ?? "").toUpperCase() === "CZ" ? (
+            <div className="pt-1">
+              <AdisregButton dic={dic || ico} />
+            </div>
+          ) : null}
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-icDph">IČ DPH</Label>
@@ -242,8 +253,24 @@ export function CustomerForm({
             />
           </div>
           <FieldError message={errors.icDph?.message} />
-          <div className="pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             <OrsrLookupButton ico={ico} />
+            {(country ?? "").toUpperCase() === "SK" ? (
+              <RegisterUzButton
+                ico={ico}
+                onFound={(data) => {
+                  const opts = { shouldDirty: true, shouldValidate: true } as const;
+                  if (data.name) setValue("name", data.name, opts);
+                  if (data.dic) setValue("dic", data.dic, opts);
+                  if (data.street) setValue("street", data.street, opts);
+                  if (data.city) setValue("city", data.city, opts);
+                  if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                }}
+              />
+            ) : null}
+            {(country ?? "").toUpperCase() === "CZ" ? (
+              <IsirButton ico={ico} />
+            ) : null}
           </div>
         </div>
         <div className={fieldClass}>
@@ -291,7 +318,19 @@ export function CustomerForm({
           <FieldError message={errors.city?.message} />
         </div>
         <div className={fieldClass}>
-          <Label htmlFor="customer-postalCode">PSČ</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="customer-postalCode">PSČ</Label>
+            <PostalValidateButton
+              code={postalCode}
+              country={country}
+              city={city}
+              onValidated={(data) => {
+                const opts = { shouldDirty: true, shouldValidate: true } as const;
+                if (data.postalCode) setValue("postalCode", data.postalCode, opts);
+                if (data.city) setValue("city", data.city, opts);
+              }}
+            />
+          </div>
           <Input
             id="customer-postalCode"
             className="data-num"
