@@ -1,13 +1,18 @@
 "use server";
 
 import { apiFetch } from "@/shared/api/client";
-import type { AuditAction, AuditLogEntry, PagedResponse } from "@/shared/api/types";
+import type {
+  AuditAction,
+  AuditLogEntry,
+  PagedResponse,
+} from "@/shared/api/types";
 
 export async function listAuditLogs(params?: {
   page?: number;
   pageSize?: number;
   action?: AuditAction;
   entityId?: string;
+  entityType?: string;
   search?: string;
   from?: string;
   to?: string;
@@ -18,6 +23,7 @@ export async function listAuditLogs(params?: {
       pageSize: params?.pageSize ?? 50,
       action: params?.action,
       entityId: params?.entityId,
+      entityType: params?.entityType,
       search: params?.search,
       from: params?.from,
       to: params?.to,

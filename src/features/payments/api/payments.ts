@@ -51,8 +51,10 @@ export const confirmPaymentImportAction = actionClient
         },
       );
       revalidateTag("invoices", "max");
+      revalidateTag("audit-logs", "max");
       revalidatePath("/invoices");
       revalidatePath("/payments/import");
+      revalidatePath("/logs");
       return data;
     } catch (error) {
       if (isApiError(error)) throw new ActionError(error.message);

@@ -2,6 +2,8 @@
   "Locale": {
     "sk": "Slovenčina",
     "en": "English",
+    "cs": "Čeština",
+    "de": "Deutsch",
     "label": "Jazyk"
   },
   "Meta": {
@@ -46,7 +48,10 @@
     "themeEnableDark": "Zapnúť tmavý režim",
     "signOut": "Odhlásiť sa",
     "selectPlaceholder": "Vyber…",
-    "settings": "Nastavenia"
+    "settings": "Nastavenia",
+    "pickDate": "Vybrať dátum",
+    "clear": "Vymazať",
+    "today": "Dnes"
   },
   "ProductTour": {
     "next": "Ďalej",
@@ -220,13 +225,36 @@
   },
   "Logs": {
     "title": "Logy",
-    "description": "Kto a kedy vystavil, zaplatil, zrušil doklad alebo poslal upomienku.",
+    "description": "Kto a kedy menil doklady, odberateľov, firmu, exporty alebo sa prihlásil.",
     "ledgerCount": "{count} záznamov",
     "ledgerTrail": "Audit trail",
     "placeholder": "Hľadať číslo, súhrn, aktéra…",
     "emptyTitle": "Zatiaľ žiadne logy",
-    "emptyBody": "Události sa zapíšu pri vystavení, úhrade, zrušení alebo upomienke.",
-    "fuzzyHint": "Fuzzy filtruje načítaných {count} záznamov."
+    "emptyBody": "Udalosti sa zapíšu pri vystavení, úhrade, úpravách odberateľov, exporte a ďalších akciách.",
+    "fuzzyHint": "Fuzzy filtruje načítaných {count} záznamov.",
+    "pageHint": "Strana {page}/{pages} — zobrazených {shown} z {total} záznamov.",
+    "pagination": "Stránkovanie logov",
+    "prevPage": "Predchádzajúca",
+    "nextPage": "Ďalšia",
+    "pageOf": "Strana {page} z {pages} · {size}/strana",
+    "detailWhen": "Kedy",
+    "detailActor": "Kto",
+    "detailEntity": "Entita",
+    "detailPayload": "Detaily",
+    "openEntity": "Otvoriť záznam",
+    "clearFilters": "Zrušiť filtre",
+    "filteredEntity": "Filtrované podľa entity {id}.",
+    "filteredRange": "Obdobie {from} – {to}.",
+    "entity": {
+      "Invoice": "Doklady",
+      "Customer": "Odberatelia",
+      "Company": "Firma",
+      "Recurring": "Opakované",
+      "PaymentImport": "Platby",
+      "Export": "Exporty",
+      "Gdpr": "GDPR",
+      "Auth": "Prihlásenie"
+    }
   },
   "Profile": {
     "title": "Profil",
@@ -1183,7 +1211,8 @@
     "xmlPreview": "Štruktúrovaný náhľad faktúry pred stiahnutím.",
     "shortcutSave": "uložiť",
     "shortcutAddLine": "nový riadok",
-    "shortcutRemoveEmpty": "zmazať prázdny"
+    "shortcutRemoveEmpty": "zmazať prázdny",
+    "auditHistory": "História v logoch"
   },
   "Hotkeys": {
     "lead": "Klikni na skratku a stlač novú kombináciu. Escape zruší nahrávanie, Backspace zruší priradenie.",

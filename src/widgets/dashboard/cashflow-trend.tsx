@@ -12,6 +12,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { formatMoney } from "@/shared/lib/format";
 import { getPathname } from "@/i18n/navigation";
+import { intlLocale } from "@/i18n/locales";
 import type { AppLocale } from "@/i18n/routing";
 
 export function CashflowTrend({
@@ -35,7 +36,7 @@ export function CashflowTrend({
 }) {
   const t = useTranslations("Dashboard");
   const locale = useLocale() as AppLocale;
-  const intlLocale = locale === "en" ? "en-US" : "sk-SK";
+  const numberLocale = intlLocale(locale);
   const isPopout = mode === "popout";
 
   const config = {
@@ -50,7 +51,7 @@ export function CashflowTrend({
   } satisfies ChartConfig;
 
   const data = months.map((m) => ({
-    month: new Intl.DateTimeFormat(intlLocale, { month: "short" }).format(
+    month: new Intl.DateTimeFormat(numberLocale, { month: "short" }).format(
       new Date(2020, m.month - 1, 1),
     ),
     paid: m.paidAmount,
@@ -139,7 +140,7 @@ export function CashflowTrend({
               width={48}
               tick={{ fill: "var(--muted)", fontSize: 10 }}
               tickFormatter={(v) =>
-                new Intl.NumberFormat(intlLocale, {
+                new Intl.NumberFormat(numberLocale, {
                   notation: "compact",
                   maximumFractionDigits: 1,
                 }).format(Number(v))

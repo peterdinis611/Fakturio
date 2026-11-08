@@ -1,4 +1,5 @@
 import { Link } from "@/i18n/navigation";
+import { intlLocale } from "@/i18n/locales";
 import { LocaleSwitcher } from "@/shared/i18n/ui/locale-switcher";
 import { AuthThemeSlot } from "@/widgets/landing/auth-theme-slot";
 import "./legal-doc.css";
@@ -117,7 +118,7 @@ export function LegalSection({
 export function formatLegalDate(iso: string, locale: string) {
   const date = new Date(`${iso}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) return iso;
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "sk-SK", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",

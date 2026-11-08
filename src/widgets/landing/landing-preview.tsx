@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { intlLocale } from "@/i18n/locales";
 
 function formatKpi(
   value: number,
@@ -17,7 +18,7 @@ function formatKpi(
   decimals?: number,
   suffix?: string,
 ) {
-  const tag = locale === "en" ? "en-US" : "sk-SK";
+  const tag = intlLocale(locale);
   const n =
     decimals != null
       ? value.toLocaleString(tag, {
@@ -329,7 +330,7 @@ export function LandingCashflowCard() {
   const reduce = useReducedMotion();
   const [drawn, setDrawn] = useState(false);
   const amount = useCountUp(1280, drawn);
-  const tag = locale === "en" ? "en-US" : "sk-SK";
+  const tag = intlLocale(locale);
 
   return (
     <motion.aside

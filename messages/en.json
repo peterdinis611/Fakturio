@@ -2,6 +2,8 @@
   "Locale": {
     "sk": "Slovak",
     "en": "English",
+    "cs": "Czech",
+    "de": "German",
     "label": "Language"
   },
   "Meta": {
@@ -46,7 +48,10 @@
     "themeEnableDark": "Switch to dark mode",
     "signOut": "Sign out",
     "selectPlaceholder": "Select…",
-    "settings": "Settings"
+    "settings": "Settings",
+    "pickDate": "Pick a date",
+    "clear": "Clear",
+    "today": "Today"
   },
   "ProductTour": {
     "next": "Next",
@@ -220,13 +225,36 @@
   },
   "Logs": {
     "title": "Logs",
-    "description": "Who issued, paid, cancelled a document or sent a reminder — and when.",
+    "description": "Who changed invoices, customers, company settings, exports, or signed in — and when.",
     "ledgerCount": "{count} entries",
     "ledgerTrail": "Audit trail",
     "placeholder": "Search number, summary, actor…",
     "emptyTitle": "No logs yet",
-    "emptyBody": "Events are recorded when you issue, pay, cancel, or send a reminder.",
-    "fuzzyHint": "Fuzzy filtering {count} loaded entries."
+    "emptyBody": "Events appear when you issue, pay, edit customers, export data, and more.",
+    "fuzzyHint": "Fuzzy filtering {count} loaded entries.",
+    "pageHint": "Page {page}/{pages} — showing {shown} of {total} entries.",
+    "pagination": "Log pagination",
+    "prevPage": "Previous",
+    "nextPage": "Next",
+    "pageOf": "Page {page} of {pages} · {size}/page",
+    "detailWhen": "When",
+    "detailActor": "Who",
+    "detailEntity": "Entity",
+    "detailPayload": "Details",
+    "openEntity": "Open record",
+    "clearFilters": "Clear filters",
+    "filteredEntity": "Filtered by entity {id}.",
+    "filteredRange": "Range {from} – {to}.",
+    "entity": {
+      "Invoice": "Documents",
+      "Customer": "Customers",
+      "Company": "Company",
+      "Recurring": "Recurring",
+      "PaymentImport": "Payments",
+      "Export": "Exports",
+      "Gdpr": "GDPR",
+      "Auth": "Sign-in"
+    }
   },
   "Profile": {
     "title": "Profile",
@@ -1183,7 +1211,8 @@
     "xmlPreview": "Structured invoice preview before download.",
     "shortcutSave": "save",
     "shortcutAddLine": "new line",
-    "shortcutRemoveEmpty": "remove empty"
+    "shortcutRemoveEmpty": "remove empty",
+    "auditHistory": "Audit history"
   },
   "Hotkeys": {
     "lead": "Click a shortcut, then press the new combination. Escape cancels recording; Backspace clears the binding.",

@@ -90,7 +90,9 @@ export const createCustomerAction = actionClient
         body: parsedInput as CreateCustomerInput,
       });
       revalidateTag("customers", "max");
+      revalidateTag("audit-logs", "max");
       revalidatePath("/customers");
+      revalidatePath("/logs");
       return data;
     } catch (error) {
       mapApiFieldErrors(customerSchema, error);
@@ -115,8 +117,10 @@ export const updateCustomerAction = actionClient
       });
       revalidateTag("customers", "max");
       revalidateTag(`customer-${id}`, "max");
+      revalidateTag("audit-logs", "max");
       revalidatePath("/customers");
       revalidatePath(`/customers/${id}`);
+      revalidatePath("/logs");
       return data;
     } catch (error) {
       mapApiFieldErrors(customerSchema, error);
@@ -132,7 +136,9 @@ export const deleteCustomerAction = actionClient
     try {
       await apiFetch<void>(`/api/customers/${id}`, { method: "DELETE" });
       revalidateTag("customers", "max");
+      revalidateTag("audit-logs", "max");
       revalidatePath("/customers");
+      revalidatePath("/logs");
       return { id };
     } catch (error) {
       if (isApiError(error)) throw new ActionError(error.message);

@@ -40,18 +40,29 @@ function Button({
   asChild = false,
   children,
   render,
+  nativeButton,
   ...props
 }: ButtonPrimitive.Props &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
   }) {
+  const resolvedRender =
+    asChild && React.isValidElement(children) ? children : render;
+  // Base UI defaults to a native <button>; Links/anchors must opt out.
+  const resolvedNativeButton =
+    nativeButton ??
+    (React.isValidElement(resolvedRender)
+      ? resolvedRender.type === "button"
+      : true);
+
   return (
     <ButtonPrimitive
       data-slot="button"
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
-      render={asChild && React.isValidElement(children) ? children : render}
+      render={resolvedRender}
+      nativeButton={resolvedNativeButton}
       {...props}
     >
       {asChild && React.isValidElement(children) ? undefined : children}

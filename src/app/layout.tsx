@@ -4,6 +4,11 @@ import {
   IBM_Plex_Mono,
   IBM_Plex_Sans,
 } from "next/font/google";
+import {
+  alternateOgLocales,
+  languageAlternates,
+  ogLocale,
+} from "@/i18n/locales";
 import { ThemeProvider } from "@/shared/theme/theme-provider";
 import { Toaster } from "@/shared/toast/toaster";
 import "./globals.css";
@@ -41,16 +46,12 @@ export const metadata: Metadata = {
   applicationName: "Fakturio",
   alternates: {
     canonical: "/",
-    languages: {
-      sk: "/",
-      en: "/en",
-      "x-default": "/",
-    },
+    languages: languageAlternates("/"),
   },
   openGraph: {
     type: "website",
-    locale: "sk_SK",
-    alternateLocale: ["en_US"],
+    locale: ogLocale("sk"),
+    alternateLocale: alternateOgLocales("sk"),
     url: "/",
     siteName: "Fakturio",
   },

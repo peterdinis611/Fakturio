@@ -2,29 +2,31 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { TermsView } from "@/features/legal/ui/terms-view";
 import { getSiteLegal } from "@/shared/legal/site-legal";
+import {
+  languageAlternates,
+  localePath,
+  ogLocale,
+} from "@/i18n/locales";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Meta" });
+  const path = localePath(locale, "/terms");
 
   return {
     title: t("termsTitle"),
     description: t("termsDescription"),
     alternates: {
-      canonical: locale === "en" ? "/en/terms" : "/terms",
-      languages: {
-        sk: "/terms",
-        en: "/en/terms",
-        "x-default": "/terms",
-      },
+      canonical: path,
+      languages: languageAlternates("/terms"),
     },
     openGraph: {
       title: t("termsTitle"),
       description: t("termsDescription"),
-      locale: locale === "en" ? "en_US" : "sk_SK",
-      url: locale === "en" ? "/en/terms" : "/terms",
+      locale: ogLocale(locale),
+      url: path,
       type: "article",
     },
     robots: { index: true, follow: true },
@@ -36,7 +38,7 @@ export default async function TermsPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Meta" });
   const legal = getSiteLegal();
-  const path = locale === "en" ? "/en/terms" : "/terms";
+  const path = localePath(locale, "/terms");
   const siteUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "http://localhost:3000";
@@ -47,7 +49,7 @@ export default async function TermsPage({ params }: Props) {
     name: t("termsTitle"),
     description: t("termsDescription"),
     url: `${siteUrl}${path}`,
-    inLanguage: locale === "en" ? "en" : "sk",
+    inLanguage: locale,
     dateModified: legal.effectiveDateIso,
     publisher: {
       "@type": "Organization",

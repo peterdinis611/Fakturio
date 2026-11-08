@@ -204,6 +204,9 @@ export default async function InvoiceDetailPage({
               <Link href={`/invoices/${id}/edit`}>{te("edit")}</Link>
             </Button>
           ) : null}
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/logs?entityId=${id}`}>{t("auditHistory")}</Link>
+          </Button>
           <InvoiceActions invoice={invoice} />
         </div>
       </div>

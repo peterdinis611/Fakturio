@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { format, isValid, parseISO } from "date-fns";
-import { sk as skDateFns } from "date-fns/locale";
-import { sk as skDayPicker } from "react-day-picker/locale";
 import { CalendarIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import { Calendar } from "@/shared/ui/calendar";
 import {
@@ -13,6 +12,11 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/popover";
 import { cn } from "@/shared/lib/utils";
+import {
+  dateFnsLocale,
+  datePattern,
+  dayPickerLocale,
+} from "@/i18n/locales";
 
 type DatePickerProps = {
   id?: string;
@@ -48,15 +52,19 @@ export function DatePicker({
   value,
   onChange,
   disabled,
-  placeholder = "Vyber dátum",
+  placeholder,
   className,
   fromDate,
   toDate,
 }: DatePickerProps) {
+  const locale = useLocale();
+  const t = useTranslations("Common");
   const [open, setOpen] = useState(false);
   const selected = parseIsoDate(value);
   const from = parseIsoDate(fromDate);
   const to = parseIsoDate(toDate);
+  const dfsLocale = dateFnsLocale(locale);
+  const rdpLocale = dayPickerLocale(locale);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -75,8 +83,8 @@ export function DatePicker({
         >
           <span className="truncate">
             {selected
-              ? format(selected, "d. M. yyyy", { locale: skDateFns })
-              : placeholder}
+              ? format(selected, datePattern(locale), { locale: dfsLocale })
+              : (placeholder ?? t("pickDate"))}
           </span>
           <CalendarIcon className="size-3.5 shrink-0 text-muted-foreground" />
         </Button>
@@ -84,7 +92,7 @@ export function DatePicker({
       <PopoverContent align="start" className="w-auto p-0">
         <Calendar
           mode="single"
-          locale={skDayPicker}
+          locale={rdpLocale}
           captionLayout="dropdown"
           selected={selected}
           defaultMonth={selected}
@@ -108,7 +116,7 @@ export function DatePicker({
               setOpen(false);
             }}
           >
-            Vymazať
+            {t("clear")}
           </Button>
           <Button
             type="button"
@@ -120,7 +128,7 @@ export function DatePicker({
               setOpen(false);
             }}
           >
-            Dnes
+            {t("today")}
           </Button>
         </div>
       </PopoverContent>

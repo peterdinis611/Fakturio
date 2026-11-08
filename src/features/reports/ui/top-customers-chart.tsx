@@ -15,6 +15,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { formatMoney } from "@/shared/lib/format";
+import { intlLocale } from "@/i18n/locales";
 import type { AppLocale } from "@/i18n/routing";
 
 export function TopCustomersChart({
@@ -31,7 +32,7 @@ export function TopCustomersChart({
 }) {
   const t = useTranslations("Reports");
   const locale = useLocale() as AppLocale;
-  const intl = locale === "en" ? "en-US" : "sk-SK";
+  const intl = intlLocale(locale);
 
   const config = {
     total: {

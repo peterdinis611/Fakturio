@@ -2,29 +2,31 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SupportView } from "@/features/legal/ui/support-view";
 import { getSiteLegal } from "@/shared/legal/site-legal";
+import {
+  languageAlternates,
+  localePath,
+  ogLocale,
+} from "@/i18n/locales";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Meta" });
+  const path = localePath(locale, "/support");
 
   return {
     title: t("supportTitle"),
     description: t("supportDescription"),
     alternates: {
-      canonical: locale === "en" ? "/en/support" : "/support",
-      languages: {
-        sk: "/support",
-        en: "/en/support",
-        "x-default": "/support",
-      },
+      canonical: path,
+      languages: languageAlternates("/support"),
     },
     openGraph: {
       title: t("supportTitle"),
       description: t("supportDescription"),
-      locale: locale === "en" ? "en_US" : "sk_SK",
-      url: locale === "en" ? "/en/support" : "/support",
+      locale: ogLocale(locale),
+      url: path,
       type: "website",
     },
     robots: { index: true, follow: true },
@@ -36,7 +38,7 @@ export default async function SupportPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Meta" });
   const legal = getSiteLegal();
-  const path = locale === "en" ? "/en/support" : "/support";
+  const path = localePath(locale, "/support");
   const siteUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "http://localhost:3000";
@@ -47,7 +49,7 @@ export default async function SupportPage({ params }: Props) {
     name: t("supportTitle"),
     description: t("supportDescription"),
     url: `${siteUrl}${path}`,
-    inLanguage: locale === "en" ? "en" : "sk",
+    inLanguage: locale,
     mainEntity: {
       "@type": "Organization",
       name: legal.controllerName,

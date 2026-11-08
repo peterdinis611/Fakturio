@@ -29,11 +29,13 @@ import {
 function revalidateInvoices(id?: string) {
   revalidateTag("invoices", "max");
   revalidateTag("reports", "max");
+  revalidateTag("audit-logs", "max");
   revalidatePath("/invoices");
   revalidatePath("/expenses");
   revalidatePath("/");
   revalidatePath("/reminders");
   revalidatePath("/reports");
+  revalidatePath("/logs");
   if (id) {
     revalidateTag(`invoice-${id}`, "max");
     revalidatePath(`/invoices/${id}`);

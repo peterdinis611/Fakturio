@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getFxRatesAction } from "@/features/fx/api/fx";
+import { intlLocale } from "@/i18n/locales";
 
 type Props = {
   currency: string;
@@ -13,6 +14,7 @@ type Props = {
 
 export function FxRateHint({ currency, base = "EUR", date }: Props) {
   const t = useTranslations("Registry");
+  const locale = useLocale();
   const code = currency.trim().toUpperCase();
   const baseCode = base.trim().toUpperCase();
   const onDate = date?.trim() || undefined;
@@ -41,7 +43,7 @@ export function FxRateHint({ currency, base = "EUR", date }: Props) {
         t("fxHint", {
           base: baseCode,
           quote: code,
-          rate: rate.toLocaleString("sk-SK", {
+          rate: rate.toLocaleString(intlLocale(locale), {
             maximumFractionDigits: 4,
           }),
           date: result.data.date,
@@ -49,7 +51,7 @@ export function FxRateHint({ currency, base = "EUR", date }: Props) {
         }),
       );
     });
-  }, [code, baseCode, onDate, t]);
+  }, [code, baseCode, onDate, locale, t]);
 
   if (!line && !pending) return null;
 

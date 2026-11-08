@@ -1,11 +1,9 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { enUS as enDateFns, sk as skDateFns } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { enUS as enDayPicker, sk as skDayPicker } from "react-day-picker/locale";
 import { Button } from "@/shared/ui/button";
 import { Calendar } from "@/shared/ui/calendar";
 import { Label } from "@/shared/ui/label";
@@ -15,7 +13,11 @@ import {
   PopoverTrigger,
 } from "@/shared/ui/popover";
 import { cn } from "@/shared/lib/utils";
-import type { AppLocale } from "@/i18n/routing";
+import {
+  dateFnsLocale,
+  datePattern,
+  dayPickerLocale,
+} from "@/i18n/locales";
 
 function parseDate(value?: string) {
   if (!value) return undefined;
@@ -46,11 +48,11 @@ export function DatePickerField({
   placeholder?: string;
 }) {
   const t = useTranslations("Reports");
-  const locale = useLocale() as AppLocale;
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const selected = parseDate(value);
-  const dateFnsLocale = locale === "en" ? enDateFns : skDateFns;
-  const dayPickerLocale = locale === "en" ? enDayPicker : skDayPicker;
+  const dfsLocale = dateFnsLocale(locale);
+  const rdpLocale = dayPickerLocale(locale);
 
   return (
     <div className="grid gap-1">
@@ -69,14 +71,14 @@ export function DatePickerField({
           >
             <CalendarIcon className="size-3.5 opacity-70" aria-hidden />
             {selected
-              ? format(selected, "d. M. yyyy", { locale: dateFnsLocale })
+              ? format(selected, datePattern(locale), { locale: dfsLocale })
               : (placeholder ?? t("pickDate"))}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            locale={dayPickerLocale}
+            locale={rdpLocale}
             selected={selected}
             onSelect={(date) => {
               onChange(date ? toIsoDay(date) : undefined);

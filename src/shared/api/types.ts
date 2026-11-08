@@ -26,7 +26,30 @@ export type AuditAction =
   | "Duplicated"
   | "OverdueMarked"
   | "CreditNoteCreated"
-  | "ProformaFinalized";
+  | "ProformaFinalized"
+  | "CustomerCreated"
+  | "CustomerUpdated"
+  | "CustomerDeleted"
+  | "CompanyUpdated"
+  | "PaymentImportApplied"
+  | "ExportRequested"
+  | "GdprExport"
+  | "GdprErasure"
+  | "RecurringCreated"
+  | "RecurringUpdated"
+  | "RecurringDeleted"
+  | "RecurringGenerated"
+  | "LoginSucceeded";
+
+export type AuditEntityType =
+  | "Invoice"
+  | "Customer"
+  | "Company"
+  | "Recurring"
+  | "PaymentImport"
+  | "Export"
+  | "Gdpr"
+  | "Auth";
 
 export type AuditLogEntry = {
   id: string;
@@ -41,6 +64,7 @@ export type AuditLogEntry = {
   actorEmail: string | null;
   summary: string;
   detailsJson: string | null;
+  companyId?: string | null;
 };
 
 export type PagedResponse<T> = {

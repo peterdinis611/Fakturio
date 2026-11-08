@@ -36,9 +36,11 @@ export async function getRecurring(id: string): Promise<RecurringInvoice> {
 function revalidateRecurring(id?: string) {
   revalidateTag("recurring", "max");
   revalidateTag("invoices", "max");
+  revalidateTag("audit-logs", "max");
   revalidatePath("/recurring");
   revalidatePath("/services");
   revalidatePath("/invoices");
+  revalidatePath("/logs");
   if (id) {
     revalidateTag(`recurring-${id}`, "max");
   }

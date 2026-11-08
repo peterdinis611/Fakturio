@@ -55,9 +55,11 @@ export const updateCompanyAction = actionClient
         await clearOnboardingSkipped();
       }
       revalidateTag("company", "max");
+      revalidateTag("audit-logs", "max");
       revalidatePath("/", "layout");
       revalidatePath("/settings/company");
       revalidatePath("/onboarding");
+      revalidatePath("/logs");
       return data;
     } catch (error) {
       if (isApiError(error)) {

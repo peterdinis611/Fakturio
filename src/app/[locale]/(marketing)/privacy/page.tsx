@@ -2,29 +2,31 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PrivacyPolicyView } from "@/features/legal/ui/privacy-policy-view";
 import { getSiteLegal } from "@/shared/legal/site-legal";
+import {
+  languageAlternates,
+  localePath,
+  ogLocale,
+} from "@/i18n/locales";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Meta" });
+  const path = localePath(locale, "/privacy");
 
   return {
     title: t("privacyTitle"),
     description: t("privacyDescription"),
     alternates: {
-      canonical: locale === "en" ? "/en/privacy" : "/privacy",
-      languages: {
-        sk: "/privacy",
-        en: "/en/privacy",
-        "x-default": "/privacy",
-      },
+      canonical: path,
+      languages: languageAlternates("/privacy"),
     },
     openGraph: {
       title: t("privacyTitle"),
       description: t("privacyDescription"),
-      locale: locale === "en" ? "en_US" : "sk_SK",
-      url: locale === "en" ? "/en/privacy" : "/privacy",
+      locale: ogLocale(locale),
+      url: path,
       type: "article",
     },
     robots: { index: true, follow: true },
@@ -36,7 +38,7 @@ export default async function PrivacyPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Meta" });
   const legal = getSiteLegal();
-  const path = locale === "en" ? "/en/privacy" : "/privacy";
+  const path = localePath(locale, "/privacy");
   const siteUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "http://localhost:3000";
@@ -47,7 +49,7 @@ export default async function PrivacyPage({ params }: Props) {
     name: t("privacyTitle"),
     description: t("privacyDescription"),
     url: `${siteUrl}${path}`,
-    inLanguage: locale === "en" ? "en" : "sk",
+    inLanguage: locale,
     dateModified: legal.effectiveDateIso,
     publisher: {
       "@type": "Organization",
