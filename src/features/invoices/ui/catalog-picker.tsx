@@ -50,7 +50,7 @@ export function CatalogPicker({
           items.map((item) => (
             <DropdownMenuItem
               key={item.id}
-              onSelect={() => onPick(item)}
+              onClick={() => onPick(item)}
               className="flex flex-col items-start gap-0.5"
             >
               <span className="font-medium">{item.description}</span>

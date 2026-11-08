@@ -167,10 +167,8 @@ export function SidebarAccount({ email }: { email?: string | null }) {
           <DropdownMenuItem
             className="rounded-[4px] gap-2 py-1.5"
             disabled={!mounted}
-            onSelect={(e) => {
-              e.preventDefault();
-              setTheme(isDark ? "light" : "dark");
-            }}
+            closeOnClick={false}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
           >
             {isDark ? (
               <Sun strokeWidth={1.5} />
@@ -186,10 +184,7 @@ export function SidebarAccount({ email }: { email?: string | null }) {
             variant="destructive"
             disabled={pendingLogout}
             className="rounded-[4px] gap-2 py-1.5"
-            onSelect={(e) => {
-              e.preventDefault();
-              logout();
-            }}
+            onClick={() => logout()}
           >
             <LogOut strokeWidth={1.5} />
             {t("signOut")}

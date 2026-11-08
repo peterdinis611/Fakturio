@@ -237,10 +237,7 @@ export function NotificationBell({
                     "focus:bg-raised/70 data-[highlighted]:bg-raised/70",
                     !n.isRead && "border-l-signal bg-signal/[0.04]",
                   )}
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    openItem(n);
-                  }}
+                  onClick={() => openItem(n)}
                 >
                   <div className="flex items-start gap-2">
                     {!n.isRead ? (

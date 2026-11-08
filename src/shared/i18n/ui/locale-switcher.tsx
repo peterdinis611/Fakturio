@@ -25,6 +25,8 @@ type LocaleSwitcherProps = {
   side?: "top" | "bottom" | "left" | "right";
   /** Smaller trigger for tight headers. */
   size?: "sm" | "default";
+  /** full = icon+code+chevron; code = EN▾; icon = languages glyph only */
+  trigger?: "full" | "code" | "icon";
 };
 
 export function LocaleSwitcher({
@@ -34,6 +36,7 @@ export function LocaleSwitcher({
   align = "end",
   side = "bottom",
   size = "sm",
+  trigger = "full",
 }: LocaleSwitcherProps) {
   const mode = variant ?? (compact ? "pills" : "dropdown");
   const t = useTranslations("Locale");
@@ -84,18 +87,31 @@ export function LocaleSwitcher({
         <Button
           type="button"
           variant="outline"
-          size={size === "sm" ? "sm" : "default"}
+          size={trigger === "icon" ? "icon-sm" : size === "sm" ? "sm" : "default"}
           disabled={pending}
-          aria-label={t("label")}
+          aria-label={`${t("label")}: ${t(locale)}`}
+          title={`${t("label")}: ${t(locale)}`}
           className={cn(
-            "gap-1.5 font-medium tabular-nums",
-            size === "sm" && "h-8 px-2.5 text-[12px]",
+            "shrink-0 font-medium tabular-nums",
+            trigger !== "icon" && "gap-1.5",
+            size === "sm" && trigger !== "icon" && "h-8 px-2 text-[12px]",
             className,
           )}
         >
-          <Languages className="size-3.5 opacity-70" strokeWidth={1.75} aria-hidden />
-          <span className="uppercase tracking-wide">{locale}</span>
-          <ChevronDown className="size-3.5 opacity-50" strokeWidth={1.75} aria-hidden />
+          {trigger === "icon" ? (
+            <Languages className="size-3.5" strokeWidth={1.75} aria-hidden />
+          ) : trigger === "code" ? (
+            <>
+              <span className="uppercase tracking-wide">{locale}</span>
+              <ChevronDown className="size-3 opacity-50" strokeWidth={1.75} aria-hidden />
+            </>
+          ) : (
+            <>
+              <Languages className="size-3.5 opacity-70" strokeWidth={1.75} aria-hidden />
+              <span className="uppercase tracking-wide">{locale}</span>
+              <ChevronDown className="size-3.5 opacity-50" strokeWidth={1.75} aria-hidden />
+            </>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

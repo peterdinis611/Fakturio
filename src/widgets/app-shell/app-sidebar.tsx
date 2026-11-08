@@ -111,10 +111,10 @@ function BrandHeader({
 }) {
   return (
     <div className="border-b border-sidebar-border px-3 py-3.5" data-tour="brand">
-      <div className="flex items-start gap-2">
+      <div className="flex items-center gap-2">
         <Link
           href="/dashboard"
-          className="min-w-0 flex-1 rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-ink/25"
+          className="min-w-0 flex-1 overflow-hidden rounded-[3px] outline-none focus-visible:ring-2 focus-visible:ring-ink/25"
         >
           <BrandLockup markSize="md" markVariant="solid" />
           {companyName ? (
@@ -123,8 +123,8 @@ function BrandHeader({
             </p>
           ) : null}
         </Link>
-        <div className="mt-0.5 flex shrink-0 items-center gap-1">
-          <LocaleSwitcher align="end" side="bottom" />
+        <div className="flex shrink-0 items-center gap-1">
+          <LocaleSwitcher trigger="icon" align="end" side="bottom" />
           {showBell ? <NotificationBell /> : null}
         </div>
       </div>
@@ -157,7 +157,7 @@ export function AppSidebar({
           />
         </Link>
         <div className="flex shrink-0 items-center gap-1.5">
-          <LocaleSwitcher align="end" side="bottom" />
+          <LocaleSwitcher trigger="icon" align="end" side="bottom" />
           <NotificationBell />
           <button
             type="button"

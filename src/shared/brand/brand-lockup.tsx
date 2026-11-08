@@ -23,7 +23,12 @@ export function BrandLockup({
   wordmarkClassName,
 }: Props) {
   return (
-    <span className={cn("brand-lockup inline-flex items-center gap-2.5", className)}>
+    <span
+      className={cn(
+        "brand-lockup inline-flex min-w-0 max-w-full items-center gap-2.5",
+        className,
+      )}
+    >
       <BrandMark
         size={markSize}
         variant={markVariant}
@@ -32,7 +37,7 @@ export function BrandLockup({
       {wordmark ? (
         <span
           className={cn(
-            "brand-wordmark text-[16px] font-semibold tracking-tight text-ink",
+            "brand-wordmark truncate text-[16px] font-semibold tracking-tight text-ink",
             wordmarkClassName,
           )}
         >

@@ -82,7 +82,7 @@ export function LineTemplatesMenu({
             templates.map((tmpl) => (
               <DropdownMenuItem
                 key={tmpl.id}
-                onSelect={() => onApply(tmpl)}
+                onClick={() => onApply(tmpl)}
                 className="flex flex-col items-start gap-0.5"
               >
                 <span className="text-[13px] font-medium">{tmpl.description}</span>
