@@ -53,6 +53,7 @@ export default async function EditInvoicePage({
           bankBic: company.bankBic,
           defaultDueDays: company.defaultDueDays,
           isVatPayer: company.isVatPayer,
+          country: company.country,
         }}
       />
     </div>

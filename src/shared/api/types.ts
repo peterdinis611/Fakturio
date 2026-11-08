@@ -641,6 +641,50 @@ export type PostalValidate = {
   source: string;
 };
 
+export type AresVrPerson = {
+  name: string;
+  role: string | null;
+  organ: string | null;
+  since: string | null;
+};
+
+export type AresVrSummary = {
+  ico: string;
+  name: string | null;
+  courtFile: string | null;
+  registeredCapital: string | null;
+  officers: AresVrPerson[];
+  officersCount: number;
+  source: string;
+};
+
+export type RegisterUzStatement = {
+  id: number;
+  type: string | null;
+  periodFrom: string | null;
+  periodTo: string | null;
+  assembledAt: string | null;
+  filedAt: string | null;
+  reportsCount: number;
+};
+
+export type RegisterUzStatements = {
+  ico: string;
+  name: string | null;
+  statements: RegisterUzStatement[];
+  source: string;
+};
+
+export type BusinessDay = {
+  country: string;
+  from: string;
+  addDays: number;
+  result: string;
+  adjusted: boolean;
+  holidaysSkipped: string[];
+  source: string;
+};
+
 export type OverdueJobSettings = {
   enabled: boolean;
   runAtHourUtc: number;

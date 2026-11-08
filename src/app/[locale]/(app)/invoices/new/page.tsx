@@ -99,6 +99,7 @@ export default async function NewInvoicePage({
           bankBic: company.bankBic,
           defaultDueDays: company.defaultDueDays,
           isVatPayer: company.isVatPayer,
+          country: company.country,
         }}
       />
     </div>

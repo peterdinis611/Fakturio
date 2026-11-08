@@ -36,6 +36,7 @@ import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 import { Button } from "@/shared/ui/button";
 import { FxRateHint } from "@/features/fx/ui/fx-rate-hint";
+import { BusinessDayButton } from "@/features/integrations/ui/business-day-button";
 import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
 import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
@@ -61,6 +62,7 @@ type CompanyDefaults = {
   bankBic: string | null;
   defaultDueDays: number;
   isVatPayer: boolean;
+  country?: string | null;
 };
 
 type InvoiceFormProps = {
@@ -507,7 +509,29 @@ export function InvoiceForm({
             <FieldError message={errors.issueDate?.message} />
           </div>
           <div className={fieldClass}>
-            <Label htmlFor="dueDate">{t("dueDate")}</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="dueDate">{t("dueDate")}</Label>
+              {!readOnly ? (
+                <BusinessDayButton
+                  from={
+                    issueDate
+                      ? addDaysIso(
+                          issueDate,
+                          companyDefaults?.defaultDueDays ?? 14,
+                        )
+                      : undefined
+                  }
+                  addDays={0}
+                  country={companyDefaults?.country ?? "SK"}
+                  onResult={(iso) =>
+                    setValue("dueDate", iso, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                />
+              ) : null}
+            </div>
             <Controller
               control={control}
               name="dueDate"

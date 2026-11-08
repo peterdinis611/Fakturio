@@ -10,6 +10,7 @@ import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
 import { AdisregButton } from "@/features/integrations/ui/adisreg-button";
+import { AresVrButton } from "@/features/integrations/ui/ares-vr-button";
 import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
 import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
 import { IsirButton } from "@/features/integrations/ui/isir-button";
@@ -400,7 +401,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
               />
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
-              <IsirButton ico={ico} />
+              <>
+                <IsirButton ico={ico} />
+                <AresVrButton ico={ico} />
+              </>
             ) : null}
           </div>
         </Field>

@@ -6,11 +6,14 @@ import { isApiError } from "@/shared/api/errors";
 import type {
   AddressNormalize,
   AdisregStatus,
+  AresVrSummary,
+  BusinessDay,
   FsVatPayer,
   IbanLookup,
   IsirStatus,
   OrsrCompanySummary,
   PostalValidate,
+  RegisterUzStatements,
   RegisterUzUnit,
 } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
@@ -192,5 +195,82 @@ export const validatePostalAction = actionClient
     } catch (error) {
       if (isApiError(error)) throw new ActionError(error.message || "PSČ validácia zlyhala.");
       throw new ActionError("PSČ validácia zlyhala.");
+    }
+  });
+
+export const lookupAresVrAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<AresVrSummary>(
+        `/api/integrations/ares-vr/${parsedInput.ico}`,
+        { cache: "no-store" },
+      );
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "ARES VR lookup zlyhal.");
+      throw new ActionError("ARES VR lookup zlyhal.");
+    }
+  });
+
+export const lookupRegisterUzStatementsAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+      take: z.number().int().min(1).max(10).optional().default(5),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<RegisterUzStatements>(
+        "/api/integrations/register-uz/statements",
+        {
+          searchParams: {
+            ico: parsedInput.ico,
+            take: String(parsedInput.take),
+          },
+          cache: "no-store",
+        },
+      );
+    } catch (error) {
+      if (isApiError(error)) {
+        throw new ActionError(error.message || "RegisterUZ závierky zlyhali.");
+      }
+      throw new ActionError("RegisterUZ závierky zlyhali.");
+    }
+  });
+
+export const businessDayAction = actionClient
+  .inputSchema(
+    z.object({
+      from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Neplatný dátum"),
+      addDays: z.number().int().min(0).max(365).optional().default(0),
+      country: z.string().trim().optional().default("SK"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<BusinessDay>("/api/integrations/business-day", {
+        searchParams: {
+          from: parsedInput.from,
+          addDays: String(parsedInput.addDays),
+          country: parsedInput.country,
+        },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) {
+        throw new ActionError(error.message || "Výpočet pracovného dňa zlyhal.");
+      }
+      throw new ActionError("Výpočet pracovného dňa zlyhal.");
     }
   });

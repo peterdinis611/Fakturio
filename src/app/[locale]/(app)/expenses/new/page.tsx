@@ -85,6 +85,7 @@ export default async function NewExpensePage({
           bankBic: company.bankBic,
           defaultDueDays: company.defaultDueDays,
           isVatPayer: company.isVatPayer,
+          country: company.country,
         }}
       />
     </div>

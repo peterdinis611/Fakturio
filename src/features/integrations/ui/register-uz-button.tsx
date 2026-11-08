@@ -2,9 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { lookupRegisterUzAction } from "@/features/integrations/api/integrations";
+import {
+  lookupRegisterUzAction,
+  lookupRegisterUzStatementsAction,
+} from "@/features/integrations/api/integrations";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
-import type { RegisterUzUnit } from "@/shared/api/types";
+import type { RegisterUzStatement, RegisterUzUnit } from "@/shared/api/types";
 import { toast } from "@/shared/toast";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
@@ -24,6 +27,7 @@ export function RegisterUzButton({ ico, onFound }: Props) {
   const t = useTranslations("Registry");
   const [pending, startTransition] = useTransition();
   const [summary, setSummary] = useState<RegisterUzUnit | null>(null);
+  const [statements, setStatements] = useState<RegisterUzStatement[]>([]);
   const value = (ico ?? "").replace(/\D/g, "");
 
   function run() {
@@ -35,6 +39,7 @@ export function RegisterUzButton({ ico, onFound }: Props) {
       const result = await lookupRegisterUzAction({ ico: value });
       if (!result?.data) {
         setSummary(null);
+        setStatements([]);
         toast.error(actionErrorMessage(result ?? {}) ?? t("ruzFailed"));
         return;
       }
@@ -46,6 +51,10 @@ export function RegisterUzButton({ ico, onFound }: Props) {
         city: result.data.city ?? undefined,
         postalCode: result.data.postalCode ?? undefined,
       });
+
+      const stmts = await lookupRegisterUzStatementsAction({ ico: value, take: 5 });
+      setStatements(stmts?.data?.statements ?? []);
+
       toast.success(t("ruzLoaded", { name: result.data.name }));
     });
   }
@@ -75,6 +84,13 @@ export function RegisterUzButton({ ico, onFound }: Props) {
           <p className="mt-1 text-[11px]">
             {t("ruzStatements", { count: summary.statementsCount })}
           </p>
+          {statements.slice(0, 5).map((s) => (
+            <p key={s.id} className="mt-0.5 text-[11px]">
+              · {[s.type, s.periodFrom && s.periodTo ? `${s.periodFrom}–${s.periodTo}` : null]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ))}
         </div>
       ) : null}
     </div>

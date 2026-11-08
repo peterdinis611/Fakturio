@@ -1265,7 +1265,21 @@
     "postalMissing": "Postal code not found.",
     "postalCityMismatch": "Postal code exists, but city looks different ({city}).",
     "postalOk": "ZIP OK · {code} · {city}",
-    "postalFailed": "Postal validation failed."
+    "postalFailed": "Postal validation failed.",
+    "aresVrLookup": "ARES VR",
+    "aresVrChecking": "ARES VR…",
+    "aresVrNeedIco": "Enter a valid company ID.",
+    "aresVrLoaded": "ARES VR · {name} · {count} people",
+    "aresVrCapital": "Registered capital: {amount}",
+    "aresVrOfficers": "Active officers: {count}",
+    "aresVrFailed": "ARES VR lookup failed.",
+    "businessDayApply": "Business day",
+    "businessDayChecking": "Calendar…",
+    "businessDayNeedDate": "Enter an issue date first.",
+    "businessDayUnsupported": "Business days support SK/CZ only.",
+    "businessDayOk": "Due date: {date}",
+    "businessDayAdjusted": "Moved to business day: {date}",
+    "businessDayFailed": "Business-day calculation failed."
   },
   "Offline": {
     "titleOffline": "You're offline",

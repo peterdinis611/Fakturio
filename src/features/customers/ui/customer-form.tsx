@@ -14,6 +14,7 @@ import {
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
 import { AdisregButton } from "@/features/integrations/ui/adisreg-button";
+import { AresVrButton } from "@/features/integrations/ui/ares-vr-button";
 import { FsVatButton } from "@/features/integrations/ui/fs-vat-button";
 import { IsirButton } from "@/features/integrations/ui/isir-button";
 import { OrsrLookupButton } from "@/features/integrations/ui/orsr-lookup-button";
@@ -269,7 +270,10 @@ export function CustomerForm({
               />
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
-              <IsirButton ico={ico} />
+              <>
+                <IsirButton ico={ico} />
+                <AresVrButton ico={ico} />
+              </>
             ) : null}
           </div>
         </div>

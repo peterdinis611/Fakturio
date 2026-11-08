@@ -1265,7 +1265,21 @@
     "postalMissing": "PSČ sa nenašlo.",
     "postalCityMismatch": "PSČ sedí, ale mesto vyzerá inak ({city}).",
     "postalOk": "PSČ OK · {code} · {city}",
-    "postalFailed": "Overenie PSČ zlyhalo."
+    "postalFailed": "Overenie PSČ zlyhalo.",
+    "aresVrLookup": "ARES VR",
+    "aresVrChecking": "ARES VR…",
+    "aresVrNeedIco": "Zadaj platné IČO.",
+    "aresVrLoaded": "ARES VR · {name} · {count} osôb",
+    "aresVrCapital": "Základné imanie: {amount}",
+    "aresVrOfficers": "Aktívni členovia: {count}",
+    "aresVrFailed": "ARES VR lookup zlyhal.",
+    "businessDayApply": "Pracovný deň",
+    "businessDayChecking": "Kalendár…",
+    "businessDayNeedDate": "Zadaj dátum vystavenia.",
+    "businessDayUnsupported": "Pracovné dni len pre SK/CZ.",
+    "businessDayOk": "Splatnosť: {date}",
+    "businessDayAdjusted": "Posunuté na pracovný deň: {date}",
+    "businessDayFailed": "Výpočet pracovného dňa zlyhal."
   },
   "Offline": {
     "titleOffline": "Ste offline",
