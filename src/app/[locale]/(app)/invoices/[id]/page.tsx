@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getInvoice } from "@/features/invoices/api/invoices";
 import { InvoiceActions } from "@/features/invoices/ui/invoice-actions";
-import { XmlPreview } from "@/widgets/preview/xml-preview";
+import { InvoiceAttachments } from "@/features/invoices/ui/invoice-attachments";
+import { InvoicePublicLink } from "@/features/invoices/ui/invoice-public-link";
+import { listInvoiceAttachments } from "@/features/invoices/api/attachments";
+import { getInvoicePublicLink } from "@/features/invoices/api/public";
 import { StatusBadge } from "@/shared/ui/status-badge";
 import { Button } from "@/shared/ui/button";
 import {
@@ -24,7 +27,6 @@ import {
   formatMoney,
   paymentMethodLabel,
 } from "@/shared/lib/format";
-import { buildInvoiceXml } from "@/shared/lib/preview/invoice-xml";
 import type { AppLocale } from "@/i18n/routing";
 
 export async function generateMetadata({
@@ -123,8 +125,14 @@ export default async function InvoiceDetailPage({
   const te = await getTranslations("CustomerDetail");
   const locale = (await getLocale()) as AppLocale;
   let invoice;
+  let attachments: Awaited<ReturnType<typeof listInvoiceAttachments>> = [];
+  let publicLink: Awaited<ReturnType<typeof getInvoicePublicLink>> | null = null;
   try {
     invoice = await getInvoice(id);
+    [attachments, publicLink] = await Promise.all([
+      listInvoiceAttachments(id),
+      getInvoicePublicLink(id).catch(() => null),
+    ]);
   } catch (e) {
     if (isApiError(e) && e.status === 404) notFound();
     throw e;
@@ -378,17 +386,26 @@ export default async function InvoiceDetailPage({
         </div>
       ) : null}
 
+      <div className="mt-6 space-y-4">
+        {publicLink ? (
+          <InvoicePublicLink
+            invoiceId={id}
+            invoiceStatus={invoice.status}
+            initial={publicLink}
+          />
+        ) : null}
+        <InvoiceAttachments invoiceId={id} attachments={attachments} />
+      </div>
+
       {invoice.status !== "Draft" ? (
         <div className="mt-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-[16px] font-medium text-ink">{t("documents")}</h2>
-            <XmlPreview
-              title={`XML · ${invoice.number}`}
-              description={t("xmlPreview")}
-              xml={buildInvoiceXml(invoice)}
-              fileName={`${invoice.number}.xml`}
-              triggerVariant="outline"
-            />
+            <Button asChild variant="outline" size="sm">
+              <a href={`/api/isdoc/${invoice.id}?disposition=attachment`} download>
+                ISDOC
+              </a>
+            </Button>
           </div>
           <iframe
             title={`PDF ${invoice.number}`}

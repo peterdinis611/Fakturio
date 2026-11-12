@@ -161,7 +161,13 @@
     "noResultsBody": "Keine Treffer für „{query}“ bei Kunden oder Rechnungen. Versuche einen kürzeren Begriff oder prüfe auf Tippfehler.",
     "queryStrip": "Suchanfrage",
     "hitsStrip": "{count} Treffer",
-    "breakdownStrip": "{customers} Kunden · {invoices} Rechnungen"
+    "breakdownStrip": "{customers} Kunden · {invoices} Rechnungen · {notes} Notizen · {services} Leistungen · {payments} Zahlungen",
+    "notes": "Notizen",
+    "services": "Leistungen",
+    "payments": "Zahlungen",
+    "note": "Notiz",
+    "service": "Leistung",
+    "payment": "Zahlung"
   },
   "Customers": {
     "title": "Kunden",
@@ -936,6 +942,11 @@
     "identityHint": "Was im Rechnungskopf steht.",
     "addressHint": "Firmensitz / Geschäftsadresse auf Belegen.",
     "bankHint": "Standardkonto auf Rechnungen.",
+    "fioBankToken": "FIO Bank API-Token",
+    "fioBankTokenPlaceholder": "Token aus FIO Online-Banking",
+    "fioBankTokenHint": "Für Zahlungsimport von FIO (Zahlungen → Import).",
+    "fioBankTokenSet": "FIO verbunden",
+    "fioBankTokenSave": "FIO-Token speichern",
     "defaultsTitle": "Standardwerte",
     "defaultsHint": "Werden bei neuen Rechnungen verwendet.",
     "contactHint": "Kontakte auf Belegen und in PDFs.",
@@ -1029,7 +1040,12 @@
     "colStatus": "Status",
     "colNote": "Notiz",
     "openCsvEditor": "CSV-Editor öffnen",
-    "pasteShort": "Text manuell einfügen"
+    "pasteShort": "Text manuell einfügen",
+    "fioTitle": "Import von FIO Bank",
+    "fioDescription": "Transaktionen für einen Zeitraum laden und per Verwendungszweck zuordnen (FIO API-Token erforderlich).",
+    "fioFrom": "Von",
+    "fioTo": "Bis",
+    "fioPreview": "FIO-Vorschau"
   },
   "Reminders": {
     "title": "Mahnungen",

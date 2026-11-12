@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
-import { updateCompanyAction } from "@/features/company/api/company";
+import { updateCompanyAction, updateCompanyBankAction } from "@/features/company/api/company";
 import { useRouter } from "@/i18n/navigation";
 import { toRegistryAutofill } from "@/features/registry/lib/apply-registry";
 import { AddressNormalizeButton } from "@/features/integrations/ui/address-normalize-button";
@@ -195,6 +195,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   const tc = useTranslations("Common");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [fioBankToken, setFioBankToken] = useState("");
+  const [hasFioBankToken, setHasFioBankToken] = useState(
+    initial.hasFioBankToken ?? false,
+  );
 
   const form = useForm<CompanyFormInput, unknown, CompanyFormValues>({
     resolver: zodResolver(companySchema),
@@ -258,6 +262,25 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     for (const [key, message] of Object.entries(fieldErrors)) {
       setError(key as keyof CompanyFormValues, { message });
     }
+  }
+
+  function saveFioToken() {
+    const token = fioBankToken.trim();
+    if (!token) {
+      toast.error("Zadaj FIO API token");
+      return;
+    }
+    startTransition(async () => {
+      const result = await updateCompanyBankAction({ fioBankToken: token });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
+        return;
+      }
+      setHasFioBankToken(result.data.hasFioBankToken);
+      setFioBankToken("");
+      toast.success("FIO token bol uložený");
+      router.refresh();
+    });
   }
 
   function onSubmit(values: CompanyFormValues) {
@@ -595,6 +618,37 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         <Field>
           <Label htmlFor="bankName">{t("bankName")}</Label>
           <Input id="bankName" {...register("bankName")} />
+        </Field>
+        <Field className="sm:col-span-2">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <Label htmlFor="fioBankToken">{t("fioBankToken")}</Label>
+            {hasFioBankToken ? (
+              <Badge variant="secondary" className="rounded-[4px] text-[10px]">
+                {t("fioBankTokenSet")}
+              </Badge>
+            ) : null}
+          </div>
+          <Input
+            id="fioBankToken"
+            type="password"
+            autoComplete="off"
+            className="data-num"
+            value={fioBankToken}
+            disabled={pending}
+            placeholder={t("fioBankTokenPlaceholder")}
+            onChange={(e) => setFioBankToken(e.target.value)}
+          />
+          <p className="mt-1 text-[12px] text-muted-foreground">{t("fioBankTokenHint")}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="mt-2"
+            disabled={pending || !fioBankToken.trim()}
+            onClick={saveFioToken}
+          >
+            {t("fioBankTokenSave")}
+          </Button>
         </Field>
       </Section>
 

@@ -10,12 +10,14 @@ import type {
   CompanyCompleteness,
   CompanySettings,
   CompanySummary,
+  UpdateCompanyBankInput,
 } from "@/shared/api/types";
+import { z } from "zod";
+import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import {
   clearOnboardingSkipped,
   setOnboardingSkipped,
 } from "@/shared/lib/onboarding";
-import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { companySchema } from "@/entities/company/model/schema";
 import { LOGO_MAX_BYTES, LOGO_TYPES } from "@/features/company/model/logo";
 
@@ -120,6 +122,44 @@ export async function uploadCompanyLogoAction(
     throw error;
   }
 }
+
+const companyBankPatchSchema = z
+  .object({
+    bankIban: z.string().nullable().optional(),
+    bankBic: z.string().nullable().optional(),
+    bankName: z.string().nullable().optional(),
+    defaultPaymentMethod: z.string().nullable().optional(),
+    defaultConstantSymbol: z.string().nullable().optional(),
+    fioBankToken: z.string().nullable().optional(),
+  })
+  .refine(
+    (v) =>
+      v.bankIban !== undefined ||
+      v.bankBic !== undefined ||
+      v.bankName !== undefined ||
+      v.defaultPaymentMethod !== undefined ||
+      v.defaultConstantSymbol !== undefined ||
+      v.fioBankToken !== undefined,
+    { message: "Uveď aspoň jedno bankové pole" },
+  );
+
+export const updateCompanyBankAction = actionClient
+  .inputSchema(companyBankPatchSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const data = await apiFetch<CompanySettings>("/api/company/bank", {
+        method: "PATCH",
+        body: parsedInput satisfies UpdateCompanyBankInput,
+      });
+      revalidateTag("company", "max");
+      revalidatePath("/settings/company");
+      revalidatePath("/payments/import");
+      return data;
+    } catch (error) {
+      if (isApiError(error)) throw ActionError.fromApi(error);
+      throw error;
+    }
+  });
 
 export async function deleteCompanyLogoAction(): Promise<CompanySettings> {
   try {

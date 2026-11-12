@@ -161,7 +161,13 @@
     "noResultsBody": "No matches for “{query}” among customers or invoices. Try a shorter term or check for typos.",
     "queryStrip": "Query",
     "hitsStrip": "{count} hits",
-    "breakdownStrip": "{customers} customers · {invoices} invoices"
+    "breakdownStrip": "{customers} customers · {invoices} invoices · {notes} notes · {services} services · {payments} payments",
+    "notes": "Notes",
+    "services": "Services",
+    "payments": "Payments",
+    "note": "Note",
+    "service": "Service",
+    "payment": "Payment"
   },
   "Customers": {
     "title": "Customers",
@@ -936,6 +942,11 @@
     "identityHint": "What goes in the invoice header.",
     "addressHint": "Registered / business address on documents.",
     "bankHint": "Default account on invoices.",
+    "fioBankToken": "FIO bank API token",
+    "fioBankTokenPlaceholder": "Token from FIO internet banking",
+    "fioBankTokenHint": "For payment import from FIO (payments → import). Token is saved separately.",
+    "fioBankTokenSet": "FIO connected",
+    "fioBankTokenSave": "Save FIO token",
     "defaultsTitle": "Defaults",
     "defaultsHint": "Applied to new invoices.",
     "contactHint": "Contacts on documents and PDFs.",
@@ -1029,7 +1040,12 @@
     "colStatus": "Status",
     "colNote": "Note",
     "openCsvEditor": "Open CSV editor",
-    "pasteShort": "Paste text manually"
+    "pasteShort": "Paste text manually",
+    "fioTitle": "Import from FIO bank",
+    "fioDescription": "Fetch transactions for a date range and match by variable symbol (requires FIO API token in company settings).",
+    "fioFrom": "From",
+    "fioTo": "To",
+    "fioPreview": "FIO preview"
   },
   "Reminders": {
     "title": "Reminders",

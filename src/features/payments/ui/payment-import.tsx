@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {
   confirmPaymentImportAction,
+  previewFioPaymentImportAction,
   previewPaymentImportAction,
 } from "@/features/payments/api/payments";
 import { CsvUploader } from "@/features/payments/ui/csv-uploader";
@@ -23,6 +24,7 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { Checkbox } from "@/shared/ui/checkbox";
+import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Separator } from "@/shared/ui/separator";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
@@ -34,6 +36,16 @@ import { formatMoney } from "@/shared/lib/format";
 import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
 
+function defaultFioFrom(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+}
+
+function todayIso(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export function PaymentImportPanel() {
   const t = useTranslations("Payments");
   const tv = useTranslations("CsvViewer");
@@ -43,6 +55,8 @@ export function PaymentImportPanel() {
   const [csvText, setCsvText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [fioFrom, setFioFrom] = useState(defaultFioFrom);
+  const [fioTo, setFioTo] = useState(todayIso);
   const [preview, setPreview] = useState<PaymentImportPreviewResponse | null>(
     null,
   );
@@ -70,6 +84,28 @@ export function PaymentImportPanel() {
     [preview],
   );
 
+  function applyPreview(data: PaymentImportPreviewResponse) {
+    setPreview(data);
+    const ids = new Set(
+      data.rows
+        .filter((r) => r.matchStatus === "matched" && r.invoiceId)
+        .map((r) => r.invoiceId!),
+    );
+    setSelected(ids);
+  }
+
+  function runFioPreview() {
+    startTransition(async () => {
+      const result = await previewFioPaymentImportAction({ from: fioFrom, to: fioTo });
+      if (!result?.data) {
+        toast.error(actionErrorMessage(result ?? {}) ?? t("previewFailed"));
+        return;
+      }
+      applyPreview(result.data);
+      toast.success(t("preview"));
+    });
+  }
+
   function runPreview() {
     startTransition(async () => {
       const result = await previewPaymentImportAction({ csvText });
@@ -77,13 +113,7 @@ export function PaymentImportPanel() {
         toast.error(actionErrorMessage(result ?? {}) ?? t("previewFailed"));
         return;
       }
-      setPreview(result.data);
-      const ids = new Set(
-        result.data.rows
-          .filter((r) => r.matchStatus === "matched" && r.invoiceId)
-          .map((r) => r.invoiceId!),
-      );
-      setSelected(ids);
+      applyPreview(result.data);
       toast.success(t("preview"));
     });
   }
@@ -137,6 +167,49 @@ export function PaymentImportPanel() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <Card size="sm" className="rounded-[6px] bg-surface ring-border">
+        <CardHeader className="border-b border-rule pb-3">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <CardTitle className="text-[15px]">{t("fioTitle")}</CardTitle>
+              <CardDescription className="mt-1 max-w-xl">{t("fioDescription")}</CardDescription>
+            </div>
+            <Badge variant="outline" className="rounded-[4px] text-[10px]">
+              FIO
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-4 pt-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="fio-from">{t("fioFrom")}</Label>
+            <Input
+              id="fio-from"
+              type="date"
+              className="data-num"
+              value={fioFrom}
+              disabled={pending}
+              onChange={(e) => setFioFrom(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="fio-to">{t("fioTo")}</Label>
+            <Input
+              id="fio-to"
+              type="date"
+              className="data-num"
+              value={fioTo}
+              disabled={pending}
+              onChange={(e) => setFioTo(e.target.value)}
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="justify-end border-t border-rule bg-raised/20">
+          <Button type="button" disabled={pending} onClick={runFioPreview}>
+            {t("fioPreview")}
+          </Button>
+        </CardFooter>
+      </Card>
+
       <Card size="sm" className="rounded-[6px] bg-surface ring-border">
         <CardHeader className="border-b border-rule pb-3">
           <div className="flex flex-wrap items-start justify-between gap-2">

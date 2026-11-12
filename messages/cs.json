@@ -161,7 +161,13 @@
     "noResultsBody": "Pro „{query}“ nejsou shody mezi zákazníky ani fakturami. Zkus kratší výraz nebo zkontroluj překlep.",
     "queryStrip": "Dotaz",
     "hitsStrip": "{count} zásahů",
-    "breakdownStrip": "{customers} zákazníků · {invoices} faktur"
+    "breakdownStrip": "{customers} zákazníků · {invoices} faktur · {notes} poznámek · {services} služeb · {payments} plateb",
+    "notes": "Poznámky",
+    "services": "Služby",
+    "payments": "Platby",
+    "note": "Poznámka",
+    "service": "Služba",
+    "payment": "Platba"
   },
   "Customers": {
     "title": "Zákazníci",
@@ -936,6 +942,11 @@
     "identityHint": "Co jde do hlavičky faktury.",
     "addressHint": "Sídlo / místo podnikání na dokladech.",
     "bankHint": "Výchozí účet na fakturách.",
+    "fioBankToken": "FIO bank API token",
+    "fioBankTokenPlaceholder": "Token z internetbankingu FIO",
+    "fioBankTokenHint": "Pro import plateb z FIO (platby → import).",
+    "fioBankTokenSet": "FIO připojeno",
+    "fioBankTokenSave": "Uložit FIO token",
     "defaultsTitle": "Výchozí hodnoty",
     "defaultsHint": "Použijí se u nové faktury.",
     "contactHint": "Kontakty na dokladech a v PDF.",
@@ -1029,7 +1040,12 @@
     "colStatus": "Stav",
     "colNote": "Poznámka",
     "openCsvEditor": "Otevřít CSV editor",
-    "pasteShort": "Vložit text ručně"
+    "pasteShort": "Vložit text ručně",
+    "fioTitle": "Import z FIO banky",
+    "fioDescription": "Stáhni transakce za období a spáruj podle VS (vyžaduje FIO API token).",
+    "fioFrom": "Od",
+    "fioTo": "Do",
+    "fioPreview": "Náhled z FIO"
   },
   "Reminders": {
     "title": "Upomínky",

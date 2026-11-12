@@ -136,7 +136,7 @@
   },
   "Search": {
     "title": "Hľadanie",
-    "description": "Fuzzy hľadanie v zákazníkoch a faktúrach — aspoň 2 znaky.",
+    "description": "Globálne hľadanie — zákazníci, faktúry, poznámky, služby a platby. Aspoň 2 znaky.",
     "placeholder": "Meno, IČO, číslo faktúry…",
     "srLabel": "Hľadať zákazníkov a faktúry",
     "loading": "Hľadám…",
@@ -161,7 +161,13 @@
     "noResultsBody": "Pre „{query}“ nie sú zhody medzi zákazníkmi ani faktúrami. Skús kratší výraz alebo skontroluj preklep.",
     "queryStrip": "Dotaz",
     "hitsStrip": "{count} zásahov",
-    "breakdownStrip": "{customers} zákazníkov · {invoices} faktúr"
+    "breakdownStrip": "{customers} zákazníkov · {invoices} faktúr · {notes} poznámok · {services} služieb · {payments} platieb",
+    "notes": "Poznámky",
+    "services": "Služby",
+    "payments": "Platby",
+    "note": "Poznámka",
+    "service": "Služba",
+    "payment": "Platba"
   },
   "Customers": {
     "title": "Zákazníci",
@@ -936,6 +942,11 @@
     "identityHint": "Čo ide do hlavičky faktúry.",
     "addressHint": "Sídlo / miesto podnikania na dokladoch.",
     "bankHint": "Predvolený účet na faktúrach.",
+    "fioBankToken": "FIO bank API token",
+    "fioBankTokenPlaceholder": "Token z internetbankingu FIO",
+    "fioBankTokenHint": "Na import platieb priamo z FIO (platby → import). Token sa neukladá do formulára firmy.",
+    "fioBankTokenSet": "FIO pripojené",
+    "fioBankTokenSave": "Uložiť FIO token",
     "defaultsTitle": "Predvolené hodnoty",
     "defaultsHint": "Použijú sa pri novej faktúre.",
     "contactHint": "Kontakty na dokladoch a v PDF.",
@@ -1029,7 +1040,12 @@
     "colStatus": "Stav",
     "colNote": "Poznámka",
     "openCsvEditor": "Otvoriť CSV editor",
-    "pasteShort": "Vložiť text ručne"
+    "pasteShort": "Vložiť text ručne",
+    "fioTitle": "Import z FIO banky",
+    "fioDescription": "Stiahni transakcie za obdobie a spáruj podľa VS (vyžaduje FIO API token v nastavení firmy).",
+    "fioFrom": "Od",
+    "fioTo": "Do",
+    "fioPreview": "Náhľad z FIO"
   },
   "Reminders": {
     "title": "Upomienky",

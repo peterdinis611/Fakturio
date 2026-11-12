@@ -99,7 +99,7 @@ export default async function PublicInvoicePage({
     <div className="min-h-dvh bg-canvas text-ink">
       <header className="border-b border-rule bg-surface">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
-          <BrandLockup size="sm" />
+          <BrandLockup markSize="sm" />
           <div className="flex flex-wrap gap-2">
             <Button type="button" size="sm" variant="outline" asChild>
               <a href={pdfDownload}>PDF</a>
