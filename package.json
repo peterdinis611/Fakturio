@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:all": "concurrently -k -n api,web -c blue,green \"dotnet watch run --project ../backend/Fakturio.Api.csproj\" \"npm run dev\"",
+    "dev:all": "bash ../scripts/dev.sh up",
+    "dev:all:no-redis": "bash ../scripts/dev.sh up --no-redis",
     "dev:api": "dotnet watch run --project ../backend/Fakturio.Api.csproj",
-    "dev:redis": "docker compose -f ../docker-compose.dev.yml up -d",
+    "dev:redis": "bash ../scripts/dev.sh redis",
+    "dev:stop": "bash ../scripts/dev.sh down",
+    "dev:status": "bash ../scripts/dev.sh status",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

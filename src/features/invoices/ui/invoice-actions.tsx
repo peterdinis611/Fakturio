@@ -17,7 +17,6 @@ import {
 import type { Invoice } from "@/shared/api/types";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { cancelSchema } from "@/entities/invoice/model/schema";
-import { XmlPreview } from "@/widgets/preview/xml-preview";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -31,7 +30,6 @@ import {
   DialogTrigger,
 } from "@/shared/ui/dialog";
 import { Spinner } from "@/shared/ui/spinner";
-import { buildInvoiceXml } from "@/shared/lib/preview/invoice-xml";
 
 type InvoiceActionsProps = {
   invoice: Invoice;
@@ -47,7 +45,7 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
 
   const pdfInline = `/api/pdf/${invoice.id}?disposition=inline`;
   const pdfDownload = `/api/pdf/${invoice.id}?disposition=attachment`;
-  const xml = buildInvoiceXml(invoice);
+  const isdocDownload = `/api/isdoc/${invoice.id}?disposition=attachment`;
   const docType = invoice.documentType ?? "Invoice";
 
   function run(
@@ -311,13 +309,11 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
               {t("downloadPdf")}
             </a>
           </Button>
-          <XmlPreview
-            title={`XML · ${invoice.number}`}
-            description="Štruktúrovaný náhľad dokladu (Fakturio XML). Nie je oficiálny e-fakturačný formát."
-            xml={xml}
-            fileName={`${invoice.number}.xml`}
-            triggerVariant="ghost"
-          />
+          <Button type="button" size="sm" variant="ghost" asChild>
+            <a href={isdocDownload} download>
+              Stiahnuť ISDOC
+            </a>
+          </Button>
         </>
       ) : null}
       {pending ? (

@@ -192,8 +192,9 @@ export async function apiFetchBlob(
   path: string,
   searchParams?: RequestOptions["searchParams"],
   accept = "application/pdf, text/csv, */*",
+  options: { skipAuth?: boolean } = {},
 ): Promise<{ blob: Blob; filename: string | null; contentType: string | null }> {
-  const authHeader = await getAuthHeader();
+  const authHeader = options.skipAuth ? {} : await getAuthHeader();
   const correlationId = createCorrelationId();
   let res: Response;
   try {

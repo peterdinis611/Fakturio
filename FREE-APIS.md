@@ -1,7 +1,7 @@
 # Free API — kandidáti pre Fakturio
 
 Zoznam free API **bez API kľúča**, ktoré dávajú zmysel pre SK/CZ fakturačnú appku.
-Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
+Služby s ApiKey / tokenom (Resend, Brevo, …) zatiaľ nepoužívame. **FIO Banka** je voliteľná — stačí uložiť token v bankových nastaveniach firmy.
 
 ## Už napojené (bez kľúča)
 
@@ -33,7 +33,7 @@ Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
 | API | Prečo nie teraz |
 |---|---|
 | Resend / Brevo | ApiKey |
-| FIO Banka API | token z internetbankingu |
+| FIO Banka API | ✅ voliteľné — token v nastaveniach firmy (`HasFioBankToken`) |
 | FinStat | platené |
 | SendGrid / Abstract / IPinfo | ApiKey / free-tier s kľúčom |
 | FS OpenData API | ApiKey |
@@ -60,6 +60,8 @@ Služby s ApiKey / tokenom (Resend, Brevo, FIO, …) zatiaľ nepoužívame.
 - `GET /api/integrations/registr-smluv?ico=` — počet + posledné CZ zmluvy
 - `GET /api/integrations/lei?ico=&jurisdiction=SK|CZ` — GLEIF LEI podľa IČO
 - `GET /api/integrations/lei/{lei}` — GLEIF LEI podľa kódu
+- `GET|POST /api/payments/import/fio/preview?from=&to=` — náhľad párovania platieb z FIO (vyžaduje token)
+- `GET /api/invoices/{id}/isdoc` — ISDOC 6.0.1 XML export
 
 ## Poznámky
 

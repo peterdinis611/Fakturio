@@ -166,6 +166,7 @@ export type CompanySettings = {
   bankIban: string | null;
   bankBic: string | null;
   bankName: string | null;
+  hasFioBankToken: boolean;
   defaultDueDays: number;
   defaultVatRate: number;
   defaultCurrency: string;
@@ -201,6 +202,57 @@ export type CompanyBank = {
   bankName: string | null;
   defaultPaymentMethod: string | null;
   defaultConstantSymbol: string | null;
+  hasFioBankToken: boolean;
+};
+
+export type UpdateCompanyBankInput = {
+  bankIban?: string | null;
+  bankBic?: string | null;
+  bankName?: string | null;
+  defaultPaymentMethod?: string | null;
+  defaultConstantSymbol?: string | null;
+  fioBankToken?: string | null;
+};
+
+export type PublicInvoice = {
+  number: string;
+  documentType: InvoiceDocumentType;
+  status: InvoiceStatus;
+  seller: InvoiceParty;
+  customer: InvoiceParty;
+  sellerIsVatPayer: boolean;
+  issueDate: string;
+  dueDate: string;
+  deliveryDate: string | null;
+  paidAt: string | null;
+  currency: string;
+  variableSymbol: string | null;
+  constantSymbol: string | null;
+  specificSymbol: string | null;
+  paymentMethod: string | null;
+  bankIban: string | null;
+  bankBic: string | null;
+  notes: string | null;
+  subtotal: number;
+  vatTotal: number;
+  total: number;
+  isOverdue: boolean;
+  items: InvoiceItem[];
+};
+
+export type PublicLink = {
+  enabled: boolean;
+  token: string | null;
+  publicPath: string | null;
+};
+
+export type InvoiceAttachment = {
+  id: string;
+  invoiceId: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  createdAt: string;
 };
 
 export type InvoiceParty = {
@@ -474,8 +526,15 @@ export type VatReport = {
   }[];
 };
 
+export type SearchHitType =
+  | "customer"
+  | "invoice"
+  | "note"
+  | "service"
+  | "payment";
+
 export type SearchHit = {
-  type: string;
+  type: SearchHitType | string;
   id: string;
   title: string;
   subtitle: string | null;
