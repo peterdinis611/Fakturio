@@ -27,6 +27,7 @@ async function authSchemas() {
         .refine(passwordMeetsPolicy, t("passwordWeak")),
       firstName: z.string().trim().max(100).optional().or(z.literal("")),
       lastName: z.string().trim().max(100).optional().or(z.literal("")),
+      turnstileToken: z.string().trim().optional(),
     }),
     login: z.object({
       email: z.email(t("emailInvalid")),
@@ -64,6 +65,7 @@ export const registerAction = actionClient
           password: parsedInput.password,
           firstName: parsedInput.firstName || null,
           lastName: parsedInput.lastName || null,
+          turnstileToken: parsedInput.turnstileToken || null,
         },
         cache: "no-store",
       });

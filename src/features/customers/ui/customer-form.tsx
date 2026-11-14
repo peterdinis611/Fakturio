@@ -23,6 +23,10 @@ import { PostalValidateButton } from "@/features/integrations/ui/postal-validate
 import { RegistrSmluvButton } from "@/features/integrations/ui/registr-smluv-button";
 import { RegisterUzButton } from "@/features/integrations/ui/register-uz-button";
 import { RpvsButton } from "@/features/integrations/ui/rpvs-button";
+import { SanctionsButton } from "@/features/integrations/ui/sanctions-button";
+import { ObchodnyVestnikButton } from "@/features/integrations/ui/obchodny-vestnik-button";
+import { PeppolButton } from "@/features/integrations/ui/peppol-button";
+import { EmailTypoHint } from "@/features/integrations/ui/email-typo-hint";
 import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -106,6 +110,7 @@ export function CustomerForm({
   const dic = watch("dic");
   const icDph = watch("icDph");
   const name = watch("name");
+  const customerEmail = watch("email");
   const street = watch("street");
   const city = watch("city");
   const postalCode = watch("postalCode");
@@ -274,6 +279,8 @@ export function CustomerForm({
                   }}
                 />
                 <RpvsButton ico={ico} />
+                <ObchodnyVestnikButton ico={ico} />
+                <PeppolButton ico={ico} />
               </>
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
@@ -281,13 +288,21 @@ export function CustomerForm({
                 <IsirButton ico={ico} />
                 <AresVrButton ico={ico} />
                 <RegistrSmluvButton ico={ico} />
+                <PeppolButton ico={ico} />
               </>
             ) : null}
+            <SanctionsButton query={name || ico} />
           </div>
         </div>
         <div className={fieldClass}>
           <Label htmlFor="customer-email">E-mail</Label>
           <Input id="customer-email" type="email" {...register("email")} />
+          <EmailTypoHint
+            email={customerEmail ?? ""}
+            onSuggest={(suggested) =>
+              setValue("email", suggested, { shouldDirty: true, shouldValidate: true })
+            }
+          />
           <FieldError message={errors.email?.message} />
         </div>
         <div className={fieldClass}>

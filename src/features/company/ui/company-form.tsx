@@ -20,6 +20,9 @@ import { PostalValidateButton } from "@/features/integrations/ui/postal-validate
 import { RegistrSmluvButton } from "@/features/integrations/ui/registr-smluv-button";
 import { RegisterUzButton } from "@/features/integrations/ui/register-uz-button";
 import { RpvsButton } from "@/features/integrations/ui/rpvs-button";
+import { SanctionsButton } from "@/features/integrations/ui/sanctions-button";
+import { ObchodnyVestnikButton } from "@/features/integrations/ui/obchodny-vestnik-button";
+import { PeppolButton } from "@/features/integrations/ui/peppol-button";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -217,6 +220,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
 
   const isVatPayer = watch("isVatPayer");
   const country = watch("country");
+  const name = watch("name");
   const ico = watch("ico");
   const dic = watch("dic");
   const icDph = watch("icDph");
@@ -428,6 +432,8 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                   }}
                 />
                 <RpvsButton ico={ico} />
+                <ObchodnyVestnikButton ico={ico} />
+                <PeppolButton ico={ico} />
               </>
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
@@ -435,8 +441,10 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 <IsirButton ico={ico} />
                 <AresVrButton ico={ico} />
                 <RegistrSmluvButton ico={ico} />
+                <PeppolButton ico={ico} />
               </>
             ) : null}
+            <SanctionsButton query={name || ico} />
           </div>
         </Field>
         <Field className="sm:col-span-2">

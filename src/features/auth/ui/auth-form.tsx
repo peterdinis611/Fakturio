@@ -17,7 +17,10 @@ import { Checkbox } from "@/shared/ui/checkbox";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Spinner } from "@/shared/ui/spinner";
+import { TurnstileWidget } from "@/features/auth/ui/turnstile-widget";
 import "./auth-form.css";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 type AuthFormProps = {
   mode: "sign-in" | "sign-up";
@@ -41,6 +44,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [lastName, setLastName] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const passwordRules = useMemo(
     () => evaluatePasswordRules(password),
@@ -50,6 +54,13 @@ export function AuthForm({ mode }: AuthFormProps) {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (mode === "sign-up" && TURNSTILE_SITE_KEY && !turnstileToken) {
+      const message = t("turnstileRequired");
+      setError(message);
+      toast.error(message);
+      return;
+    }
 
     if (mode === "sign-up" && !privacyAccepted) {
       const message = t("privacyRequired");
@@ -67,6 +78,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               password,
               firstName,
               lastName,
+              turnstileToken: turnstileToken ?? undefined,
             });
 
       if (!result?.data) {
@@ -211,11 +223,19 @@ export function AuthForm({ mode }: AuthFormProps) {
         </div>
       ) : null}
 
+      {mode === "sign-up" && TURNSTILE_SITE_KEY ? (
+        <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={setTurnstileToken} />
+      ) : null}
+
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
 
       <Button
         type="submit"
-        disabled={pending || (mode === "sign-up" && !privacyAccepted)}
+        disabled={
+          pending
+          || (mode === "sign-up" && !privacyAccepted)
+          || (mode === "sign-up" && !!TURNSTILE_SITE_KEY && !turnstileToken)
+        }
         className="w-full"
       >
         {pending ? (

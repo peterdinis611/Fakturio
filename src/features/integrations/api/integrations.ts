@@ -18,6 +18,10 @@ import type {
   RegisterUzUnit,
   RegistrSmluvStatus,
   RpvsStatus,
+  SanctionsSearch,
+  SkObchodnyVestnik,
+  EmailTypoHint,
+  PeppolLookup,
 } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
@@ -319,6 +323,86 @@ export const lookupRegistrSmluvAction = actionClient
         throw new ActionError(error.message || "Registr smluv lookup zlyhal.");
       }
       throw new ActionError("Registr smluv lookup zlyhal.");
+    }
+  });
+
+export const lookupSanctionsAction = actionClient
+  .inputSchema(
+    z.object({
+      q: z.string().trim().min(2, "Zadaj aspoň 2 znaky"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<SanctionsSearch>("/api/integrations/sanctions", {
+        searchParams: { q: parsedInput.q },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Sanctions lookup zlyhal.");
+      throw new ActionError("Sanctions lookup zlyhal.");
+    }
+  });
+
+export const lookupObchodnyVestnikAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<SkObchodnyVestnik>("/api/integrations/obchodny-vestnik", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) {
+        throw new ActionError(error.message || "Obchodný vestník lookup zlyhal.");
+      }
+      throw new ActionError("Obchodný vestník lookup zlyhal.");
+    }
+  });
+
+export const emailTypoHintAction = actionClient
+  .inputSchema(
+    z.object({
+      email: z.string().trim().min(5, "Zadaj e-mail"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<EmailTypoHint>("/api/integrations/email-typo", {
+        searchParams: { email: parsedInput.email },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Kontrola e-mailu zlyhala.");
+      throw new ActionError("Kontrola e-mailu zlyhala.");
+    }
+  });
+
+export const lookupPeppolAction = actionClient
+  .inputSchema(
+    z.object({
+      ico: z
+        .string()
+        .transform((v) => normalizeIco(v))
+        .refine((v) => isValidIco(v), { message: "Neplatné IČO" }),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<PeppolLookup>("/api/integrations/peppol", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Peppol lookup zlyhal.");
+      throw new ActionError("Peppol lookup zlyhal.");
     }
   });
 

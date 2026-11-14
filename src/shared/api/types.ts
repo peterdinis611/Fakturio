@@ -634,6 +634,55 @@ export type FsVatPayer = {
   icDph: string | null;
   name: string | null;
   source: string;
+  warningCode?: string | null;
+  warningMessage?: string | null;
+};
+
+export type SanctionsHit = {
+  id: string | null;
+  name: string;
+  schema: string | null;
+  countries: string[];
+  topics: string[];
+  detailUrl: string | null;
+};
+
+export type SanctionsSearch = {
+  query: string;
+  count: number;
+  hits: SanctionsHit[];
+  source: string;
+};
+
+export type SkObchodnyVestnik = {
+  ico: string;
+  found: boolean;
+  name: string | null;
+  portalUrl: string;
+  source: string;
+};
+
+export type EmailTypoHint = {
+  email: string;
+  hasSuggestion: boolean;
+  suggestedEmail: string | null;
+  note: string | null;
+  source: string;
+};
+
+export type PeppolParticipant = {
+  participantId: string | null;
+  name: string | null;
+  country: string | null;
+  scheme: string | null;
+  documentTypes: string[];
+};
+
+export type PeppolLookup = {
+  ico: string;
+  found: boolean;
+  participants: PeppolParticipant[];
+  source: string;
 };
 
 export type AddressNormalize = {
