@@ -67,6 +67,7 @@ import {
   FONT_SIZES,
   FontSize,
 } from "@/features/notes/ui/note-editor-extensions";
+import { isSafeHttpUrl } from "@/shared/lib/sanitize-html";
 
 const BODY_LIMIT = 16000;
 
@@ -181,6 +182,7 @@ function setLink(editor: Editor) {
     editor.chain().focus().extendMarkRange("link").unsetLink().run();
     return;
   }
+  if (!isSafeHttpUrl(href)) return;
   editor
     .chain()
     .focus()
@@ -193,7 +195,7 @@ function insertImage(editor: Editor) {
   const next = window.prompt("URL obrázka", "https://");
   if (next === null) return;
   const src = next.trim();
-  if (!src) return;
+  if (!src || !isSafeHttpUrl(src)) return;
   editor.chain().focus().setImage({ src, alt: "" }).run();
 }
 
@@ -273,6 +275,7 @@ export function RichTextEditor({
         openOnClick: false,
         autolink: true,
         defaultProtocol: "https",
+        protocols: ["http", "https"],
         HTMLAttributes: {
           class: "note-link",
           rel: "noopener noreferrer nofollow",

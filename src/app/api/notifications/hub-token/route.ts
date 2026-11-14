@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server";
-import { getAccessToken } from "@/shared/auth/session";
+import { apiFetch } from "@/shared/api/client";
+import { isApiError } from "@/shared/api/errors";
 
-/** Exposes JWT for the browser SignalR client (httpOnly cookie → memory). */
+type HubTokenResponse = {
+  accessToken: string;
+  expiresAt: string;
+};
+
+/** Proxies a short-lived SignalR hub JWT (tok=hub). Session JWT stays httpOnly. */
 export async function GET() {
-  const token = await getAccessToken();
-  if (!token) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  try {
+    const data = await apiFetch<HubTokenResponse>("/api/auth/hub-token", {
+      cache: "no-store",
+    });
+    return NextResponse.json({
+      accessToken: data.accessToken,
+      expiresAt: data.expiresAt,
+    });
+  } catch (error) {
+    if (isApiError(error) && error.status === 401) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json({ error: "hub_token_failed" }, { status: 502 });
   }
-
-  return NextResponse.json({ accessToken: token });
 }

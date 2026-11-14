@@ -1,4 +1,5 @@
 import { apiFetchBlob } from "@/shared/api/client";
+import { contentDisposition } from "@/shared/lib/content-disposition";
 
 export async function GET(
   _request: Request,
@@ -16,7 +17,7 @@ export async function GET(
     return new Response(blob, {
       headers: {
         "Content-Type": contentType ?? "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${name}"`,
+        "Content-Disposition": contentDisposition(name),
         "Cache-Control": "private, no-store",
       },
     });

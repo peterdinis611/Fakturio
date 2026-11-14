@@ -60,6 +60,47 @@ function uploadPatterns(...origins: string[]): RemotePattern[] {
   return out;
 }
 
+function cspConnectSources(): string[] {
+  const origins = new Set<string>(["'self'"]);
+  for (const raw of [apiBase, publicApiBase, appUrl]) {
+    try {
+      const u = new URL(raw);
+      origins.add(u.origin);
+      const wsProtocol = u.protocol === "https:" ? "wss:" : "ws:";
+      origins.add(`${wsProtocol}//${u.host}`);
+    } catch {
+      // ignore invalid env URLs
+    }
+  }
+  return [...origins];
+}
+
+function cspImageSources(): string[] {
+  const origins = new Set<string>(["'self'", "data:", "blob:"]);
+  for (const raw of [apiBase, publicApiBase, appUrl]) {
+    try {
+      origins.add(new URL(raw).origin);
+    } catch {
+      // ignore
+    }
+  }
+  return [...origins];
+}
+
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+  "style-src 'self' 'unsafe-inline'",
+  `img-src ${cspImageSources().join(" ")}`,
+  `connect-src ${cspConnectSources().join(" ")}`,
+  "font-src 'self'",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "worker-src 'self' blob:",
+].join("; ");
+
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -72,6 +113,10 @@ const securityHeaders = [
   {
     key: "X-Permitted-Cross-Domain-Policies",
     value: "none",
+  },
+  {
+    key: "Content-Security-Policy",
+    value: contentSecurityPolicy,
   },
   ...(isProd
     ? [

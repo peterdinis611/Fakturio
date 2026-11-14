@@ -1,4 +1,5 @@
 import { apiFetchBlob } from "@/shared/api/client";
+import { contentDisposition } from "@/shared/lib/content-disposition";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     return new Response(blob, {
       headers: {
         "Content-Type": contentType || "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${filename || "faktury.csv"}"`,
+        "Content-Disposition": contentDisposition(filename || "faktury.csv"),
         "Cache-Control": "private, no-store",
       },
     });

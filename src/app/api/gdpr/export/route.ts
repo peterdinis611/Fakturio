@@ -1,4 +1,5 @@
 import { apiFetchBlob } from "@/shared/api/client";
+import { contentDisposition } from "@/shared/lib/content-disposition";
 
 export async function GET() {
   try {
@@ -11,7 +12,9 @@ export async function GET() {
     return new Response(blob, {
       headers: {
         "Content-Type": contentType || "application/zip",
-        "Content-Disposition": `attachment; filename="${filename || "fakturio-gdpr.zip"}"`,
+        "Content-Disposition": contentDisposition(
+          filename || "fakturio-gdpr.zip",
+        ),
         "Cache-Control": "private, no-store",
       },
     });

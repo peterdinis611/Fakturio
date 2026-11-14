@@ -10,6 +10,7 @@ import {
   isRichNoteBody,
   noteBodyPlain,
 } from "@/features/notes/ui/rich-text-editor";
+import { sanitizeNoteHtml } from "@/shared/lib/sanitize-html";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -124,7 +125,9 @@ export function NotesBoard({ items }: Props) {
                   isRichNoteBody(note.body) ? (
                     <div
                       className="note-body note-body--clamp text-[13px] leading-relaxed text-muted-foreground"
-                      dangerouslySetInnerHTML={{ __html: note.body }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeNoteHtml(note.body),
+                      }}
                     />
                   ) : (
                     <p className="line-clamp-5 whitespace-pre-wrap text-[13px] leading-relaxed text-muted-foreground">

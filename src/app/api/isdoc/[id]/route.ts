@@ -1,4 +1,5 @@
 import { apiFetchBlob } from "@/shared/api/client";
+import { contentDisposition } from "@/shared/lib/content-disposition";
 
 export async function GET(
   request: Request,
@@ -14,14 +15,12 @@ export async function GET(
   try {
     const { blob, filename, contentType } = await apiFetchBlob(
       `/api/invoices/${id}/isdoc`,
-      undefined,
-      "application/xml, text/xml, */*",
     );
     const name = filename || `faktura-${id}.isdoc`;
     return new Response(blob, {
       headers: {
-        "Content-Type": contentType ?? "application/xml",
-        "Content-Disposition": `${disposition}; filename="${name}"`,
+        "Content-Type": contentType || "application/xml",
+        "Content-Disposition": contentDisposition(name, disposition),
         "Cache-Control": "private, no-store",
       },
     });

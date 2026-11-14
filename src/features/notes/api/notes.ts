@@ -8,6 +8,7 @@ import { isApiError } from "@/shared/api/errors";
 import type { Note, PagedResponse } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { noteSchema } from "@/entities/note/model/schema";
+import { sanitizeNoteHtml } from "@/shared/lib/sanitize-html";
 
 export async function listNotes(params?: {
   page?: number;
@@ -50,7 +51,7 @@ export const createNoteAction = actionClient
         method: "POST",
         body: {
           title: parsedInput.title,
-          body: parsedInput.body || "",
+          body: sanitizeNoteHtml(parsedInput.body || ""),
           isPinned: parsedInput.isPinned,
         },
       });
@@ -73,7 +74,7 @@ export const updateNoteAction = actionClient
         method: "PUT",
         body: {
           title: body.title,
-          body: body.body || "",
+          body: sanitizeNoteHtml(body.body || ""),
           isPinned: body.isPinned,
         },
       });

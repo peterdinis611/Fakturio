@@ -1,8 +1,6 @@
 import { Suspense } from "react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { listAdminUsers } from "@/features/admin/api/admin";
-import { getCurrentUser } from "@/features/auth/api/auth";
-import { redirect } from "@/i18n/navigation";
 import { ServerLink as Link } from "@/i18n/server-link";
 import { PageHeader } from "@/widgets/app-shell/page-header";
 import { AdminUsersBody } from "@/widgets/admin/admin-users";
@@ -14,12 +12,6 @@ export async function generateMetadata() {
 }
 
 export default async function AdminUsersPage() {
-  const locale = await getLocale();
-  const user = await getCurrentUser();
-  if (!user?.isAdmin) {
-    redirect({ href: "/dashboard", locale });
-  }
-
   const dataPromise = listAdminUsers({ page: 1, pageSize: 50 });
   const t = await getTranslations("Admin");
   const tl = await getTranslations("Loading");
