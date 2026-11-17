@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Languages } from "lucide-react";
+import { ChevronDown, Languages } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";

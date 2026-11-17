@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckIcon, ChevronsUpDownIcon, SearchIcon } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, SearchIcon } from "@/shared/icons";
 import {
   countriesForSelect,
   countryDial,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Copy, Link2 } from "lucide-react";
+import { Copy, Link2 } from "@/shared/icons";
 import { useLocale } from "next-intl";
 import { toast } from "@/shared/toast";
 import { setInvoicePublicLinkAction } from "@/features/invoices/api/public";

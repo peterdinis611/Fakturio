@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Package } from "lucide-react";
+import { Download, Package } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { CsvPreview } from "@/widgets/preview/csv-preview";
 import { XmlPreview } from "@/widgets/preview/xml-preview";

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/shared/icons";
 import { logoutAction } from "@/features/auth/api/auth";
 import { Button } from "@/shared/ui/button";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Pin, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pin, Pencil, Plus, Trash2 } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { deleteNoteAction } from "@/features/notes/api/notes";

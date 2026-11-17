@@ -1,6 +1,6 @@
 "use client";
 
-import { Route } from "lucide-react";
+import { Route } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { FileSpreadsheet, PencilLine } from "lucide-react";
+import { FileSpreadsheet, PencilLine } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {

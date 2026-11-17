@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "@teispace/next-themes";
-import { Check, Monitor, Moon, Sun } from "lucide-react";
+import { Check, Monitor, Moon, Sun } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { cn } from "@/shared/lib/utils";

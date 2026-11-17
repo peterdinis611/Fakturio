@@ -1,6 +1,6 @@
 "use client";
 
-import { BookmarkPlus, LayoutTemplate } from "lucide-react";
+import { BookmarkPlus, LayoutTemplate } from "@/shared/icons";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";

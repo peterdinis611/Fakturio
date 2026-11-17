@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useTransition } from "react";
-import { Download, Paperclip, Trash2, Upload } from "lucide-react";
+import { Download, Paperclip, Trash2, Upload } from "@/shared/icons";
 import { toast } from "@/shared/toast";
 import {
   deleteInvoiceAttachmentAction,

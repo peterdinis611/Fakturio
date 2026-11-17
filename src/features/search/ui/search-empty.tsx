@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, FileSearch, Search } from "lucide-react";
+import { ArrowUpRight, FileSearch, Search } from "@/shared/icons";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@/shared/icons";
 import { cn } from "@/shared/lib/utils";
 
 /** Scroll window to top on client navigations. */

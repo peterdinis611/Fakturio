@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings2 } from "lucide-react";
+import { Settings2 } from "@/shared/icons";
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@/shared/ui/button";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileSpreadsheet, Upload, X } from "lucide-react";
+import { FileSpreadsheet, Upload, X } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { useId, useRef, useState } from "react";
 import { Badge } from "@/shared/ui/badge";

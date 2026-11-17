@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/shared/icons";
 import { logoutAction } from "@/features/auth/api/auth";
 import { toast } from "@/shared/toast";
 import { Button } from "@/shared/ui/button";
@@ -26,7 +26,9 @@ export function ProfileSignOut() {
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="ghost"
+      size="sm"
+      className="border border-border bg-surface/60 hover:border-ring/40 hover:bg-raised"
       disabled={pending}
       onClick={onSignOut}
     >

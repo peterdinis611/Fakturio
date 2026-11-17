@@ -1,0 +1,355 @@
+.profile-dossier {
+  --profile-accent: var(--ring);
+  position: relative;
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.profile-dossier::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -1.5rem -1rem auto;
+  height: 18rem;
+  background:
+    radial-gradient(
+      60% 80% at 8% 20%,
+      color-mix(in oklab, var(--profile-accent) 18%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 60% at 92% 0%,
+      color-mix(in oklab, var(--warning) 8%, transparent),
+      transparent 65%
+    );
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.profile-dossier > * {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  padding: 1.25rem 1.25rem 1.35rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--raised) 70%, transparent) 0%,
+      var(--surface) 42%,
+      var(--surface) 100%
+    );
+  box-shadow: inset 0 1px 0 color-mix(in oklab, #fff 4%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media (min-width: 640px) {
+  .profile-identity {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: 1.5rem;
+    padding: 1.5rem 1.5rem 1.6rem;
+  }
+}
+
+.profile-identity::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--profile-accent),
+    color-mix(in oklab, var(--profile-accent) 20%, transparent)
+  );
+}
+
+.profile-monogram {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 6px;
+  border: 1px solid color-mix(in oklab, var(--profile-accent) 35%, var(--border));
+  background: color-mix(in oklab, var(--profile-accent) 10%, var(--raised));
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.profile-monogram::before {
+  content: "";
+  position: absolute;
+  inset: 0.35rem;
+  border: 1px dashed color-mix(in oklab, var(--profile-accent) 28%, transparent);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.profile-identity-copy {
+  min-width: 0;
+}
+
+.profile-identity-name {
+  margin: 0;
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.profile-identity-mail {
+  margin-top: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.profile-identity-mail span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 640px) {
+  .profile-meta {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+.profile-meta-item {
+  display: flex;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.profile-meta-icon {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--raised);
+  color: var(--faint);
+  flex-shrink: 0;
+}
+
+.profile-meta-label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.profile-meta-value {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--text);
+}
+
+.profile-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.profile-section {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: clip;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.profile-section:hover {
+  border-color: color-mix(in oklab, var(--profile-accent) 28%, var(--border));
+}
+
+.profile-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--profile-accent) 7%, transparent),
+      transparent 42%
+    ),
+    color-mix(in oklab, var(--raised) 45%, transparent);
+}
+
+.profile-section-index {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklab, var(--profile-accent) 85%, var(--muted));
+  border: 1px solid color-mix(in oklab, var(--profile-accent) 30%, var(--border));
+  background: color-mix(in oklab, var(--profile-accent) 8%, transparent);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.profile-section-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.profile-section-desc {
+  margin: 0.3rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  max-width: 36ch;
+}
+
+.profile-section-body {
+  padding: 1.1rem;
+}
+
+.profile-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+@media (min-width: 640px) {
+  .profile-links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: color-mix(in oklab, var(--raised) 55%, transparent);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.profile-link:hover {
+  background: var(--raised);
+  border-color: color-mix(in oklab, var(--profile-accent) 35%, var(--border));
+  transform: translateY(-1px);
+}
+
+.profile-link:focus-visible {
+  outline: 2px solid var(--profile-accent);
+  outline-offset: 2px;
+}
+
+.profile-link-icon {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.profile-link:hover .profile-link-icon {
+  color: var(--profile-accent);
+  border-color: color-mix(in oklab, var(--profile-accent) 40%, var(--border));
+}
+
+.profile-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+.profile-reveal {
+  animation: profile-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.profile-reveal[data-delay="1"] {
+  animation-delay: 40ms;
+}
+.profile-reveal[data-delay="2"] {
+  animation-delay: 80ms;
+}
+.profile-reveal[data-delay="3"] {
+  animation-delay: 120ms;
+}
+.profile-reveal[data-delay="4"] {
+  animation-delay: 160ms;
+}
+.profile-reveal[data-delay="5"] {
+  animation-delay: 200ms;
+}
+.profile-reveal[data-delay="6"] {
+  animation-delay: 240ms;
+}
+
+@keyframes profile-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-reveal {
+    animation: none;
+  }
+  .profile-link:hover {
+    transform: none;
+  }
+}

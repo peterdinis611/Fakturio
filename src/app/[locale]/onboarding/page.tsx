@@ -1,4 +1,4 @@
-import { InfoIcon } from "lucide-react";
+import { InfoIcon } from "@/shared/icons";
 import { getTranslations } from "next-intl/server";
 import { getCompany } from "@/features/company/api/company";
 import { CompanyForm } from "@/features/company/ui/company-form";

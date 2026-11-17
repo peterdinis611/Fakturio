@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ScrollText } from "lucide-react";
+import { ScrollText } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useFuzzySearch } from "@/shared/hooks/use-fuzzy-search";

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { CloudOffIcon, RefreshCwIcon, WifiOffIcon } from "lucide-react";
+import { CloudOffIcon, RefreshCwIcon, WifiOffIcon } from "@/shared/icons";
 import { useConnectivity } from "@/shared/connectivity/use-connectivity";
 import { toast } from "@/shared/toast";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";

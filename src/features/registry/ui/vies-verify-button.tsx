@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { ShieldCheck, ShieldAlert } from "lucide-react";
+import { ShieldCheck, ShieldAlert } from "@/shared/icons";
 import { verifyVatAction } from "@/features/registry/api/registry";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { toast } from "@/shared/toast";

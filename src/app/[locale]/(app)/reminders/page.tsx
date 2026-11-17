@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertCircle, Clock3, Mail } from "lucide-react";
+import { AlertCircle, Clock3, Mail } from "@/shared/icons";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getReminders } from "@/features/invoices/api/invoices";
 import { PageHeader } from "@/widgets/app-shell/page-header";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Code2, Copy, Download } from "lucide-react";
+import { Check, Code2, Copy, Download } from "@/shared/icons";
 import {
   useEffect,
   useState,

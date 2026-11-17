@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen } from "lucide-react";
+import { BookOpen } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/shared/ui/button";
 import {

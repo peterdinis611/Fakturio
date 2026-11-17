@@ -6,7 +6,7 @@ import {
   CalendarClock,
   Keyboard,
   Palette,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/utils";

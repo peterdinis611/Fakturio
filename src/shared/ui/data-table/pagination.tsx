@@ -5,7 +5,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-} from "lucide-react";
+} from "@/shared/icons";
 import type { Table } from "@tanstack/react-table";
 import { Button } from "@/shared/ui/button";
 import {

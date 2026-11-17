@@ -11,7 +11,7 @@ import {
   useHotkeys,
 } from "@tanstack/react-hotkeys";
 import { toast } from "@/shared/toast";
-import { PlusIcon, Trash2Icon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "@/shared/icons";
 import {
   createInvoiceAction,
   updateInvoiceAction,
@@ -366,13 +366,17 @@ export function InvoiceForm({
           });
 
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+        toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo", {
+          description: "Skontroluj položky, sumy a údaje odberateľa.",
+        });
         applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
 
       if (isEdit) {
-        toast.success(t("saved"));
+        toast.success(t("saved"), {
+          description: "Zmeny sú uložené na doklade.",
+        });
         router.refresh();
         return;
       }
@@ -382,6 +386,12 @@ export function InvoiceForm({
         status === "Issued"
           ? `${label} bola vystavená`
           : `Koncept (${label.toLowerCase()}) bol vytvorený`,
+        {
+          description:
+            status === "Issued"
+              ? `Číslo ${result.data.number} · môžeš ju poslať alebo stiahnuť PDF.`
+              : "Doklad ostáva ako koncept, kým ho nevystavíš.",
+        },
       );
       router.push(`/invoices/${result.data.id}`);
     });

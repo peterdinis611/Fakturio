@@ -1,6 +1,6 @@
 "use client";
 
-import { Braces, Download, Eye, Table2 } from "lucide-react";
+import { Braces, Download, Eye, Table2 } from "@/shared/icons";
 import {
   useEffect,
   useState,

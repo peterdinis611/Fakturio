@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "@/shared/icons";
 import type { Column } from "@tanstack/react-table";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";

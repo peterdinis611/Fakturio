@@ -1,4 +1,4 @@
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon } from "@/shared/icons";
 import { getTranslations } from "next-intl/server";
 import type { CompanyCompleteness } from "@/shared/api/types";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";

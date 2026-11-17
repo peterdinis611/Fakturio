@@ -1,87 +1,62 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { XIcon } from "lucide-react";
-import {
-  dismissToast,
-  getToasts,
-  subscribeToasts,
-} from "./store";
-import type { ToastRecord, ToastVariant } from "./types";
-import "./toast.css";
+import { useTheme } from "@teispace/next-themes";
+import { Toaster as SileoToaster } from "sileo";
+import "./sileo-theme.css";
+import { useEffect, useState } from "react";
 
-const EMPTY_TOASTS: ToastRecord[] = [];
-const getServerToasts = () => EMPTY_TOASTS;
+const LIGHT = {
+  fill: "#12151a",
+  styles: {
+    title:
+      "font-[family-name:var(--font-plex)]! text-[13px]! font-medium! tracking-[-0.01em]! normal-case! text-[#f7f8fa]!",
+    description:
+      "font-[family-name:var(--font-plex)]! text-[13px]! leading-5! text-[#f7f8fa]/72!",
+    badge: "bg-white/10! ring-1 ring-inset ring-white/10!",
+    button:
+      "rounded-[4px]! font-[family-name:var(--font-plex)]! text-[12px]! font-medium! bg-white/12! hover:bg-white/18!",
+  },
+} as const;
 
-const MARK: Record<ToastVariant, string> = {
-  default: "i",
-  success: "OK",
-  error: "!",
-  warning: "!",
-};
-
-function ToastItem({ toast }: { toast: ToastRecord }) {
-  const [leaving, setLeaving] = useState(false);
-
-  function close() {
-    if (leaving) return;
-    setLeaving(true);
-    window.setTimeout(() => dismissToast(toast.id), 150);
-  }
-
-  useEffect(() => {
-    if (toast.duration <= 0 || !toast.dismissible) return;
-    // Soft leave shortly before store removal for exit animation.
-    const lead = Math.max(0, toast.duration - 160);
-    const timer = window.setTimeout(() => setLeaving(true), lead);
-    return () => window.clearTimeout(timer);
-  }, [toast.duration, toast.dismissible, toast.id]);
-
-  return (
-    <div
-      className="fk-toast"
-      data-variant={toast.variant}
-      data-leaving={leaving ? "true" : "false"}
-      role={toast.variant === "error" ? "alert" : "status"}
-      aria-live={toast.variant === "error" ? "assertive" : "polite"}
-    >
-      <span className="fk-toast-mark" aria-hidden>
-        {MARK[toast.variant]}
-      </span>
-      <div className="fk-toast-body">
-        <p className="fk-toast-title">{toast.title}</p>
-        {toast.description ? (
-          <p className="fk-toast-description">{toast.description}</p>
-        ) : null}
-      </div>
-      {toast.dismissible ? (
-        <button
-          type="button"
-          className="fk-toast-close"
-          aria-label="Zavrieť"
-          onClick={close}
-        >
-          <XIcon className="size-3.5" />
-        </button>
-      ) : null}
-    </div>
-  );
-}
+const DARK = {
+  fill: "#f7f8fa",
+  styles: {
+    title:
+      "font-[family-name:var(--font-plex)]! text-[13px]! font-medium! tracking-[-0.01em]! normal-case! text-[#12151a]!",
+    description:
+      "font-[family-name:var(--font-plex)]! text-[13px]! leading-5! text-[#12151a]/70!",
+    badge: "bg-black/8! ring-1 ring-inset ring-black/8!",
+    button:
+      "rounded-[4px]! font-[family-name:var(--font-plex)]! text-[12px]! font-medium! bg-black/8! hover:bg-black/12!",
+  },
+} as const;
 
 export function Toaster() {
-  const toasts = useSyncExternalStore(
-    subscribeToasts,
-    getToasts,
-    getServerToasts,
-  );
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  if (toasts.length === 0) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
+  const skin = isDark ? DARK : LIGHT;
 
   return (
-    <div className="fk-toaster" aria-label="Notifikácie">
-      {toasts.map((t) => (
-        <ToastItem key={t.id} toast={t} />
-      ))}
-    </div>
+    <SileoToaster
+      position="top-right"
+      theme={isDark ? "dark" : "light"}
+      offset={{ top: 18, right: 18, bottom: 18, left: 18 }}
+      options={{
+        fill: skin.fill,
+        roundness: 6,
+        styles: skin.styles,
+        autopilot: {
+          expand: 480,
+          collapse: 3600,
+        },
+        duration: 4500,
+      }}
+    />
   );
 }

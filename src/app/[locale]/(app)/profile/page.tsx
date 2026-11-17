@@ -8,7 +8,7 @@ import {
   ScrollText,
   Settings2,
   ShieldCheck,
-} from "lucide-react";
+} from "@/shared/icons";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/features/auth/api/auth";
 import { getCompany } from "@/features/company/api/company";
@@ -19,20 +19,12 @@ import { ProfilePasswordForm } from "@/features/profile/ui/profile-password-form
 import { ProfileSection } from "@/features/profile/ui/profile-section";
 import { ProfileSignOut } from "@/features/profile/ui/profile-sign-out";
 import { PageHeader } from "@/widgets/app-shell/page-header";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/card";
 import { emptyDash, formatDateTime } from "@/shared/lib/format";
 import { redirect } from "@/i18n/navigation";
 import { ServerLink as Link } from "@/i18n/server-link";
 import type { AppLocale } from "@/i18n/routing";
+import "@/features/profile/ui/profile.css";
 
 export async function generateMetadata() {
   const t = await getTranslations("Profile");
@@ -61,151 +53,133 @@ export default async function ProfilePage() {
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
   const mark = initials(user.firstName, user.lastName, user.email);
 
+  const shortcuts = [
+    { href: "/settings/company", label: t("setCompany"), Icon: Building2 },
+    { href: "/settings/appearance", label: t("openAppearance"), Icon: Palette },
+    { href: "/settings", label: t("openSettings"), Icon: Settings2 },
+    { href: "/privacy", label: t("openPrivacy"), Icon: Scale },
+    { href: "/terms", label: t("openTerms"), Icon: ScrollText },
+    { href: "/support", label: t("openSupport"), Icon: LifeBuoy },
+  ] as const;
+
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        actions={<ProfileSignOut />}
-      />
+    <div className="profile-dossier">
+      <div className="profile-reveal">
+        <PageHeader
+          title={t("title")}
+          description={t("description")}
+          actions={<ProfileSignOut />}
+        />
+      </div>
 
-      <Card
-        size="sm"
-        className="overflow-hidden rounded-[6px] bg-surface ring-border"
+      <section
+        className="profile-identity profile-reveal"
+        data-delay={1}
+        aria-label={displayName}
       >
-        <CardHeader className="border-b border-rule bg-raised/30">
-          <div className="flex flex-wrap items-center gap-4">
-            <Avatar aria-hidden size="xl">
-              <AvatarFallback>{mark}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <CardTitle className="truncate text-[17px]">{displayName}</CardTitle>
-                <Badge
-                  variant="outline"
-                  className="rounded-[4px] border-ring/35 text-[10px] tracking-[0.08em] text-ring uppercase"
-                >
-                  {t("active")}
-                </Badge>
-              </div>
-              <CardDescription className="mt-1 flex items-center gap-1.5 truncate">
-                <Mail className="size-3.5 shrink-0" aria-hidden />
-                {user.email}
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-4 pt-4 sm:grid-cols-2">
-          <div className="flex gap-2.5">
-            <CalendarDays
-              className="mt-0.5 size-3.5 shrink-0 text-faint"
-              aria-hidden
-            />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium tracking-[0.06em] text-muted-foreground uppercase">
-                {t("created")}
-              </p>
-              <p className="mt-1 data-num text-[13px] text-ink">
-                {formatDateTime(user.createdAt, locale)}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2.5">
-            <ShieldCheck
-              className="mt-0.5 size-3.5 shrink-0 text-faint"
-              aria-hidden
-            />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium tracking-[0.06em] text-muted-foreground uppercase">
-                {t("lastSeen")}
-              </p>
-              <p className="mt-1 data-num text-[13px] text-ink">
-                {user.lastSeenAt
-                  ? formatDateTime(user.lastSeenAt, locale)
-                  : emptyDash(null)}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <ProfileSection
-        index="01"
-        title={t("sectionAccount")}
-        description={t("sectionAccountHint")}
-      >
-        <ProfileAccountForm user={user} />
-      </ProfileSection>
-
-      <ProfileSection
-        index="02"
-        title={t("sectionSecurity")}
-        description={t("sectionSecurityHint")}
-      >
-        <ProfilePasswordForm userId={user.id} />
-      </ProfileSection>
-
-      <ProfileSection
-        index="03"
-        title={t("sectionLogo")}
-        description={t("sectionLogoHint")}
-      >
-        <LogoUploader logoUrl={company.logoUrl} />
-      </ProfileSection>
-
-      <ProfileSection
-        index="04"
-        title={t("sectionGdpr")}
-        description={t("sectionGdprHint")}
-      >
-        <GdprPanel />
-      </ProfileSection>
-
-      <ProfileSection
-        index="05"
-        title={t("sectionShortcuts")}
-        description={t("sectionShortcutsHint")}
-      >
-        <div className="grid gap-2 sm:grid-cols-2">
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/settings/company">
-              <Building2 className="size-3.5" aria-hidden />
-              {t("setCompany")}
-            </Link>
-          </Button>
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/settings/appearance">
-              <Palette className="size-3.5" aria-hidden />
-              {t("openAppearance")}
-            </Link>
-          </Button>
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/settings">
-              <Settings2 className="size-3.5" aria-hidden />
-              {t("openSettings")}
-            </Link>
-          </Button>
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/privacy">
-              <Scale className="size-3.5" aria-hidden />
-              {t("openPrivacy")}
-            </Link>
-          </Button>
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/terms">
-              <ScrollText className="size-3.5" aria-hidden />
-              {t("openTerms")}
-            </Link>
-          </Button>
-          <Button asChild variant="secondary" className="justify-start">
-            <Link href="/support">
-              <LifeBuoy className="size-3.5" aria-hidden />
-              {t("openSupport")}
-            </Link>
-          </Button>
+        <div className="profile-monogram" aria-hidden>
+          {mark}
         </div>
-        <p className="mt-3 text-[12px] text-muted-foreground">{t("companyHint")}</p>
-      </ProfileSection>
+        <div className="profile-identity-copy">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="profile-identity-name">{displayName}</h2>
+            <Badge
+              variant="outline"
+              className="rounded-[4px] border-ring/40 text-[10px] tracking-[0.1em] text-ring uppercase"
+            >
+              {t("active")}
+            </Badge>
+          </div>
+          <p className="profile-identity-mail">
+            <Mail className="size-3.5 shrink-0" aria-hidden />
+            <span>{user.email}</span>
+          </p>
+
+          <div className="profile-meta">
+            <div className="profile-meta-item">
+              <span className="profile-meta-icon" aria-hidden>
+                <CalendarDays className="size-3.5" />
+              </span>
+              <div className="min-w-0">
+                <p className="profile-meta-label">{t("created")}</p>
+                <p className="profile-meta-value data-num">
+                  {formatDateTime(user.createdAt, locale)}
+                </p>
+              </div>
+            </div>
+            <div className="profile-meta-item">
+              <span className="profile-meta-icon" aria-hidden>
+                <ShieldCheck className="size-3.5" />
+              </span>
+              <div className="min-w-0">
+                <p className="profile-meta-label">{t("lastSeen")}</p>
+                <p className="profile-meta-value data-num">
+                  {user.lastSeenAt
+                    ? formatDateTime(user.lastSeenAt, locale)
+                    : emptyDash(null)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="profile-stack">
+        <ProfileSection
+          index="01"
+          title={t("sectionAccount")}
+          description={t("sectionAccountHint")}
+          delay={2}
+        >
+          <ProfileAccountForm user={user} />
+        </ProfileSection>
+
+        <ProfileSection
+          index="02"
+          title={t("sectionSecurity")}
+          description={t("sectionSecurityHint")}
+          delay={3}
+        >
+          <ProfilePasswordForm userId={user.id} />
+        </ProfileSection>
+
+        <ProfileSection
+          index="03"
+          title={t("sectionLogo")}
+          description={t("sectionLogoHint")}
+          delay={4}
+        >
+          <LogoUploader logoUrl={company.logoUrl} />
+        </ProfileSection>
+
+        <ProfileSection
+          index="04"
+          title={t("sectionGdpr")}
+          description={t("sectionGdprHint")}
+          delay={5}
+        >
+          <GdprPanel />
+        </ProfileSection>
+
+        <ProfileSection
+          index="05"
+          title={t("sectionShortcuts")}
+          description={t("sectionShortcutsHint")}
+          delay={6}
+        >
+          <nav className="profile-links" aria-label={t("sectionShortcuts")}>
+            {shortcuts.map(({ href, label, Icon }) => (
+              <Link key={href} href={href} className="profile-link">
+                <span className="profile-link-icon" aria-hidden>
+                  <Icon className="size-3.5" />
+                </span>
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <p className="profile-hint">{t("companyHint")}</p>
+        </ProfileSection>
+      </div>
     </div>
   );
 }

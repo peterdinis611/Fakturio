@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/shared/icons";
 import { dueDaysLabel, type DueDaysTranslate } from "@/widgets/dashboard/due-days";
 import { Button } from "@/shared/ui/button";
 import type { InvoiceListItem, InvoiceReminder, ReportOverview } from "@/shared/api/types";

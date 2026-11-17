@@ -8,7 +8,7 @@ import {
   Settings,
   Sun,
   UserRound,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useTheme } from "@teispace/next-themes";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter as useNextRouter } from "next/navigation";

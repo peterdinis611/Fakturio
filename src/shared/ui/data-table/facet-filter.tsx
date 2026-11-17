@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, PlusCircle, X } from "lucide-react";
+import { Check, PlusCircle, X } from "@/shared/icons";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {

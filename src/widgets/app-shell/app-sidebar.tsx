@@ -19,7 +19,7 @@ import {
   Users,
   Wallet,
   X,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { NotificationBell } from "@/features/notifications/ui/notification-bell";

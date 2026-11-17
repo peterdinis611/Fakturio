@@ -10,7 +10,7 @@ import {
   type AppHotkeyId,
 } from "@tanstack/react-hotkeys";
 import { useTranslations } from "next-intl";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw } from "@/shared/icons";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
 

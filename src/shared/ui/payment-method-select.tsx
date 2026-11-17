@@ -5,8 +5,8 @@ import {
   CreditCardIcon,
   LandmarkIcon,
   MoreHorizontalIcon,
-  type LucideIcon,
-} from "lucide-react";
+  type PulsoIcon,
+} from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -25,7 +25,7 @@ const METHODS: ReadonlyArray<{
     | "payCashHint"
     | "payCardHint"
     | "payOtherHint";
-  Icon: LucideIcon;
+  Icon: PulsoIcon;
 }> = [
   {
     value: "bank_transfer",
@@ -69,7 +69,7 @@ function MethodRow({
 }: {
   label: string;
   hint: string;
-  Icon: LucideIcon;
+  Icon: PulsoIcon;
 }) {
   return (
     <span className="inline-flex w-full min-w-0 items-center gap-2.5">

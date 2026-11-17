@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { DndProvider, useDrop } from "react-dnd";
 import { HTML5Backend, NativeTypes } from "react-dnd-html5-backend";
-import { ImagePlus, Trash2, Upload } from "lucide-react";
+import { ImagePlus, Trash2, Upload } from "@/shared/icons";
 import {
   deleteCompanyLogoAction,
   uploadCompanyLogoAction,
@@ -79,7 +79,9 @@ function LogoDropZone({ logoUrl }: Props) {
       startTransition(async () => {
         try {
           await uploadCompanyLogoAction(formData);
-          toast.success(t("logoSaved"));
+          toast.success(t("logoSaved"), {
+            description: "Logo sa zobrazí na PDF faktúrach.",
+          });
           router.refresh();
         } catch (err) {
           setPreview(null);
@@ -88,7 +90,9 @@ function LogoDropZone({ logoUrl }: Props) {
             err instanceof Error ? err.message : undefined,
           );
           setError(msg);
-          toast.error(msg);
+          toast.error(msg, {
+            description: "Použi PNG alebo JPG do 2 MB.",
+          });
         }
       });
     },
@@ -134,11 +138,14 @@ function LogoDropZone({ logoUrl }: Props) {
           setPreview(null);
         }
         await deleteCompanyLogoAction();
-        toast.success(t("logoRemoved"));
+        toast.success(t("logoRemoved"), {
+          description: "Na faktúrach sa logo už nebude zobrazovať.",
+        });
         router.refresh();
       } catch (err) {
         toast.error(
           toUserFacingError(err instanceof Error ? err.message : undefined),
+          { description: "Skús to znova o chvíľu." },
         );
       }
     });

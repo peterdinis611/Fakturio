@@ -24,7 +24,7 @@ import {
   UserRound,
   Users,
   X,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useTranslations } from "next-intl";
 import {

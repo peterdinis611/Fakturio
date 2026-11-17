@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "@/shared/icons";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
 import { loginAction, registerAction } from "@/features/auth/api/auth";

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { deleteServiceAction } from "@/features/services/api/services";
 import { ServiceCatalogForm } from "@/features/services/ui/service-catalog-form";

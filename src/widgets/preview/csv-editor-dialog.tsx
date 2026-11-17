@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Braces, FileSpreadsheet, Table2 } from "lucide-react";
+import { Braces, FileSpreadsheet, Table2 } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import {
   countCsvDataRows,

@@ -9,7 +9,7 @@ import {
   FileText,
   Mail,
   UserRound,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";

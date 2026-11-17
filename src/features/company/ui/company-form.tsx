@@ -271,18 +271,24 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
   function saveFioToken() {
     const token = fioBankToken.trim();
     if (!token) {
-      toast.error("Zadaj FIO API token");
+      toast.error("Zadaj FIO API token", {
+        description: "Token nájdeš vo FIO Internetbankingu → API.",
+      });
       return;
     }
     startTransition(async () => {
       const result = await updateCompanyBankAction({ fioBankToken: token });
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
+        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"), {
+          description: "Skontroluj token a skús to znova.",
+        });
         return;
       }
       setHasFioBankToken(result.data.hasFioBankToken);
       setFioBankToken("");
-      toast.success("FIO token bol uložený");
+      toast.success("FIO token bol uložený", {
+        description: "Import pohybov z FIO je pripravený.",
+      });
       router.refresh();
     });
   }
@@ -291,11 +297,18 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     startTransition(async () => {
       const result = await updateCompanyAction(values);
       if (!result?.data) {
-        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
+        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"), {
+          description: "Skontroluj povinné polia a skús uložiť znova.",
+        });
         applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
       }
-      toast.success(t("saved"));
+      toast.success(t("saved"), {
+        description:
+          mode === "onboarding"
+            ? "Pokračuj vystavením prvej faktúry."
+            : "Údaje firmy sú pripravené na faktúrach.",
+      });
       router.push(mode === "onboarding" ? "/first-invoice" : "/dashboard");
       router.refresh();
     });

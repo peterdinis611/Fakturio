@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Trash2 } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {

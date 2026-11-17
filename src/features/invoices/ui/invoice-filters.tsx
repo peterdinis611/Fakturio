@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "@/shared/icons";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/shared/ui/badge";
 import type { InvoiceDocumentType, InvoiceStatus } from "@/shared/api/types";

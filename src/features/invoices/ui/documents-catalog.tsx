@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Download } from "@/shared/icons";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { getCompanySummary } from "@/features/company/api/company";

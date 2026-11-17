@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Maximize2 } from "lucide-react";
+import { Maximize2 } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { AgingChart } from "@/features/reports/ui/aging-chart";
 import { StatusChart } from "@/features/reports/ui/status-chart";

@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import {

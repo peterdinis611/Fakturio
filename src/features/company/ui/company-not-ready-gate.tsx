@@ -1,4 +1,4 @@
-import { Building2 } from "lucide-react";
+import { Building2 } from "@/shared/icons";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/shared/ui/empty-state";
 

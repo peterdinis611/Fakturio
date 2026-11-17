@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw } from "@/shared/icons";
 import { toast } from "@/shared/toast";
 import {
   markReminderSentAction,

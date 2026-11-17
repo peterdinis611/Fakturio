@@ -60,7 +60,7 @@ import {
   Undo2,
   Unlink,
   WrapText,
-} from "lucide-react";
+} from "@/shared/icons";
 import { cn } from "@/shared/lib/utils";
 import {
   Callout,

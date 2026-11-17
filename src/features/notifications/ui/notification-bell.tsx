@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, BellOff, Settings2 } from "lucide-react";
+import { Bell, BellOff, Settings2 } from "@/shared/icons";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import {

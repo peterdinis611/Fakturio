@@ -162,7 +162,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     optimizePackageImports: [
-      "lucide-react",
+      "pulsoicon-react",
       "date-fns",
       "recharts",
       "motion",

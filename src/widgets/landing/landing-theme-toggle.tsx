@@ -2,7 +2,7 @@
 
 import { useTheme } from "@teispace/next-themes";
 import { motion, useReducedMotion } from "motion/react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 

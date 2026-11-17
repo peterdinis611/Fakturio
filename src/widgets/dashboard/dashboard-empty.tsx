@@ -5,7 +5,7 @@ import {
   Building2,
   FileText,
   UserPlus,
-} from "lucide-react";
+} from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { CreateCustomerDialog } from "@/features/customers/ui/create-customer-dialog";
 import { BrandMark } from "@/shared/brand/brand-mark";
