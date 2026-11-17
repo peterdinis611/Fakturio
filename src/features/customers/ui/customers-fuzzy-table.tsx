@@ -310,7 +310,7 @@ export function CustomersFuzzyTable({
               table={table}
               labels={{
                 rowsPerPage: td("rowsPerPage"),
-                pageOf: td("pageOf"),
+                pageOf: (page, pages) => td("pageOf", { page, pages }),
                 first: td("first"),
                 previous: td("previous"),
                 next: td("next"),

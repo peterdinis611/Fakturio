@@ -521,12 +521,12 @@ export function InvoicesFuzzyTable({
               table={table}
               labels={{
                 rowsPerPage: td("rowsPerPage"),
-                pageOf: td("pageOf"),
+                pageOf: (page, pages) => td("pageOf", { page, pages }),
                 first: td("first"),
                 previous: td("previous"),
                 next: td("next"),
                 last: td("last"),
-                selected: td("selected"),
+                selected: (count) => td("selected", { count }),
               }}
             />
           </div>

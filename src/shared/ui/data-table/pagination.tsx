@@ -23,12 +23,12 @@ export function DataTablePagination<TData>({
   table: Table<TData>;
   labels: {
     rowsPerPage: string;
-    pageOf: string;
+    pageOf: (page: number, pages: number) => string;
     first: string;
     previous: string;
     next: string;
     last: string;
-    selected?: string;
+    selected?: (count: number) => string;
   };
 }) {
   const selected = table.getFilteredSelectedRowModel().rows.length;
@@ -38,9 +38,7 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-1 py-2">
       <p className="text-[12px] text-muted-foreground">
-        {selected > 0 && labels.selected
-          ? labels.selected.replace("{count}", String(selected))
-          : null}
+        {selected > 0 && labels.selected ? labels.selected(selected) : null}
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
@@ -64,9 +62,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <p className="min-w-[6.5rem] text-center text-[12px] tabular-nums text-muted-foreground">
-          {labels.pageOf
-            .replace("{page}", String(pageIndex + 1))
-            .replace("{pages}", String(pageCount))}
+          {labels.pageOf(pageIndex + 1, pageCount)}
         </p>
         <div className="flex items-center gap-1">
           <Button
