@@ -622,6 +622,7 @@
     "jobOverdue": "Overdue sync",
     "jobReminder": "Reminders",
     "jobRecurring": "Recurring invoices",
+    "openPanel": "Open admin panel",
     "usersTitle": "Users",
     "usersLead": "Accounts across this Fakturio instance.",
     "backOverview": "Back to overview",

@@ -89,9 +89,17 @@ export async function AdminOverviewBody({
               </span>
             </p>
           </div>
-          <p className="data-num text-[12px] text-muted-foreground">
-            {formatDate(data.generatedAtUtc, locale)}
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/admin/panel"
+              className="text-[13px] font-medium text-ink underline-offset-2 hover:underline"
+            >
+              {t("openPanel")}
+            </Link>
+            <p className="data-num text-[12px] text-muted-foreground">
+              {formatDate(data.generatedAtUtc, locale)}
+            </p>
+          </div>
         </div>
       </MotionItem>
 
