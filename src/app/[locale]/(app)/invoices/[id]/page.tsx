@@ -7,6 +7,7 @@ import { InvoiceAttachments } from "@/features/invoices/ui/invoice-attachments";
 import { InvoicePublicLink } from "@/features/invoices/ui/invoice-public-link";
 import { listInvoiceAttachments } from "@/features/invoices/api/attachments";
 import { getInvoicePublicLink } from "@/features/invoices/api/public";
+import { getEmailStatus } from "@/features/emails/api/emails";
 import { StatusBadge } from "@/shared/ui/status-badge";
 import { Button } from "@/shared/ui/button";
 import {
@@ -127,12 +128,17 @@ export default async function InvoiceDetailPage({
   let invoice;
   let attachments: Awaited<ReturnType<typeof listInvoiceAttachments>> = [];
   let publicLink: Awaited<ReturnType<typeof getInvoicePublicLink>> | null = null;
+  let emailConfigured = false;
   try {
     invoice = await getInvoice(id);
-    [attachments, publicLink] = await Promise.all([
+    const [atts, link, emailStatus] = await Promise.all([
       listInvoiceAttachments(id),
       getInvoicePublicLink(id).catch(() => null),
+      getEmailStatus().catch(() => null),
     ]);
+    attachments = atts;
+    publicLink = link;
+    emailConfigured = emailStatus?.configured ?? false;
   } catch (e) {
     if (isApiError(e) && e.status === 404) notFound();
     throw e;
@@ -215,7 +221,10 @@ export default async function InvoiceDetailPage({
           <Button asChild variant="ghost" size="sm">
             <Link href={`/logs?entityId=${id}`}>{t("auditHistory")}</Link>
           </Button>
-          <InvoiceActions invoice={invoice} />
+          <InvoiceActions
+            invoice={invoice}
+            emailConfigured={emailConfigured}
+          />
         </div>
       </div>
 

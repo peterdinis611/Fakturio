@@ -222,6 +222,7 @@ const auditActionLabels: Record<AppLocale, Record<AuditAction, string>> = {
     RecurringDeleted: "Opakovaná zmazaná",
     RecurringGenerated: "Opakovaná generovaná",
     LoginSucceeded: "Prihlásenie",
+    EmailSent: "E-mail odoslaný",
   },
   en: {
     Created: "Created",
@@ -248,6 +249,7 @@ const auditActionLabels: Record<AppLocale, Record<AuditAction, string>> = {
     RecurringDeleted: "Recurring deleted",
     RecurringGenerated: "Recurring generated",
     LoginSucceeded: "Login",
+    EmailSent: "Email sent",
   },
   cs: {
     Created: "Vytvoření",
@@ -274,6 +276,7 @@ const auditActionLabels: Record<AppLocale, Record<AuditAction, string>> = {
     RecurringDeleted: "Opakovaná smazána",
     RecurringGenerated: "Opakovaná generována",
     LoginSucceeded: "Přihlášení",
+    EmailSent: "E-mail odeslán",
   },
   de: {
     Created: "Erstellt",
@@ -300,6 +303,7 @@ const auditActionLabels: Record<AppLocale, Record<AuditAction, string>> = {
     RecurringDeleted: "Wiederkehrend gelöscht",
     RecurringGenerated: "Wiederkehrend generiert",
     LoginSucceeded: "Anmeldung",
+    EmailSent: "E-Mail gesendet",
   },
 };
 

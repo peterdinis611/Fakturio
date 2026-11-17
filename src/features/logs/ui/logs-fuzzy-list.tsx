@@ -22,6 +22,7 @@ const actionTone: Partial<Record<AuditAction, string>> = {
   RecurringDeleted: "text-negative",
   GdprErasure: "text-negative",
   ReminderSent: "text-ink",
+  EmailSent: "text-ink",
   Issued: "text-ink",
   CreditNoteCreated: "text-ink",
   LoginSucceeded: "text-muted-foreground",

@@ -40,6 +40,7 @@ const ACTIONS: (AuditAction | "all")[] = [
   "RecurringUpdated",
   "RecurringDeleted",
   "LoginSucceeded",
+  "EmailSent",
 ];
 
 const ENTITY_TYPES = [

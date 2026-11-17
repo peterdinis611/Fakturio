@@ -39,7 +39,8 @@ export type AuditAction =
   | "RecurringUpdated"
   | "RecurringDeleted"
   | "RecurringGenerated"
-  | "LoginSucceeded";
+  | "LoginSucceeded"
+  | "EmailSent";
 
 export type AuditEntityType =
   | "Invoice"

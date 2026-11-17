@@ -14,6 +14,7 @@ import {
   issueInvoiceAction,
   markPaidAction,
 } from "@/features/invoices/api/invoices";
+import { SendInvoiceEmailDialog } from "@/features/emails/ui/send-invoice-email-dialog";
 import type { Invoice } from "@/shared/api/types";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import { cancelSchema } from "@/entities/invoice/model/schema";
@@ -33,9 +34,13 @@ import { Spinner } from "@/shared/ui/spinner";
 
 type InvoiceActionsProps = {
   invoice: Invoice;
+  emailConfigured?: boolean;
 };
 
-export function InvoiceActions({ invoice }: InvoiceActionsProps) {
+export function InvoiceActions({
+  invoice,
+  emailConfigured = false,
+}: InvoiceActionsProps) {
   const t = useTranslations("InvoiceDetail");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -299,6 +304,10 @@ export function InvoiceActions({ invoice }: InvoiceActionsProps) {
 
       {showPdf ? (
         <>
+          <SendInvoiceEmailDialog
+            invoice={invoice}
+            emailConfigured={emailConfigured}
+          />
           <Button type="button" size="sm" variant="ghost" asChild>
             <Link href={pdfInline} target="_blank" rel="noopener noreferrer">
               Náhľad PDF · QR

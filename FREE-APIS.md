@@ -36,11 +36,24 @@ Služby s ApiKey / tokenom (Resend, Brevo, …) zatiaľ nepoužívame. **FIO Ban
 | [Peppol directory](https://directory.peppol.eu/) | E-invoice účastník (stub) | ✅ soft-fail |
 | ISDOC 6.0.1 (lokálne) | XML export faktúry | ✅ `GET /api/invoices/{id}/isdoc` |
 
+## E-mail (voliteľné — ApiKey / SMTP)
+
+| Provider | Konfigurácia |
+|---|---|
+| Virtual | `Email:Provider=Virtual` — len log + audit `EmailSent` (dev default) |
+| SMTP | `Email:Provider=Smtp` + `Smtp:Host/Port/Username/Password` + `FromAddress` |
+| Resend | `Email:Provider=Resend` + `Resend:ApiKey` + `FromAddress` |
+
+- `GET /api/emails/status` — či je provider pripravený
+- `POST /api/emails/test` — skúšobný e-mail
+- `POST /api/invoices/{id}/email` — odoslanie dokladu (PDF + voliteľný public link)
+- Upomienky: ak `NotificationPreferences.EmailEnabled`, job pošle e-mail zákazníkovi
+
 ## Neskôr (vyžadujú kľúč / token — mimo scope)
 
 | API | Prečo nie teraz |
 |---|---|
-| Resend / Brevo | ApiKey |
+| Brevo / SendGrid | Alternatíva k Resend — zatiaľ nepoužívame |
 | FIO Banka API | ✅ voliteľné — token v nastaveniach firmy (`HasFioBankToken`) |
 | [Companies House](https://developer.company-information.service.gov.uk/) | Vyžaduje API kľúč (UK) |
 | FinStat | platené |

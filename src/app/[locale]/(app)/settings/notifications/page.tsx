@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { getNotificationPreferences } from "@/features/notifications/api/notifications";
 import { NotificationPrefsForm } from "@/features/notifications/ui/notification-prefs-form";
+import { getEmailStatus } from "@/features/emails/api/emails";
+import { EmailStatusPanel } from "@/features/emails/ui/email-status-panel";
 import {
   Card,
   CardContent,
@@ -16,7 +18,10 @@ export async function generateMetadata() {
 
 export default async function NotificationSettingsPage() {
   const t = await getTranslations("Settings");
-  const prefs = await getNotificationPreferences();
+  const [prefs, emailStatus] = await Promise.all([
+    getNotificationPreferences(),
+    getEmailStatus().catch(() => null),
+  ]);
 
   return (
     <Card size="sm" className="rounded-[6px] bg-surface ring-border">
@@ -24,7 +29,8 @@ export default async function NotificationSettingsPage() {
         <CardTitle className="text-[15px]">{t("notificationsTitle")}</CardTitle>
         <CardDescription>{t("notificationsDescription")}</CardDescription>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="space-y-5 pt-4">
+        {emailStatus ? <EmailStatusPanel status={emailStatus} /> : null}
         <NotificationPrefsForm initial={prefs} />
       </CardContent>
     </Card>
