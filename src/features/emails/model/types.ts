@@ -4,6 +4,7 @@ export type EmailStatus = {
   fromAddress: string | null;
   fromName: string | null;
   hasPublicAppBaseUrl: boolean;
+  simulated?: boolean;
 };
 
 export type SendTestEmailResponse = {

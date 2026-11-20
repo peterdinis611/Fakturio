@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "sileo/styles.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -187,43 +186,10 @@
   html {
     @apply font-sans;
   }
-  /* html:root beats sileo's :root (0,1,1 > 0,1,0) */
-  html:root {
-    --sileo-width: 360px;
-    --sileo-height: 42px;
-    --sileo-duration: 560ms;
-    --sileo-state-success: #4ade80;
-    --sileo-state-loading: #a3a39a;
-    --sileo-state-error: #f87171;
-    --sileo-state-warning: #fbbf24;
-    --sileo-state-info: #2dd4bf;
-    --sileo-state-action: #2dd4bf;
-  }
-  html.dark:root {
-    --sileo-state-success: #166534;
-    --sileo-state-loading: #5a6270;
-    --sileo-state-error: #b91c1c;
-    --sileo-state-warning: #92400e;
-    --sileo-state-info: #0f766e;
-    --sileo-state-action: #0f766e;
-  }
   .num,
   .data-num,
   table {
     font-variant-numeric: tabular-nums;
-  }
-  [data-sileo-viewport] {
-    z-index: 80;
-  }
-  [data-sileo-title] {
-    text-transform: none !important;
-    letter-spacing: -0.01em;
-  }
-  [data-sileo-description] {
-    font-variant-numeric: tabular-nums;
-  }
-  [data-sileo-button] {
-    border-radius: 4px !important;
   }
 }
 

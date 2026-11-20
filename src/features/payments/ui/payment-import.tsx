@@ -129,10 +129,18 @@ export function PaymentImportPanel() {
 
   function confirm() {
     const rows = matchedRows
-      .filter((r) => r.invoiceId && selected.has(r.invoiceId))
+      .filter(
+        (r) =>
+          r.invoiceId &&
+          selected.has(r.invoiceId) &&
+          (r.normalizedVariableSymbol || r.rawVariableSymbol),
+      )
       .map((r) => ({
         invoiceId: r.invoiceId!,
         paidAt: r.bookingDate,
+        variableSymbol:
+          r.normalizedVariableSymbol ?? r.rawVariableSymbol ?? "",
+        amount: r.amount ?? r.invoiceTotal ?? null,
       }));
 
     if (rows.length === 0) {

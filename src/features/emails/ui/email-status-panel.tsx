@@ -22,10 +22,15 @@ export function EmailStatusPanel({ status }: { status: EmailStatus }) {
         <p className="text-[13px] font-medium text-ink">{t("emailDelivery")}</p>
         <p className="text-[12px] text-muted-foreground">
           {status.configured
-            ? t("emailConfigured", {
-                provider: status.provider,
-                from: status.fromAddress ?? "—",
-              })
+            ? status.simulated
+              ? t("emailSimulated", {
+                  provider: status.provider,
+                  from: status.fromAddress ?? "—",
+                })
+              : t("emailConfigured", {
+                  provider: status.provider,
+                  from: status.fromAddress ?? "—",
+                })
             : t("emailNotConfigured")}
         </p>
       </div>

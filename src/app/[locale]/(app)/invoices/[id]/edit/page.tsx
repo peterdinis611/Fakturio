@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCompany } from "@/features/company/api/company";
+import { CompanyNotReadyGate } from "@/features/company/ui/company-not-ready-gate";
 import { listCustomers } from "@/features/customers/api/customers";
 import { getInvoice } from "@/features/invoices/api/invoices";
 import { listServices } from "@/features/services/api/services";
@@ -38,6 +39,15 @@ export default async function EditInvoicePage({
     listServices({ pageSize: 100, activeOnly: true }),
   ]);
 
+  if (!company.completeness.isReadyToInvoice) {
+    return (
+      <div>
+        <PageHeader title={`${t("editTitle")} · ${invoice.number}`} />
+        <CompanyNotReadyGate />
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader title={`${t("editTitle")} · ${invoice.number}`} />
@@ -45,6 +55,7 @@ export default async function EditInvoicePage({
         initial={invoice}
         customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
         catalogItems={services.items}
+        defaultFlow={invoice.flow}
         companyDefaults={{
           defaultVatRate: company.defaultVatRate,
           defaultCurrency: company.defaultCurrency,

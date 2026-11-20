@@ -154,6 +154,11 @@ export function CompanyEdit() {
         <TextInput source="email" type="email" />
         <TextInput source="city" />
         <TextInput source="country" helperText="2-letter ISO code, e.g. SK" />
+        <TextInput
+          source="icDph"
+          label="IČ DPH"
+          helperText="Required when VAT payer is enabled"
+        />
         <BooleanInput source="isVatPayer" />
       </SimpleForm>
     </Edit>

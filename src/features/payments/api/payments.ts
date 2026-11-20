@@ -57,6 +57,8 @@ export const confirmPaymentImportAction = actionClient
           z.object({
             invoiceId: z.string().uuid(),
             paidAt: z.string().nullable().optional(),
+            variableSymbol: z.string().min(1),
+            amount: z.number().nullable().optional(),
           }),
         )
         .min(1)
@@ -69,7 +71,14 @@ export const confirmPaymentImportAction = actionClient
         "/api/payments/import/confirm",
         {
           method: "POST",
-          body: { rows: parsedInput.rows },
+          body: {
+            rows: parsedInput.rows.map((r) => ({
+              invoiceId: r.invoiceId,
+              paidAt: r.paidAt,
+              variableSymbol: r.variableSymbol,
+              amount: r.amount ?? null,
+            })),
+          },
         },
       );
       revalidateTag("invoices", "max");

@@ -12,6 +12,7 @@ import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { adminAuthProvider } from "./auth-provider";
 import { adminDataProvider } from "./data-provider";
 import { AdminDashboard } from "./dashboard";
 import { JobSettingsEdit, JobSettingsRedirect } from "./job-settings";
@@ -46,8 +47,9 @@ export function AdminAppLoaded({ basename }: { basename: string }) {
   return (
     <Admin
       dataProvider={adminDataProvider}
+      authProvider={adminAuthProvider}
       basename={basename}
-      requireAuth={false}
+      requireAuth
       dashboard={AdminDashboard}
       disableTelemetry
     >

@@ -334,7 +334,9 @@ export function InvoiceForm({
 
     toast.error(
       messages.filter(Boolean)[0] ??
-        "Doplň povinné polia — odberateľ, popis a cenu položky.",
+        defaultFlow === "Received"
+          ? "Doplň povinné polia — dodávateľ, popis a cenu položky."
+          : "Doplň povinné polia — odberateľ, popis a cenu položky.",
     );
 
     // Scroll first invalid field into view
@@ -367,7 +369,10 @@ export function InvoiceForm({
 
       if (!result?.data) {
         toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo", {
-          description: "Skontroluj položky, sumy a údaje odberateľa.",
+          description:
+            defaultFlow === "Received"
+              ? "Skontroluj položky, sumy a údaje dodávateľa."
+              : "Skontroluj položky, sumy a údaje odberateľa.",
         });
         applyFieldErrors(toFieldErrors(result?.validationErrors));
         return;
@@ -453,7 +458,9 @@ export function InvoiceForm({
           )}
           <div className={cn(fieldClass, "sm:col-span-2")}>
             <div className="flex items-center justify-between gap-2">
-              <Label>{ti("colCustomer")}</Label>
+              <Label>
+                {defaultFlow === "Received" ? t("colSupplier") : ti("colCustomer")}
+              </Label>
               {!readOnly ? (
                 <CreateCustomerDialog
                   trigger={
@@ -487,7 +494,13 @@ export function InvoiceForm({
                   disabled={readOnly || pending}
                 >
                   <SelectTrigger className="w-full" aria-invalid={!!errors.customerId}>
-                    <SelectValue placeholder={t("pickCustomer")} />
+                    <SelectValue
+                      placeholder={
+                        defaultFlow === "Received"
+                          ? t("pickSupplier")
+                          : t("pickCustomer")
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {customerOptions.map((c) => (

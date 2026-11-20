@@ -17,8 +17,9 @@ function jwtSecret(): Uint8Array | null {
 /**
  * Verify session JWT signature + expiry (same key/issuer/audience as the API).
  * Edge-safe (jose + Uint8Array). Returns null when invalid.
- * When JWT_KEY is unset outside production, falls back to an unverified presence check
- * so local dev still works before the secret is wired into frontend/.env.
+ *
+ * Unverified cookie fallback is opt-in via ALLOW_DEV_UNVERIFIED_JWT=true
+ * (local wiring only). Staging/preview without JWT_KEY fail closed.
  */
 export async function verifyAccessToken(
   token: string | null | undefined,
@@ -27,7 +28,10 @@ export async function verifyAccessToken(
 
   const secret = jwtSecret();
   if (!secret) {
-    if (process.env.NODE_ENV === "production") return null;
+    const allowDevBypass =
+      process.env.ALLOW_DEV_UNVERIFIED_JWT === "true" &&
+      process.env.NODE_ENV !== "production";
+    if (!allowDevBypass) return null;
     return { sub: "dev-unverified", exp: Math.floor(Date.now() / 1000) + 3600 };
   }
 

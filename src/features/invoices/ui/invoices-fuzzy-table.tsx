@@ -46,6 +46,7 @@ import {
 } from "@/shared/ui/table";
 import { DataTableColumnHeader } from "@/shared/ui/data-table/column-header";
 import { DataTableFacetFilter } from "@/shared/ui/data-table/facet-filter";
+import { dataTablePaginationLabels } from "@/shared/ui/data-table/labels";
 import { DataTablePagination } from "@/shared/ui/data-table/pagination";
 import { DataTableViewOptions } from "@/shared/ui/data-table/view-options";
 
@@ -519,15 +520,7 @@ export function InvoicesFuzzyTable({
           <div className="border-t border-border px-2">
             <DataTablePagination
               table={table}
-              labels={{
-                rowsPerPage: td("rowsPerPage"),
-                pageOf: (page, pages) => td("pageOf", { page, pages }),
-                first: td("first"),
-                previous: td("previous"),
-                next: td("next"),
-                last: td("last"),
-                selected: (count) => td("selected", { count }),
-              }}
+              labels={dataTablePaginationLabels(td)}
             />
           </div>
         </div>

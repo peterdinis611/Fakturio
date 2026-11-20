@@ -2,6 +2,7 @@
 
 import { useTheme } from "@teispace/next-themes";
 import { Toaster as SileoToaster } from "sileo";
+import "sileo/styles.css";
 import "./sileo-theme.css";
 import { useEffect, useState } from "react";
 
