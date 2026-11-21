@@ -890,6 +890,105 @@ export type LeiLookup = {
   source: string;
 };
 
+export type BankCodeLookup = {
+  code: string;
+  country: string;
+  name: string | null;
+  bic: string | null;
+  found: boolean;
+  source: string;
+};
+
+export type BankCodeEntry = {
+  code: string;
+  name: string;
+  bic: string | null;
+};
+
+export type BankCodeList = {
+  country: string;
+  items: BankCodeEntry[];
+  source: string;
+};
+
+export type EuVatRateCountry = {
+  country: string;
+  standard: number;
+  reduced: number[];
+};
+
+export type EuVatRates = {
+  country: string | null;
+  standard: number | null;
+  reduced: number[];
+  countries: EuVatRateCountry[];
+  source: string;
+};
+
+export type Geolocate = {
+  ip: string | null;
+  countryCode: string | null;
+  countryName: string | null;
+  source: string;
+};
+
+export type MfEinvoiceItem = {
+  id: string | null;
+  format: string | null;
+  customerName: string | null;
+  supplierName: string | null;
+  customerIco: string | null;
+  supplierIco: string | null;
+  issuedAt: string | null;
+};
+
+export type MfEinvoiceLookup = {
+  ico: string;
+  found: boolean;
+  invoices: MfEinvoiceItem[];
+  source: string;
+};
+
+export type CzJusticePdfLink = {
+  title: string;
+  url: string;
+};
+
+export type CzJusticePdf = {
+  ico: string;
+  found: boolean;
+  links: CzJusticePdfLink[];
+  source: string;
+};
+
+export type OpenDataDataset = {
+  title: string | null;
+  url: string | null;
+  organization: string | null;
+  notes: string | null;
+};
+
+export type OpenDataSearch = {
+  query: string;
+  country: string;
+  found: boolean;
+  datasets: OpenDataDataset[];
+  source: string;
+};
+
+export type AvatarLookup = {
+  emailHash: string;
+  gravatarUrl: string;
+  libravatarUrl: string;
+  source: string;
+};
+
+export type PasswordCheck = {
+  pwned: boolean;
+  count: number;
+  source: string;
+};
+
 export type OverdueJobSettings = {
   enabled: boolean;
   runAtHourUtc: number;

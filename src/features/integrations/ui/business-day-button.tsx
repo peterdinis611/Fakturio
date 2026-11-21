@@ -8,6 +8,8 @@ import { toast } from "@/shared/toast";
 import { Button } from "@/shared/ui/button";
 import { Spinner } from "@/shared/ui/spinner";
 
+const BUSINESS_DAY_COUNTRIES = new Set(["SK", "CZ", "AT", "HU", "PL"]);
+
 type Props = {
   from: string | null | undefined;
   addDays?: number;
@@ -25,7 +27,7 @@ export function BusinessDayButton({
   const [pending, startTransition] = useTransition();
   const date = (from ?? "").trim();
   const cc = (country || "SK").toUpperCase();
-  const supported = cc === "SK" || cc === "CZ";
+  const supported = BUSINESS_DAY_COUNTRIES.has(cc);
 
   function run() {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {

@@ -35,6 +35,15 @@ Služby s ApiKey / tokenom (Resend, Brevo, …) zatiaľ nepoužívame. **FIO Ban
 | E-mail typo hint (lokálne) | Bežné preklepy domén | ✅ customer form |
 | [Peppol directory](https://directory.peppol.eu/) | E-invoice účastník (stub) | ✅ soft-fail |
 | ISDOC 6.0.1 (lokálne) | XML export faktúry | ✅ `GET /api/invoices/{id}/isdoc` |
+| NBS / ČNB bank codes (lokálne JSON) | SK/CZ kód → BIC / názov | ✅ `bank-code`, `bank-codes` + IBAN local |
+| [VATcomply](https://www.vatcomply.com/) | TEDB DPH sadzby, IBAN fallback, geolocate | ✅ `vat-rates`, `geolocate`, IBAN enrich |
+| MF SR eInvoice | Verejné UBL/D16B metadáta | ✅ `einvoice` (soft-fail) |
+| CZ Justice / OR odkazy | Deep-link výpis podľa IČO | ✅ `cz-justice-pdf` |
+| data.gov.sk / data.gov.cz | CKAN package_search | ✅ `open-data` |
+| open.er-api.com | FX fallback po ECB/NBS/Frankfurter | ✅ CompositeFx `open-er-api` |
+| AT/HU/PL sviatky (lokálne) | Business-day splatnosť B2B | ✅ `business-day` country AT\|HU\|PL |
+| Gravatar / Libravatar | Avatar URL z e-mailu | ✅ `avatar` |
+| [HIBP range](https://haveibeenpwned.com/API/v3#PwnedPasswords) | Soft check hesla (k-anonymity) | ✅ `POST password-check` |
 
 ## E-mail (voliteľné — ApiKey / SMTP)
 
@@ -96,6 +105,15 @@ Služby s ApiKey / tokenom (Resend, Brevo, …) zatiaľ nepoužívame. **FIO Ban
 - `GET /api/integrations/countries` — REST Countries (cached)
 - `GET /api/integrations/email-typo?email=` — doménový preklep
 - `GET /api/integrations/peppol?ico=` — Peppol directory (stub)
+- `GET /api/integrations/bank-code?code=&country=` — NBS/ČNB kód → banka/BIC
+- `GET /api/integrations/bank-codes?country=` — celý lokálny číselník
+- `GET /api/integrations/vat-rates?country=` — EU TEDB sadzby (VATcomply)
+- `GET /api/integrations/geolocate?ip=` — krajina podľa IP (VATcomply)
+- `GET /api/integrations/einvoice?ico=` — MF SR eInvoice public list
+- `GET /api/integrations/cz-justice-pdf?ico=` — CZ Justice / OR deep-linky
+- `GET /api/integrations/open-data?q=&country=` — data.gov.sk/cz search
+- `GET /api/integrations/avatar?email=` — Gravatar + Libravatar URL
+- `POST /api/integrations/password-check` — HIBP range (body `{ password }`)
 - `GET|POST /api/payments/import/fio/preview?from=&to=` — náhľad párovania platieb z FIO (vyžaduje token)
 - `GET /api/invoices/{id}/isdoc` — ISDOC 6.0.1 XML export
 

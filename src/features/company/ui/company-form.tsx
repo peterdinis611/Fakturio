@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -23,6 +23,10 @@ import { RpvsButton } from "@/features/integrations/ui/rpvs-button";
 import { SanctionsButton } from "@/features/integrations/ui/sanctions-button";
 import { ObchodnyVestnikButton } from "@/features/integrations/ui/obchodny-vestnik-button";
 import { PeppolButton } from "@/features/integrations/ui/peppol-button";
+import { geolocateAction } from "@/features/integrations/api/integrations";
+import { EinvoiceLookupButton } from "@/features/integrations/ui/einvoice-lookup-button";
+import { CzJusticePdfButton } from "@/features/integrations/ui/cz-justice-pdf-button";
+import { OpenDataSearchButton } from "@/features/integrations/ui/open-data-search-button";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
 import { ViesVerifyButton } from "@/features/registry/ui/vies-verify-button";
 import { useRegistryLookup } from "@/features/registry/ui/use-registry-lookup";
@@ -263,6 +267,22 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
     onFound: applyRegistry,
   });
 
+  // One-shot: when the saved company has no country yet, preselect from IP geolocation.
+  useEffect(() => {
+    if (initial.country) return;
+    let cancelled = false;
+    void geolocateAction({}).then((result) => {
+      if (cancelled) return;
+      const cc = result?.data?.countryCode?.trim().toUpperCase();
+      if (!cc || cc.length !== 2) return;
+      setValue("country", cc, { shouldDirty: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function applyFieldErrors(fieldErrors?: Record<string, string>) {
     if (!fieldErrors) return;
     for (const [key, message] of Object.entries(fieldErrors)) {
@@ -449,6 +469,7 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 <RpvsButton ico={ico} />
                 <ObchodnyVestnikButton ico={ico} />
                 <PeppolButton ico={ico} />
+                <EinvoiceLookupButton ico={ico} />
               </>
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
@@ -457,9 +478,11 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
                 <AresVrButton ico={ico} />
                 <RegistrSmluvButton ico={ico} />
                 <PeppolButton ico={ico} />
+                <CzJusticePdfButton ico={ico} />
               </>
             ) : null}
             <SanctionsButton query={name || ico} />
+            <OpenDataSearchButton query={name} country={country} />
           </div>
         </Field>
         <Field className="sm:col-span-2">

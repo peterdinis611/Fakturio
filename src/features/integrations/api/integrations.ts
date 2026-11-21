@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 import { apiFetch } from "@/shared/api/client";
 import { isApiError } from "@/shared/api/errors";
@@ -22,6 +23,15 @@ import type {
   SkObchodnyVestnik,
   EmailTypoHint,
   PeppolLookup,
+  BankCodeLookup,
+  BankCodeList,
+  EuVatRates,
+  Geolocate,
+  MfEinvoiceLookup,
+  CzJusticePdf,
+  OpenDataSearch,
+  AvatarLookup,
+  PasswordCheck,
 } from "@/shared/api/types";
 import { ActionError, actionClient } from "@/shared/lib/safe-action";
 import { isValidIco, normalizeIco } from "@/shared/lib/validations/sk";
@@ -430,5 +440,192 @@ export const lookupLeiAction = actionClient
     } catch (error) {
       if (isApiError(error)) throw new ActionError(error.message || "LEI lookup zlyhal.");
       throw new ActionError("LEI lookup zlyhal.");
+    }
+  });
+
+const icoSchema = z
+  .string()
+  .transform((v) => normalizeIco(v))
+  .refine((v) => isValidIco(v), { message: "Neplatné IČO" });
+
+export const lookupBankCodeAction = actionClient
+  .inputSchema(
+    z.object({
+      code: z
+        .string()
+        .trim()
+        .min(1, "Zadaj kód banky")
+        .transform((v) => v.replace(/\s+/g, "")),
+      country: z.string().trim().optional().default("SK"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<BankCodeLookup>("/api/integrations/bank-code", {
+        searchParams: {
+          code: parsedInput.code,
+          country: parsedInput.country.toUpperCase(),
+        },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Kód banky sa nepodarilo overiť.");
+      throw new ActionError("Kód banky sa nepodarilo overiť.");
+    }
+  });
+
+export const listBankCodesAction = actionClient
+  .inputSchema(
+    z.object({
+      country: z.string().trim().optional().default("SK"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<BankCodeList>("/api/integrations/bank-codes", {
+        searchParams: { country: parsedInput.country.toUpperCase() },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Zoznam bánk sa nepodarilo načítať.");
+      throw new ActionError("Zoznam bánk sa nepodarilo načítať.");
+    }
+  });
+
+export const getEuVatRatesAction = actionClient
+  .inputSchema(
+    z.object({
+      country: z.string().trim().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<EuVatRates>("/api/integrations/vat-rates", {
+        searchParams: {
+          ...(parsedInput.country
+            ? { country: parsedInput.country.toUpperCase() }
+            : {}),
+        },
+        next: { revalidate: 60 * 60 },
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Sadzby DPH sa nepodarilo načítať.");
+      throw new ActionError("Sadzby DPH sa nepodarilo načítať.");
+    }
+  });
+
+export const geolocateAction = actionClient
+  .inputSchema(
+    z.object({
+      ip: z.string().trim().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      let ip = parsedInput.ip;
+      if (!ip) {
+        const h = await headers();
+        ip =
+          h.get("x-forwarded-for")?.split(",")[0]?.trim()
+          || h.get("x-real-ip")?.trim()
+          || undefined;
+      }
+      return await apiFetch<Geolocate>("/api/integrations/geolocate", {
+        searchParams: { ...(ip ? { ip } : {}) },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Geolokácia zlyhala.");
+      throw new ActionError("Geolokácia zlyhala.");
+    }
+  });
+
+export const lookupMfEinvoiceAction = actionClient
+  .inputSchema(z.object({ ico: icoSchema }))
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<MfEinvoiceLookup>("/api/integrations/einvoice", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "E-faktúra lookup zlyhal.");
+      throw new ActionError("E-faktúra lookup zlyhal.");
+    }
+  });
+
+export const lookupCzJusticePdfAction = actionClient
+  .inputSchema(z.object({ ico: icoSchema }))
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<CzJusticePdf>("/api/integrations/cz-justice-pdf", {
+        searchParams: { ico: parsedInput.ico },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Justice.cz lookup zlyhal.");
+      throw new ActionError("Justice.cz lookup zlyhal.");
+    }
+  });
+
+export const searchOpenDataAction = actionClient
+  .inputSchema(
+    z.object({
+      q: z.string().trim().min(2, "Zadaj aspoň 2 znaky"),
+      country: z.string().trim().optional(),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<OpenDataSearch>("/api/integrations/open-data", {
+        searchParams: {
+          q: parsedInput.q,
+          ...(parsedInput.country
+            ? { country: parsedInput.country.toUpperCase() }
+            : {}),
+        },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Open data vyhľadávanie zlyhalo.");
+      throw new ActionError("Open data vyhľadávanie zlyhalo.");
+    }
+  });
+
+export const lookupAvatarAction = actionClient
+  .inputSchema(
+    z.object({
+      email: z.string().trim().min(5, "Zadaj e-mail"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<AvatarLookup>("/api/integrations/avatar", {
+        searchParams: { email: parsedInput.email },
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Avatar sa nepodarilo načítať.");
+      throw new ActionError("Avatar sa nepodarilo načítať.");
+    }
+  });
+
+export const checkPasswordAction = actionClient
+  .inputSchema(
+    z.object({
+      password: z.string().min(1, "Zadaj heslo"),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    try {
+      return await apiFetch<PasswordCheck>("/api/integrations/password-check", {
+        method: "POST",
+        body: { password: parsedInput.password },
+        skipAuth: true,
+        cache: "no-store",
+      });
+    } catch (error) {
+      if (isApiError(error)) throw new ActionError(error.message || "Kontrola hesla zlyhala.");
+      throw new ActionError("Kontrola hesla zlyhala.");
     }
   });

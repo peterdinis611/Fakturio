@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "@/shared/icons";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "@/shared/toast";
 import { loginAction, registerAction } from "@/features/auth/api/auth";
+import { checkPasswordAction } from "@/features/integrations/api/integrations";
 import { actionErrorMessage } from "@/shared/lib/action-utils";
 import {
   evaluatePasswordRules,
@@ -25,6 +26,9 @@ const DEMO_LOGIN_ENABLED =
   process.env.NODE_ENV === "development"
   || process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
 
+/** Breach count above which the warning is phrased more strongly (still non-blocking). */
+const PWNED_HUGE_THRESHOLD = 100_000;
+
 type AuthFormProps = {
   mode: "sign-in" | "sign-up";
 };
@@ -38,6 +42,7 @@ const RULE_LABEL: Record<PasswordRuleId, "passwordRuleMin" | "passwordRuleUpper"
 
 export function AuthForm({ mode }: AuthFormProps) {
   const t = useTranslations("Auth");
+  const tr = useTranslations("Registry");
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
@@ -73,6 +78,20 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     startTransition(async () => {
+      if (mode === "sign-up") {
+        // Soft warning only (HIBP k-anonymity via backend); never blocks sign-up.
+        const check = await checkPasswordAction({ password }).catch(() => null);
+        const pwned = check?.data;
+        if (pwned?.pwned && pwned.count > 0) {
+          const count = pwned.count.toLocaleString();
+          toast.warning(
+            pwned.count >= PWNED_HUGE_THRESHOLD
+              ? tr("passwordPwnedHuge", { count })
+              : tr("passwordPwned", { count }),
+          );
+        }
+      }
+
       const result =
         mode === "sign-in"
           ? await loginAction({

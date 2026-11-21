@@ -15,6 +15,7 @@ import { getCompany } from "@/features/company/api/company";
 import { GdprPanel } from "@/features/gdpr/ui/gdpr-panel";
 import { LogoUploader } from "@/features/profile/ui/logo-uploader";
 import { ProfileAccountForm } from "@/features/profile/ui/profile-account-form";
+import { ProfileAvatar } from "@/features/integrations/ui/profile-avatar";
 import { ProfilePasswordForm } from "@/features/profile/ui/profile-password-form";
 import { ProfileSection } from "@/features/profile/ui/profile-section";
 import { ProfileSignOut } from "@/features/profile/ui/profile-sign-out";
@@ -78,7 +79,11 @@ export default async function ProfilePage() {
         aria-label={displayName}
       >
         <div className="profile-monogram" aria-hidden>
-          {mark}
+          <ProfileAvatar
+            email={user.email}
+            fallback={mark}
+            className="absolute inset-0 size-full rounded-[5px] object-cover"
+          />
         </div>
         <div className="profile-identity-copy">
           <div className="flex flex-wrap items-center gap-2">

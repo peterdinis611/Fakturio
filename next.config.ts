@@ -76,7 +76,14 @@ function cspConnectSources(): string[] {
 }
 
 function cspImageSources(): string[] {
-  const origins = new Set<string>(["'self'", "data:", "blob:"]);
+  const origins = new Set<string>([
+    "'self'",
+    "data:",
+    "blob:",
+    // Gravatar (profile avatar via /api/integrations/avatar)
+    "https://*.gravatar.com",
+    "https://gravatar.com",
+  ]);
   for (const raw of [apiBase, publicApiBase, appUrl]) {
     try {
       origins.add(new URL(raw).origin);

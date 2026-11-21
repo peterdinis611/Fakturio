@@ -26,6 +26,9 @@ import { RpvsButton } from "@/features/integrations/ui/rpvs-button";
 import { SanctionsButton } from "@/features/integrations/ui/sanctions-button";
 import { ObchodnyVestnikButton } from "@/features/integrations/ui/obchodny-vestnik-button";
 import { PeppolButton } from "@/features/integrations/ui/peppol-button";
+import { EinvoiceLookupButton } from "@/features/integrations/ui/einvoice-lookup-button";
+import { CzJusticePdfButton } from "@/features/integrations/ui/cz-justice-pdf-button";
+import { OpenDataSearchButton } from "@/features/integrations/ui/open-data-search-button";
 import { EmailTypoHint } from "@/features/integrations/ui/email-typo-hint";
 import { CompanySearchField } from "@/features/registry/ui/company-search-field";
 import { IcoLookupField } from "@/features/registry/ui/ico-lookup-field";
@@ -281,6 +284,7 @@ export function CustomerForm({
                 <RpvsButton ico={ico} />
                 <ObchodnyVestnikButton ico={ico} />
                 <PeppolButton ico={ico} />
+                <EinvoiceLookupButton ico={ico} />
               </>
             ) : null}
             {(country ?? "").toUpperCase() === "CZ" ? (
@@ -289,9 +293,11 @@ export function CustomerForm({
                 <AresVrButton ico={ico} />
                 <RegistrSmluvButton ico={ico} />
                 <PeppolButton ico={ico} />
+                <CzJusticePdfButton ico={ico} />
               </>
             ) : null}
             <SanctionsButton query={name || ico} />
+            <OpenDataSearchButton query={name} country={country} />
           </div>
         </div>
         <div className={fieldClass}>

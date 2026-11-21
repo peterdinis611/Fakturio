@@ -42,6 +42,7 @@ import {
 } from "@/features/invoices/lib/reverse-charge";
 import { FxRateHint } from "@/features/fx/ui/fx-rate-hint";
 import { BusinessDayButton } from "@/features/integrations/ui/business-day-button";
+import { VatRateHint } from "@/features/integrations/ui/vat-rate-hint";
 import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
 import { CurrencySelect } from "@/shared/ui/currency-select";
 import { DatePicker } from "@/shared/ui/date-picker";
@@ -568,6 +569,26 @@ export function InvoiceForm({
                   {ti("reverseChargeBadge")}
                 </Badge>
               </div>
+            ) : null}
+            {isVatPayer && !reverseCharge ? (
+              <VatRateHint
+                country={
+                  customerOptions.find((c) => c.id === watchedCustomerId)?.country
+                }
+                disabled={readOnly || pending}
+                onApply={
+                  readOnly
+                    ? undefined
+                    : (rate) => {
+                        (watchedItems ?? []).forEach((_, index) =>
+                          setValue(`items.${index}.vatRate`, rate, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          }),
+                        );
+                      }
+                }
+              />
             ) : null}
           </div>
           <div className={fieldClass}>
