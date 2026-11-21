@@ -110,7 +110,10 @@ const createInvoiceSchema = invoiceSchema.and(
 );
 
 const updateInvoiceSchema = invoiceSchema.and(
-  z.object({ id: z.string().uuid("Neplatné ID faktúry") }),
+  z.object({
+    id: z.string().uuid("Neplatné ID faktúry"),
+    expectedUpdatedAt: z.string().min(1).optional().nullable(),
+  }),
 );
 
 const invoiceIdSchema = z.object({ id: z.string().uuid("Neplatné ID faktúry") });
@@ -127,6 +130,11 @@ function throwMappedApiError(schema: z.ZodType, error: unknown): never {
             { _errors: [message] },
           ]),
         ) as never,
+      );
+    }
+    if (error.status === 409 || error.problem.code === "conflict") {
+      throw new ActionError(
+        "Doklad medzičasom niekto upravil. Obnov stránku a skús znova.",
       );
     }
     throw new ActionError(error.message);
@@ -181,6 +189,7 @@ export const updateInvoiceAction = actionClient
       bankBic: values.bankBic,
       notes: values.notes,
       items: values.items,
+      expectedUpdatedAt: values.expectedUpdatedAt ?? null,
     };
 
     try {

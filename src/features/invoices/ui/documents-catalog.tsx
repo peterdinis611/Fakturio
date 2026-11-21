@@ -25,9 +25,13 @@ import type {
   InvoiceStatus,
   PagedResponse,
 } from "@/shared/api/types";
-import { invoicesExportHref, moneyS3ExportHref } from "@/shared/lib/exports";
+import {
+  expensesExportHref,
+  invoicesExportHref,
+  moneyS3ExportHref,
+} from "@/shared/lib/exports";
 
-/** Client fuzzy search window — keep payload small for faster RSC. */
+/** Catalog page size — server `search` filters the full set; fuzzy refines the page. */
 const CATALOG_SIZE = 100;
 
 export type DocumentsCatalogSearchParams = {
@@ -64,7 +68,10 @@ export function loadDocumentsCatalog(
   flow: DocumentFlow,
   searchParams: DocumentsCatalogSearchParams,
 ): Promise<DocumentsCatalogData> {
-  const { status, documentType, overdueOnly } = parseFilters(flow, searchParams);
+  const { status, documentType, search, overdueOnly } = parseFilters(
+    flow,
+    searchParams,
+  );
   return Promise.all([
     listInvoices({
       page: 1,
@@ -73,6 +80,7 @@ export function loadDocumentsCatalog(
       documentType,
       overdueOnly,
       flow,
+      search: search || undefined,
     }),
     getCompanySummary().catch(() => null),
   ]).then(([data, company]) => ({ data, company }));
@@ -147,7 +155,25 @@ async function DocumentsCatalogBody({ flow, searchParams, dataPromise }: Props) 
                     </a>
                   </Button>
                 </>
-              ) : null}
+              ) : (
+                <>
+                  <CsvPreview
+                    href={expensesExportHref({ status })}
+                    title={t("expensesCsvTitle")}
+                    description={
+                      status
+                        ? t("expensesCsvFiltered", { status })
+                        : t("expensesCsvAll")
+                    }
+                  />
+                  <Button asChild variant="ghost" size="sm">
+                    <a href={expensesExportHref({ status })} download>
+                      <Download className="size-3.5" aria-hidden />
+                      {tc("download")}
+                    </a>
+                  </Button>
+                </>
+              )}
               {create ? (
                 <InvoiceReadyLink href={create.href} ready={ready}>
                   {td(create.labelKey)}

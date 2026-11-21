@@ -108,6 +108,8 @@ function toFormValues(initial: CompanySettings): CompanyFormInput {
     defaultVatRate: initial.defaultVatRate,
     defaultCurrency: initial.defaultCurrency || "EUR",
     invoicePrefix: initial.invoicePrefix ?? "",
+    proformaPrefix: initial.proformaPrefix ?? "",
+    creditNotePrefix: initial.creditNotePrefix ?? "",
     defaultPaymentMethod: initial.defaultPaymentMethod ?? "",
     defaultConstantSymbol: initial.defaultConstantSymbol ?? "",
     defaultInvoiceNotes: initial.defaultInvoiceNotes ?? "",
@@ -479,12 +481,18 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
             <Switch
               id="isVatPayer"
               checked={isVatPayer}
-              onCheckedChange={(checked) =>
+              onCheckedChange={(checked) => {
                 setValue("isVatPayer", checked, {
                   shouldDirty: true,
                   shouldValidate: true,
-                })
-              }
+                });
+                if (!checked) {
+                  setValue("defaultVatRate", 0, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                }
+              }}
             />
           </div>
         </Field>
@@ -720,6 +728,14 @@ export function CompanyForm({ initial, mode }: CompanyFormProps) {
         <Field>
           <Label htmlFor="invoicePrefix">{t("invoicePrefix")}</Label>
           <Input id="invoicePrefix" {...register("invoicePrefix")} />
+        </Field>
+        <Field>
+          <Label htmlFor="proformaPrefix">{t("proformaPrefix")}</Label>
+          <Input id="proformaPrefix" {...register("proformaPrefix")} />
+        </Field>
+        <Field>
+          <Label htmlFor="creditNotePrefix">{t("creditNotePrefix")}</Label>
+          <Input id="creditNotePrefix" {...register("creditNotePrefix")} />
         </Field>
         <Field>
           <Label htmlFor="defaultPaymentMethod">{t("paymentMethod")}</Label>

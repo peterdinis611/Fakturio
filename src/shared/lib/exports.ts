@@ -20,6 +20,14 @@ export function invoicesExportHref(params?: {
   return withRange("/api/exports/invoices", params);
 }
 
+export function expensesExportHref(params?: {
+  from?: string;
+  to?: string;
+  status?: string;
+}) {
+  return withRange("/api/exports/expenses", params);
+}
+
 export function vatExportHref(params?: { from?: string; to?: string }) {
   return withRange("/api/exports/vat", params);
 }

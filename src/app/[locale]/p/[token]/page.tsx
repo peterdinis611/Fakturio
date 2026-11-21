@@ -64,11 +64,13 @@ export async function generateMetadata({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const robots = { index: false, follow: false };
   try {
     const inv = await getPublicInvoice(token);
-    return { title: `${inv.number} · Fakturio` };
+    return { title: `${inv.number} · Fakturio`, robots };
   } catch {
-    return { title: "Doklad · Fakturio" };
+    const t = await getTranslations("PublicLink");
+    return { title: t("metaFallback"), robots };
   }
 }
 
@@ -79,6 +81,7 @@ export default async function PublicInvoicePage({
 }) {
   const { token } = await params;
   const t = await getTranslations("InvoiceDetail");
+  const tPublic = await getTranslations("PublicLink");
   const locale = (await getLocale()) as AppLocale;
 
   let invoice;
@@ -222,7 +225,7 @@ export default async function PublicInvoicePage({
         ) : null}
 
         <p className="mt-10 text-center text-[11px] uppercase tracking-widest text-faint">
-          Fakturio · verejný náhľad dokladu
+          {tPublic("footer")}
         </p>
       </main>
     </div>

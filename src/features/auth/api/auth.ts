@@ -32,6 +32,7 @@ async function authSchemas() {
     login: z.object({
       email: z.email(t("emailInvalid")),
       password: z.string().min(1, t("passwordRequired")).max(128),
+      turnstileToken: z.string().trim().optional(),
     }),
   };
 }
@@ -88,6 +89,7 @@ export const loginAction = actionClient
         body: {
           email: parsedInput.email,
           password: parsedInput.password,
+          turnstileToken: parsedInput.turnstileToken || null,
         },
         cache: "no-store",
       });

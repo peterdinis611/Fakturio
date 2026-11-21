@@ -34,7 +34,12 @@ import {
 } from "@/entities/invoice/model/schema";
 import { cn } from "@/shared/lib/utils";
 import type { AppLocale } from "@/i18n/routing";
+import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
+import {
+  allItemsZeroVat,
+  isReverseCharge,
+} from "@/features/invoices/lib/reverse-charge";
 import { FxRateHint } from "@/features/fx/ui/fx-rate-hint";
 import { BusinessDayButton } from "@/features/integrations/ui/business-day-button";
 import { IbanLookupField } from "@/features/integrations/ui/iban-lookup-field";
@@ -65,8 +70,15 @@ type CompanyDefaults = {
   country?: string | null;
 };
 
+type CustomerOption = {
+  id: string;
+  name: string;
+  country?: string | null;
+  icDph?: string | null;
+};
+
 type InvoiceFormProps = {
-  customers: { id: string; name: string }[];
+  customers: CustomerOption[];
   initial?: Invoice | null;
   companyDefaults?: CompanyDefaults;
   defaultCustomerId?: string;
@@ -218,6 +230,28 @@ export function InvoiceForm({
   const currency = watch("currency") || "EUR";
   const issueDate = watch("issueDate");
   const bankIban = watch("bankIban");
+  const watchedCustomerId = watch("customerId");
+
+  const reverseCharge = useMemo(() => {
+    if ((initial?.flow ?? defaultFlow) === "Received") return false;
+    const customer = customerOptions.find((c) => c.id === watchedCustomerId);
+    if (!customer) return false;
+    return isReverseCharge({
+      sellerIsVatPayer: isVatPayer,
+      sellerCountry: companyDefaults?.country,
+      customerCountry: customer.country,
+      customerIcDph: customer.icDph,
+      itemsAllZeroVat: allItemsZeroVat(watchedItems),
+    });
+  }, [
+    initial?.flow,
+    defaultFlow,
+    customerOptions,
+    watchedCustomerId,
+    isVatPayer,
+    companyDefaults?.country,
+    watchedItems,
+  ]);
 
   const grandTotal = useMemo(() => {
     return (watchedItems ?? []).reduce(
@@ -358,7 +392,11 @@ export function InvoiceForm({
 
     startTransition(async () => {
       const result = isEdit
-        ? await updateInvoiceAction({ ...payload, id: initial!.id })
+        ? await updateInvoiceAction({
+            ...payload,
+            id: initial!.id,
+            expectedUpdatedAt: initial!.updatedAt,
+          })
         : await createInvoiceAction({
             ...payload,
             status: status ?? "Draft",
@@ -472,7 +510,15 @@ export function InvoiceForm({
                   onCreated={(customer) => {
                     setCustomerOptions((prev) => {
                       if (prev.some((c) => c.id === customer.id)) return prev;
-                      return [...prev, { id: customer.id, name: customer.name }].sort(
+                      return [
+                        ...prev,
+                        {
+                          id: customer.id,
+                          name: customer.name,
+                          country: customer.country,
+                          icDph: customer.icDph,
+                        },
+                      ].sort(
                         (a, b) => a.name.localeCompare(b.name, locale),
                       );
                     });
@@ -513,6 +559,16 @@ export function InvoiceForm({
               )}
             />
             <FieldError message={errors.customerId?.message} />
+            {reverseCharge ? (
+              <div>
+                <Badge
+                  variant="outline"
+                  className="rounded-[4px] text-[11px] font-medium"
+                >
+                  {ti("reverseChargeBadge")}
+                </Badge>
+              </div>
+            ) : null}
           </div>
           <div className={fieldClass}>
             <Label htmlFor="issueDate">Dátum vystavenia</Label>

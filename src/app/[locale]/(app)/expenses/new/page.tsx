@@ -72,7 +72,12 @@ export default async function NewExpensePage({
         }
       />
       <InvoiceForm
-        customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
+        customers={customers.items.map((c) => ({
+          id: c.id,
+          name: c.name,
+          country: c.country,
+          icDph: c.icDph,
+        }))}
         defaultCustomerId={sp.customerId}
         defaultDocumentType={documentType}
         defaultFlow="Received"

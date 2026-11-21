@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Copy, Link2 } from "@/shared/icons";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "@/shared/toast";
 import { setInvoicePublicLinkAction } from "@/features/invoices/api/public";
 import type { PublicLink } from "@/shared/api/types";
@@ -22,6 +22,7 @@ type Props = {
 
 export function InvoicePublicLink({ invoiceId, invoiceStatus, initial }: Props) {
   const locale = useLocale() as AppLocale;
+  const t = useTranslations("PublicLink");
   const [pending, startTransition] = useTransition();
   const [link, setLink] = useState(initial);
 
@@ -38,13 +39,11 @@ export function InvoicePublicLink({ invoiceId, invoiceStatus, initial }: Props) 
     startTransition(async () => {
       const result = await setInvoicePublicLinkAction({ id: invoiceId, enabled });
       if (!result?.data) {
-        toast.error(
-          actionErrorMessage(result ?? {}) ?? "Verejný odkaz sa nepodarilo uložiť",
-        );
+        toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
         return;
       }
       setLink(result.data);
-      toast.success(enabled ? "Verejný odkaz je zapnutý" : "Verejný odkaz je vypnutý");
+      toast.success(enabled ? t("enabled") : t("disabled"));
     });
   }
 
@@ -53,9 +52,9 @@ export function InvoicePublicLink({ invoiceId, invoiceStatus, initial }: Props) 
     if (!url) return;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Odkaz skopírovaný");
+      toast.success(t("copied"));
     } catch {
-      toast.error("Kopírovanie zlyhalo");
+      toast.error(t("copyFailed"));
     }
   }
 
@@ -67,10 +66,10 @@ export function InvoicePublicLink({ invoiceId, invoiceStatus, initial }: Props) 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <Link2 aria-hidden className="size-4 text-muted-foreground" />
-            <h2 className="text-[14px] font-medium text-ink">Verejný odkaz</h2>
+            <h2 className="text-[14px] font-medium text-ink">{t("title")}</h2>
           </div>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Zákazník môže zobraziť doklad a stiahnuť PDF bez prihlásenia.
+            {t("description")}
           </p>
         </div>
         <CardToggle
@@ -97,7 +96,7 @@ export function InvoicePublicLink({ invoiceId, invoiceStatus, initial }: Props) 
             onClick={copyUrl}
           >
             <Copy className="size-3.5" aria-hidden />
-            Kopírovať
+            {t("copy")}
           </Button>
         </div>
       ) : null}
@@ -116,6 +115,7 @@ function CardToggle({
   disabled: boolean;
   onCheckedChange: (next: boolean) => void;
 }) {
+  const t = useTranslations("PublicLink");
   return (
     <div className="flex items-center gap-2">
       <Switch
@@ -125,7 +125,7 @@ function CardToggle({
         onCheckedChange={onCheckedChange}
       />
       <Label htmlFor={id} className="sr-only">
-        Zapnúť verejný odkaz
+        {t("title")}
       </Label>
     </div>
   );

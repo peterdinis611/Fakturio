@@ -172,6 +172,8 @@ export type CompanySettings = {
   defaultVatRate: number;
   defaultCurrency: string;
   invoicePrefix: string | null;
+  proformaPrefix: string | null;
+  creditNotePrefix: string | null;
   defaultPaymentMethod: string | null;
   defaultConstantSymbol: string | null;
   defaultInvoiceNotes: string | null;
@@ -336,6 +338,7 @@ export type Invoice = {
   daysUntilDue: number | null;
   createdAt: string;
   updatedAt: string;
+  isReverseCharge?: boolean;
   items: InvoiceItem[];
 };
 
@@ -390,6 +393,7 @@ export type UpdateInvoiceInput = {
   bankBic?: string | null;
   notes?: string | null;
   items: InvoiceItemInput[];
+  expectedUpdatedAt?: string | null;
 };
 
 export type InvoiceStats = {

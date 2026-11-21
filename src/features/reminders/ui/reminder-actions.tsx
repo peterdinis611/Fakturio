@@ -27,7 +27,7 @@ export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
         startTransition(async () => {
           const result = await markReminderSentAction({ id: invoiceId });
           if (!result?.data) {
-            toast.error(actionErrorMessage(result ?? {}) ?? "Uloženie zlyhalo");
+            toast.error(actionErrorMessage(result ?? {}) ?? t("saveFailed"));
             return;
           }
           toast.success(t("markedSent"));
@@ -35,7 +35,7 @@ export function MarkReminderSentButton({ invoiceId }: { invoiceId: string }) {
         });
       }}
     >
-      {pending ? "Ukladám…" : t("markSent")}
+      {pending ? t("saving") : t("markSent")}
     </Button>
   );
 }
@@ -55,13 +55,13 @@ export function SyncOverdueButton() {
           const result = await syncOverdueAction();
           if (!result?.data) {
             toast.error(
-              actionErrorMessage(result ?? {}) ?? "Synchronizácia zlyhala",
+              actionErrorMessage(result ?? {}) ?? t("syncFailed"),
             );
             return;
           }
           toast.success(
             result.data.updatedCount > 0
-              ? `Aktualizovaných ${result.data.updatedCount} faktúr`
+              ? t("updatedCount", { count: result.data.updatedCount })
               : t("noChanges"),
           );
           router.refresh();
@@ -69,7 +69,7 @@ export function SyncOverdueButton() {
       }}
     >
       <RefreshCw className={pending ? "animate-spin" : undefined} />
-      {pending ? "Synchronizujem…" : t("refreshOverdue")}
+      {pending ? t("syncing") : t("refreshOverdue")}
     </Button>
   );
 }

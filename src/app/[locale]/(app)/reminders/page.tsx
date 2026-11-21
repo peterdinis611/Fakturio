@@ -78,7 +78,9 @@ function ReminderRow({
             {r.customerName}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[12px] text-muted-foreground">
-            <span>Splatnosť {formatDate(r.dueDate, locale)}</span>
+            <span>
+              {tr("dueDateLabel", { date: formatDate(r.dueDate, locale) })}
+            </span>
             {r.customerEmail ? (
               <span className="inline-flex items-center gap-1 truncate">
                 <Mail className="size-3" aria-hidden />
@@ -202,10 +204,12 @@ export default async function RemindersPage({
         ledger={
           reminders.length > 0 ? (
             <>
-              <span className="data-num">{reminders.length} položiek</span>
+              <span className="data-num">
+                {t("itemsCount", { count: reminders.length })}
+              </span>
               {overdue.length > 0 ? (
                 <span className="text-negative">
-                  {overdue.length} po splatnosti ·{" "}
+                  {t("overdueCount", { count: overdue.length })} ·{" "}
                   <span className="money">
                     {formatMoney(overdueSum, currency, locale)}
                   </span>
@@ -215,7 +219,7 @@ export default async function RemindersPage({
               )}
               {!onlyOverdue && upcoming.length > 0 ? (
                 <span>
-                  {upcoming.length} blíži sa ·{" "}
+                  {t("upcomingCount", { count: upcoming.length })} ·{" "}
                   <span className="money">
                     {formatMoney(upcomingSum, currency, locale)}
                   </span>
@@ -295,19 +299,19 @@ export default async function RemindersPage({
 
             <ul className="mt-8 grid gap-2 text-[13px] sm:grid-cols-3">
               <li className="border border-dashed border-border px-3 py-3">
-                <p className="text-faint">Horizont</p>
+                <p className="text-faint">{t("horizon")}</p>
                 <p className="mt-0.5 font-medium text-ink">
                   {t("withinDays", { count: withinDays })}
                 </p>
               </li>
               <li className="border border-dashed border-border px-3 py-3">
-                <p className="text-faint">Filter</p>
+                <p className="text-faint">{t("filter")}</p>
                 <p className="mt-0.5 font-medium text-ink">
                   {onlyOverdue ? t("onlyOverdue") : t("upcoming")}
                 </p>
               </li>
               <li className="border border-dashed border-border px-3 py-3">
-                <p className="text-faint">Akcia</p>
+                <p className="text-faint">{t("action")}</p>
                 <p className="mt-0.5 font-medium text-ink">
                   {t("refreshOverdue")}
                 </p>

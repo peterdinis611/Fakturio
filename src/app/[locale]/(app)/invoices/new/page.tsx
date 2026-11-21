@@ -87,7 +87,12 @@ export default async function NewInvoicePage({
         }
       />
       <InvoiceForm
-        customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
+        customers={customers.items.map((c) => ({
+          id: c.id,
+          name: c.name,
+          country: c.country,
+          icDph: c.icDph,
+        }))}
         defaultCustomerId={sp.customerId}
         defaultDocumentType={documentType}
         catalogItems={services.items}

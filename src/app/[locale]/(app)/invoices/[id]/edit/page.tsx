@@ -53,7 +53,12 @@ export default async function EditInvoicePage({
       <PageHeader title={`${t("editTitle")} · ${invoice.number}`} />
       <InvoiceForm
         initial={invoice}
-        customers={customers.items.map((c) => ({ id: c.id, name: c.name }))}
+        customers={customers.items.map((c) => ({
+          id: c.id,
+          name: c.name,
+          country: c.country,
+          icDph: c.icDph,
+        }))}
         catalogItems={services.items}
         defaultFlow={invoice.flow}
         companyDefaults={{

@@ -21,6 +21,9 @@ import { TurnstileWidget } from "@/features/auth/ui/turnstile-widget";
 import "./auth-form.css";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+const DEMO_LOGIN_ENABLED =
+  process.env.NODE_ENV === "development"
+  || process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
 
 type AuthFormProps = {
   mode: "sign-in" | "sign-up";
@@ -55,7 +58,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     e.preventDefault();
     setError(null);
 
-    if (mode === "sign-up" && TURNSTILE_SITE_KEY && !turnstileToken) {
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
       const message = t("turnstileRequired");
       setError(message);
       toast.error(message);
@@ -72,7 +75,11 @@ export function AuthForm({ mode }: AuthFormProps) {
     startTransition(async () => {
       const result =
         mode === "sign-in"
-          ? await loginAction({ email, password })
+          ? await loginAction({
+              email,
+              password,
+              turnstileToken: turnstileToken ?? undefined,
+            })
           : await registerAction({
               email,
               password,
@@ -223,7 +230,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         </div>
       ) : null}
 
-      {mode === "sign-up" && TURNSTILE_SITE_KEY ? (
+      {TURNSTILE_SITE_KEY ? (
         <TurnstileWidget siteKey={TURNSTILE_SITE_KEY} onToken={setTurnstileToken} />
       ) : null}
 
@@ -234,7 +241,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         disabled={
           pending
           || (mode === "sign-up" && !privacyAccepted)
-          || (mode === "sign-up" && !!TURNSTILE_SITE_KEY && !turnstileToken)
+          || (!!TURNSTILE_SITE_KEY && !turnstileToken)
         }
         className="w-full"
       >
@@ -250,7 +257,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         )}
       </Button>
 
-      {mode === "sign-in" ? (
+      {mode === "sign-in" && DEMO_LOGIN_ENABLED ? (
         <div className="space-y-2">
           <div className="relative flex items-center gap-3 py-0.5">
             <span className="h-px flex-1 bg-border" aria-hidden />
